@@ -1,3 +1,0 @@
-# SmartEdu
-# SmartEdu
-# SmartEdu
