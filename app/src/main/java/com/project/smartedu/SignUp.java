@@ -89,20 +89,23 @@ public class SignUp extends AppCompatActivity {
             progressDialog.setMessage("Registering User...");
             progressDialog.show();
 
+
             firebaseAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
 
                     if(task.isSuccessful()){
-
-                        Toast.makeText(getApplicationContext(),"User Registration Successful",Toast.LENGTH_LONG).show();
                         progressDialog.dismiss();
+                        Toast.makeText(getApplicationContext(),"User Registration Successful",Toast.LENGTH_LONG).show();
+
 
                     }else{
-
-                        Toast.makeText(getApplicationContext(),"User Registration Failed",Toast.LENGTH_LONG).show();
                         progressDialog.dismiss();
+                        Toast.makeText(getApplicationContext(),"User Registration Failed",Toast.LENGTH_LONG).show();
+
                     }
+
+
 
                 }
             });
