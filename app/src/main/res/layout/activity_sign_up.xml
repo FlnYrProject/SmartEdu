@@ -1,34 +1,133 @@
-<?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context="com.project.smartedu.SignUp">
+    android:layout_height="wrap_content"
+    tools:context=".LoginActivity"
+    >
 
-    <android.support.design.widget.AppBarLayout
+    <RelativeLayout
+        android:id="@+id/signUpScreen"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_height="match_parent">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Name"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:lines="1"
+            android:scrollHorizontally="true"
+            android:id="@+id/nameText"
+            android:layout_marginTop="33dp"
+            android:layout_alignParentTop="true"
+            android:layout_toStartOf="@+id/passwordSignup" />
 
-    </android.support.design.widget.AppBarLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Email"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:lines="1"
+            android:scrollHorizontally="true"
+            android:id="@+id/emailText"
+            android:layout_marginTop="31dp"
+            android:layout_below="@+id/nameText"
+            android:layout_alignEnd="@+id/nameText" />
 
-    <include layout="@layout/content_sign_up" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Password"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:lines="1"
+            android:scrollHorizontally="true"
+            android:id="@+id/passwordText"
+            android:layout_marginTop="31dp"
+            android:layout_below="@+id/emailText"
+            android:layout_alignEnd="@+id/emailText" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Confirm Password"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:lines="1"
+            android:scrollHorizontally="true"
+            android:id="@+id/confirmPasswordText"
+            android:layout_marginTop="31dp"
+            android:layout_below="@+id/passwordText"
+            android:layout_alignEnd="@+id/passwordText"
+            android:layout_alignParentStart="true" />
 
-</android.support.design.widget.CoordinatorLayout>
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:ems="10"
+            android:id="@+id/userNameSignup"
+            android:layout_alignBottom="@+id/nameText"
+            android:layout_toEndOf="@+id/nameText" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
+            android:ems="10"
+            android:id="@+id/emailSignup"
+            android:layout_alignBottom="@+id/emailText"
+            android:layout_toEndOf="@+id/emailText" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:ems="10"
+            android:id="@+id/passwordSignup"
+            android:layout_alignBottom="@+id/passwordText"
+            android:layout_alignEnd="@+id/already" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:ems="10"
+            android:id="@+id/confirmPasswordSignup"
+            android:layout_above="@+id/signUpButton"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Already a SmartEdu User?"
+            android:id="@+id/already"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign Up"
+            android:id="@+id/signUpButton"
+
+            android:layout_marginTop="78dp"
+            android:layout_below="@+id/confirmPasswordText"
+            android:layout_alignRight="@+id/passwordSignup"
+            android:layout_alignEnd="@+id/passwordSignup"
+            android:background="#20BF9F"
+            android:textColor="#ffffff" />
+
+    </RelativeLayout>
+
+
+</RelativeLayout>
+
