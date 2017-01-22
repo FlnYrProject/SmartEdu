@@ -1,6 +1,7 @@
 package com.project.smartedu;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -70,6 +71,10 @@ public class SignUp extends AppCompatActivity {
 
 
     private void clickedAlreadyUser(){
+
+        finish();
+        Intent toLogin=new Intent(this,LoginActivity.class);
+        startActivity(toLogin);
 
     }
 

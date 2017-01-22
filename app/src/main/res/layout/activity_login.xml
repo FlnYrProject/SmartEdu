@@ -58,7 +58,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Log In"
-        android:id="@+id/login"
+        android:id="@+id/loginButton"
         android:layout_centerVertical="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
@@ -70,7 +70,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="Not A SmartEdu User?"
-        android:id="@+id/noUser"
+        android:id="@+id/notAlreadyUser"
         android:layout_alignParentBottom="true"
 
         android:layout_alignParentEnd="true"
