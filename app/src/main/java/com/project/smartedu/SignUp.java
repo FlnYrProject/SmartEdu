@@ -9,6 +9,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ButtonBarLayout;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -46,8 +47,11 @@ public class SignUp extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
 
 
+        Log.d("signup", "onCreate: " + firebaseAuth);
 
-
+        if(firebaseAuth.getCurrentUser()!=null){
+            Log.d("signup", "onCreate: already signed in ");
+        }
 
         alreadyUserText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,14 +102,15 @@ public class SignUp extends AppCompatActivity {
             firebaseAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
-
+                    Log.d("signup", "onComplete: here");
+                    progressDialog.dismiss();
                     if(task.isSuccessful()){
-                        progressDialog.dismiss();
+
                         Toast.makeText(getApplicationContext(),"User Registration Successful",Toast.LENGTH_LONG).show();
 
 
                     }else{
-                        progressDialog.dismiss();
+
                         Toast.makeText(getApplicationContext(),"User Registration Failed",Toast.LENGTH_LONG).show();
 
                     }
