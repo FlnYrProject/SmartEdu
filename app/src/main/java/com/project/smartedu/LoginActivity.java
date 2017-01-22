@@ -41,7 +41,8 @@ public class LoginActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
 
         if(firebaseAuth.getCurrentUser()!=null){
-            Log.d("login", "onCreate: already signed in ");
+
+
         }
 
         notAlreadyUserText.setOnClickListener(new View.OnClickListener() {
@@ -79,7 +80,7 @@ public class LoginActivity extends AppCompatActivity {
 
         }else{
 
-            Toast.makeText(getApplicationContext(),email + " " + password,Toast.LENGTH_LONG).show();
+
 
             progressDialog.setMessage("Logging In...");
             progressDialog.show();
