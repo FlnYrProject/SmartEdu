@@ -153,7 +153,8 @@ public class LoginActivity extends AppCompatActivity {
                         break;
                     }else{
 
-                        //other role
+                        Intent toChooseRole=new Intent(LoginActivity.this, ChooseRole.class);
+                        startActivity(toChooseRole);
 
                     }
 

@@ -186,7 +186,8 @@ public class SignUp extends AppCompatActivity {
                         break;
                     }else{
 
-                        //other role
+                        Intent toChooseRole=new Intent(SignUp.this, ChooseRole.class);
+                        startActivity(toChooseRole);
 
                     }
 
