@@ -2,6 +2,7 @@ package com.project.smartedu;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,6 +19,15 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+import com.project.smartedu.admin.Home;
+
+import java.util.HashMap;
+
+import static com.project.smartedu.Constants.databaseReference;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -27,6 +37,7 @@ public class LoginActivity extends AppCompatActivity {
     TextView notAlreadyUserText;
     ProgressDialog progressDialog;
     FirebaseAuth firebaseAuth;
+    DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +50,11 @@ public class LoginActivity extends AppCompatActivity {
         notAlreadyUserText=(TextView)findViewById(R.id.notAlreadyUser);
         progressDialog = new ProgressDialog(this);
         firebaseAuth = FirebaseAuth.getInstance();
+        databaseReference=Constants.databaseReference;
 
         if(firebaseAuth.getCurrentUser()!=null){
 
+        //adminCheck();
 
         }
 
@@ -96,6 +109,8 @@ public class LoginActivity extends AppCompatActivity {
 
 
                         Toast.makeText(getApplicationContext(),"User Login Successful",Toast.LENGTH_LONG).show();
+                        adminCheck();
+
 
                     }else{
 
@@ -111,5 +126,51 @@ public class LoginActivity extends AppCompatActivity {
         }
 
     }
+
+
+    public void adminCheck(){
+
+
+        databaseReference= databaseReference.child(Constants.INSTITUTION_TABLE);
+
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                HashMap<String, String> map=(HashMap<String, String>)dataSnapshot.getValue();
+
+                for(int x=0;x<map.size();x++){
+                    String userId=firebaseAuth.getCurrentUser().getUid();
+                    boolean ifadmin=map.containsKey(userId);
+
+
+                    if(ifadmin) {
+                       String name=map.get(userId);
+
+                        Toast.makeText(getApplicationContext(), "Welcome " + name + " admin", Toast.LENGTH_LONG).show();
+                        Intent toAdminConsole=new Intent(LoginActivity.this, Home.class);
+                        startActivity(toAdminConsole);
+                        break;
+                    }else{
+
+                        //other role
+
+                    }
+
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+    }
+
 
 }
