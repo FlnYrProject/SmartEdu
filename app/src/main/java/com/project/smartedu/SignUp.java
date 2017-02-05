@@ -32,6 +32,7 @@ import java.util.Map;
 
 public class SignUp extends AppCompatActivity {
 
+    EditText userNameInput;
     EditText emailInput;
     EditText passwordInput;
     EditText confirmPasswordInput;
@@ -47,6 +48,7 @@ public class SignUp extends AppCompatActivity {
         setContentView(R.layout.activity_sign_up);
 
 
+        userNameInput=(EditText)findViewById(R.id.userNameSignup);
         emailInput=(EditText)findViewById(R.id.emailSignup);
         passwordInput=(EditText)findViewById(R.id.passwordSignup);
         confirmPasswordInput=(EditText)findViewById(R.id.confirmPasswordSignup);
@@ -117,11 +119,21 @@ public class SignUp extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
 
-                    progressDialog.dismiss();
+
                     if(task.isSuccessful()){
 
+                        databaseReference=Constants.databaseReference.child(Constants.USER_DETAILS_TABLE);
+
+
+                        databaseReference.child("name").setValue(userNameInput.getText().toString());
+
+                        progressDialog.dismiss();
                         Toast.makeText(getApplicationContext(),"User Registration Successful ",Toast.LENGTH_LONG).show();
 
+
+
+                        Intent toChooseRole=new Intent(SignUp.this, ChooseRole.class);
+                        startActivity(toChooseRole);
 
                        /* databaseReference.addValueEventListener(new ValueEventListener() {
                             @Override
@@ -145,7 +157,7 @@ public class SignUp extends AppCompatActivity {
 
 
                     }else{
-
+                        progressDialog.dismiss();
                         Toast.makeText(getApplicationContext(),"User Registration Failed",Toast.LENGTH_LONG).show();
 
                     }
@@ -166,7 +178,7 @@ public class SignUp extends AppCompatActivity {
     public void adminCheck(){
 
 
-        databaseReference= databaseReference.child(Constants.INSTITUTION_TABLE);
+        databaseReference= Constants.databaseReference.child(Constants.INSTITUTION_TABLE);
 
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -181,7 +193,6 @@ public class SignUp extends AppCompatActivity {
 
                     if(ifadmin) {
                         String name=map.get(userId);
-                        //String name=map.get(userId);
                         Toast.makeText(getApplicationContext(), "Welcome " + name, Toast.LENGTH_LONG).show();
                         break;
                     }else{
