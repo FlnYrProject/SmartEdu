@@ -61,7 +61,7 @@ public class SignUp extends AppCompatActivity {
         Log.d("signup", "onCreate: " + firebaseAuth);
 
         if(firebaseAuth.getCurrentUser()!=null){
-
+            adminCheck();
 
         }
 
