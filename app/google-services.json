@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "496574299712",
+    "firebase_url": "https://smartedu-41d1a.firebaseio.com",
+    "project_id": "smartedu-41d1a",
+    "storage_bucket": "smartedu-41d1a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:496574299712:android:e7718ed3d4dae06c",
+        "android_client_info": {
+          "package_name": "com.project.smartedu"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "496574299712-fn3mc77rfkucsjqje85vi87h6el1g7h7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUJAGmQnm3ZBmlgnqHek0YOyM7_HXY_hM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
