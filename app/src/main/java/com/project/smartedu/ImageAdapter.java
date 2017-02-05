@@ -42,7 +42,7 @@ public class ImageAdapter extends BaseAdapter {
         }
         else if(role.equals("Student")) {
             return mThumbIdsStudent.length;
-        }else if(role.equals("Admin"))
+        }else if(role.equals("admin"))
         {
             return mThumbIdsAdmin.length;
         }
@@ -116,7 +116,7 @@ public class ImageAdapter extends BaseAdapter {
             imageView.setImageResource(mThumbIdsStudent[position]);
         }
 
-        else if(role.equals("Admin"))
+        else if(role.equals("admin"))
 
         {
                            /* Bitmap bitmap = decodeSampledBitmapFromResource(imageView.getResources(), mThumbIdsAdmin[position],

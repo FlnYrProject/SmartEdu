@@ -3,4 +3,6 @@
     <string name="title_activity_sign_up">SignUp</string>
     <string name="title_activity_home">Home</string>
     <string name="title_activity_choose_role">ChooseRole</string>
+    <string name="title_activity_tasks">Tasks</string>
+    <string name="title_activity_new_task">NewTask</string>
 </resources>

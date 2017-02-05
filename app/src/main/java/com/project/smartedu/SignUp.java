@@ -25,7 +25,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.project.smartedu.admin.Home;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -127,6 +129,7 @@ public class SignUp extends AppCompatActivity {
 
                         databaseReference.child("name").setValue(userNameInput.getText().toString());
 
+
                         progressDialog.dismiss();
                         Toast.makeText(getApplicationContext(),"User Registration Successful ",Toast.LENGTH_LONG).show();
 
@@ -178,7 +181,8 @@ public class SignUp extends AppCompatActivity {
     public void adminCheck(){
 
 
-        databaseReference= Constants.databaseReference.child(Constants.INSTITUTION_TABLE);
+        databaseReference= databaseReference.child(Constants.INSTITUTION_TABLE);
+
 
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -193,7 +197,10 @@ public class SignUp extends AppCompatActivity {
 
                     if(ifadmin) {
                         String name=map.get(userId);
-                        Toast.makeText(getApplicationContext(), "Welcome " + name, Toast.LENGTH_LONG).show();
+
+                        Toast.makeText(getApplicationContext(), "Welcome " + name + " admin", Toast.LENGTH_LONG).show();
+                        Intent toAdminConsole=new Intent(SignUp.this, Home.class);
+                        startActivity(toAdminConsole);
                         break;
                     }else{
 

@@ -24,10 +24,18 @@
         <activity
             android:name=".admin.Home"
             android:label="@string/title_activity_home"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ChooseRole"
             android:label="@string/title_activity_choose_role"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".common.Tasks"
+            android:label="@string/title_activity_tasks"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".common.NewTask"
+            android:label="@string/title_activity_new_task"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
