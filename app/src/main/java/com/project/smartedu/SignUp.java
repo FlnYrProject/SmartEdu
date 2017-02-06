@@ -127,7 +127,7 @@ public class SignUp extends AppCompatActivity {
                         databaseReference=Constants.databaseReference.child(Constants.USER_DETAILS_TABLE);
 
 
-                        databaseReference.child("name").setValue(userNameInput.getText().toString());
+                        databaseReference.child(firebaseAuth.getCurrentUser().getUid()).child("name").setValue(userNameInput.getText().toString());
 
 
                         progressDialog.dismiss();
@@ -196,10 +196,11 @@ public class SignUp extends AppCompatActivity {
 
 
                     if(ifadmin) {
-                        String name=map.get(userId);
+                        String institutionName=map.get(userId);
 
-                        Toast.makeText(getApplicationContext(), "Welcome " + name + " admin", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Welcome " + institutionName + " admin", Toast.LENGTH_LONG).show();
                         Intent toAdminConsole=new Intent(SignUp.this, Home.class);
+                        toAdminConsole.putExtra("institution_name",institutionName);
                         startActivity(toAdminConsole);
                         break;
                     }else{

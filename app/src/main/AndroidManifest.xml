@@ -36,6 +36,18 @@
         <activity
             android:name=".common.NewTask"
             android:label="@string/title_activity_new_task"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".admin.Teachers"
+            android:label="@string/title_activity_teachers"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".admin.NewTeacher"
+            android:label="@string/title_activity_new_teacher"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".BaseActivity"
+            android:label="@string/title_activity_base"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

@@ -15,7 +15,7 @@ public class Constants {
     public static final String USER_DETAILS_TABLE= "user_details";
     public static final String INSTITUTION_TABLE= "institution";
     public static final String TASK_TABLE= "tasks";
-
+    public static final String TEACHER_TABLE= "teachers";
 
 
 

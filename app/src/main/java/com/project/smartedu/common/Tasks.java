@@ -17,6 +17,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.R;
 
@@ -28,7 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-public class Tasks extends AppCompatActivity {
+public class Tasks extends BaseActivity {
 
 
     ListView taskList;
@@ -37,7 +38,7 @@ public class Tasks extends AppCompatActivity {
     ArrayAdapter adapter=null;
     ArrayList<String> taskLt;
     List<String> items;
-    String role;
+
 
     DatabaseReference databaseReference;
     FirebaseAuth firebaseAuth;

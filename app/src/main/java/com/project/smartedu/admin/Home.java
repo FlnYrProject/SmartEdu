@@ -14,16 +14,17 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.google.firebase.database.DatabaseReference;
+import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.ImageAdapter;
 import com.project.smartedu.R;
 import com.project.smartedu.common.Tasks;
 
-public class Home extends AppCompatActivity {
+public class Home extends BaseActivity{
 
-    int densityX;
-    int densityY;
+
     DatabaseReference databaseReference;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,25 +33,12 @@ public class Home extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
 
 
-        // put in base activity later
-        WindowManager windowManager = ((WindowManager) getSystemService(Context.WINDOW_SERVICE));
-        Display display = windowManager.getDefaultDisplay();
-        densityX = display.getWidth();
-        densityY= display.getHeight();
 
-
-
+        Intent from_login = getIntent();
+        institutionName=from_login.getStringExtra("institution_name");
 
 
         GridView gridview = (GridView) findViewById(R.id.gridview);
@@ -62,11 +50,16 @@ public class Home extends AppCompatActivity {
                                     int position, long id) {
                 if (position == 0) { //teachers
 
+                    Intent student_intent = new Intent(Home.this, Teachers.class);
+                    student_intent.putExtra("institution_name",institutionName);
+                    student_intent.putExtra("role", "admin");
+                    startActivity(student_intent);
+
                 } else if (position == 1) { //tasks
 
                     Intent task_intent = new Intent(Home.this, Tasks.class);
                     //task_intent.putExtra("institution_code",institution_code);
-                    //task_intent.putExtra("institution_name",institution_name);
+                    task_intent.putExtra("institution_name",institutionName);
                     task_intent.putExtra("role", "admin");
                     startActivity(task_intent);
 

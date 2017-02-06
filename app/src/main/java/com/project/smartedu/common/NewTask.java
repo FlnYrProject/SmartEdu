@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
+import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.R;
 import com.project.smartedu.database.Task;
@@ -29,7 +30,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class NewTask extends AppCompatActivity {
+public class NewTask extends BaseActivity {
 
 
     String myTitle;
@@ -175,53 +176,6 @@ public class NewTask extends AppCompatActivity {
 
     }
 
-
-
-
-    void checkDate(int Day, int Month, int Year, long milliseconds[]){
-
-        Date d;
-        java.util.Calendar calendar= java.util.Calendar.getInstance();
-        SimpleDateFormat format=new SimpleDateFormat("dd/MM/yyyy");
-        String date= format.format(new Date(calendar.getTimeInMillis()));
-        d=null;
-        try {
-            d=format.parse(date);
-        } catch (java.text.ParseException e1) {
-            e1.printStackTrace();
-        }
-        milliseconds[0]= d.getTime();
-
-        String string_date = String.valueOf(Day) + "-" + String.valueOf(Month) + "-" + String.valueOf(Year);
-
-        SimpleDateFormat f = new SimpleDateFormat("dd-MM-yyyy");
-        d = null;
-        try {
-            d = f.parse(string_date);
-        } catch (java.text.ParseException e) {
-            e.printStackTrace();
-        }
-        milliseconds[1] = d.getTime();
-
-        Log.d("date test base", milliseconds[0] + " selected:" + milliseconds[1]);
-
-
-    }
-
-
-
-
-
-    void setDialogSize(Dialog dialogcal){
-        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-        lp.copyFrom(dialogcal.getWindow().getAttributes());
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-        lp.height = WindowManager.LayoutParams.MATCH_PARENT;
-        lp.gravity = Gravity.CENTER;
-
-        dialogcal.getWindow().setAttributes(lp);
-
-    }
 
 
 }
