@@ -65,6 +65,7 @@ public class BaseActivity extends AppCompatActivity {
 
 
         //found width of Screen for Gridview
+        firebaseAuth=FirebaseAuth.getInstance();
         WindowManager windowManager = ((WindowManager) getSystemService(Context.WINDOW_SERVICE));
         Display display = windowManager.getDefaultDisplay();
         densityX = display.getWidth();

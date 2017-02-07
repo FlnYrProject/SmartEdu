@@ -11,12 +11,15 @@ import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
 
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.ImageAdapter;
+import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
 import com.project.smartedu.common.Tasks;
 
@@ -24,6 +27,7 @@ public class Home extends BaseActivity{
 
 
     DatabaseReference databaseReference;
+    Button logout;
 
 
     @Override
@@ -33,7 +37,15 @@ public class Home extends BaseActivity{
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        logout=(Button)findViewById(R.id.lo);
 
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                firebaseAuth.signOut();
+                startActivity(new Intent(Home.this, LoginActivity.class));
+            }
+        });
 
 
 
