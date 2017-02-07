@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -21,6 +22,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.project.smartedu.Constants;
 import com.project.smartedu.R;
+import com.project.smartedu.common.Tasks;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,6 +35,7 @@ public class Teachers extends AppCompatActivity {
     String name;
     Integer age;
     ArrayList<String> teacherLt;
+    ArrayAdapter adapter=null;
 
     Button createIDs;
     Button delButton;
@@ -76,7 +79,7 @@ public class Teachers extends AppCompatActivity {
         teacherList = (ListView) findViewById(R.id.teacherList);
 
 
-        firebaseAuth=FirebaseAuth.getInstance();
+//        firebaseAuth=FirebaseAuth.getInstance();
         databaseReference = Constants.databaseReference.child(Constants.TEACHER_TABLE).child(institutionName);
 
 
@@ -105,7 +108,24 @@ public class Teachers extends AppCompatActivity {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                                String teacher=(String) dataSnapshot.getValue();
+                                final String teacher=(String) dataSnapshot.getValue();
+
+                                databaseReference = Constants.databaseReference.child(Constants.USER_DETAILS_TABLE).child(teacher);
+
+                                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        HashMap<String, String> teachermap=(HashMap<String, String>)dataSnapshot.getValue();
+                                        teacherLt.add(teachermap.get("name"));
+                                        showList();
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
 
                                 Log.d("ta",teacher);
 
@@ -142,4 +162,10 @@ public class Teachers extends AppCompatActivity {
 
     }
 
+
+    public void showList(){
+
+        adapter = new ArrayAdapter(Teachers.this, android.R.layout.simple_list_item_1, teacherLt);
+        teacherList.setAdapter(adapter);
+    }
 }

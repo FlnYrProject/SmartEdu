@@ -1,5 +1,6 @@
 package com.project.smartedu.admin;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,6 +12,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -21,6 +24,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
+import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
 
 import java.util.List;
@@ -43,14 +47,16 @@ public class NewTeacher extends BaseActivity {
     String parentId;
     String studentId;
 
+    EditText admin_pass;
+    Button ok;
 
     DatabaseReference databaseReference;
 
     FirebaseUser firebaseUser;
     FirebaseUser teacherfirebaseUser;
-    FirebaseAuth prefirebaseauth;
 
-    String preemail,pass;
+
+    String pass,admin_email;
 
 
     @Override
@@ -66,7 +72,7 @@ public class NewTeacher extends BaseActivity {
 
         firebaseAuth=FirebaseAuth.getInstance();
         firebaseUser=firebaseAuth.getCurrentUser();
-        prefirebaseauth=firebaseAuth;
+
 
 
         teacherName = (EditText) findViewById(R.id.teacherName);
@@ -87,8 +93,47 @@ public class NewTeacher extends BaseActivity {
                     Toast.makeText(getApplicationContext(), "Teacher details cannot be empty!", Toast.LENGTH_LONG).show();
                 } else {
 
-                    addTeacherUser(name, age,email, firebaseUser);
-                    sleep(3000);
+                    final Dialog enter_password_dialog = new Dialog(NewTeacher.this);
+                    enter_password_dialog.setContentView(R.layout.enter_password);
+                    enter_password_dialog.setTitle("Provide authentication");
+
+                    setDialogSize(enter_password_dialog);
+                    admin_pass = (EditText) enter_password_dialog.findViewById(R.id.admin_pass);
+
+                    ok = (Button) enter_password_dialog.findViewById(R.id.done);
+                    enter_password_dialog.show();
+
+                    ok.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            admin_email=firebaseUser.getEmail();
+
+                            firebaseAuth.signInWithEmailAndPassword(admin_email,admin_pass.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+
+                                    if(task.isSuccessful()){
+                                        pass=admin_pass.getText().toString();
+                                        enter_password_dialog.dismiss();
+                                        addTeacherUser(name, age,email, firebaseUser);
+                                        sleep(3000);
+
+                                    }else{
+
+                                        Toast.makeText(getApplicationContext(),"Incorrect Authentication",Toast.LENGTH_LONG).show();
+
+                                    }
+
+                                }
+                            });
+
+
+                        }
+                    });
+
+
+
                 }
             }
         });
@@ -114,7 +159,7 @@ public class NewTeacher extends BaseActivity {
         String password=institutionName + Name + institutionName;
 
 
-        prefirebaseauth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        firebaseAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
 
@@ -159,10 +204,24 @@ public class NewTeacher extends BaseActivity {
 
 
                         Toast.makeText(getApplicationContext(), "Teacher details successfully stored", Toast.LENGTH_LONG).show();
-                        Intent i = new Intent(NewTeacher.this, Teachers.class);
-                        i.putExtra("institution_name", institutionName);
-                        i.putExtra("role", role);
-        startActivity(i);
+
+            firebaseAuth.signInWithEmailAndPassword(admin_email,pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                        if(task.isSuccessful()){
+                            Intent i = new Intent(NewTeacher.this, Teachers.class);
+                            i.putExtra("institution_name", institutionName);
+                            i.putExtra("role", role);
+                            startActivity(i);
+                        }else{
+                            Toast.makeText(getApplicationContext(), "signed out due to some error,please sign in again", Toast.LENGTH_LONG).show();
+                            firebaseAuth.signOut();
+                            startActivity(new Intent(NewTeacher.this, LoginActivity.class));
+
+                        }
+                }
+            });
+
 
     }
 

@@ -32,6 +32,8 @@ public class ChooseRole extends BaseActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with add role", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                firebaseAuth.signOut();
+                startActivity(new Intent(ChooseRole.this, LoginActivity.class));
             }
         });
 
@@ -41,13 +43,6 @@ public class ChooseRole extends BaseActivity {
         teacher=(Button)findViewById(R.id.button_teacher);
 
 
-        student.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                firebaseAuth.signOut();
-                startActivity(new Intent(ChooseRole.this, LoginActivity.class));
-            }
-        });
 
 
 
