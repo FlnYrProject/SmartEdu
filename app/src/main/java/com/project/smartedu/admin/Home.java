@@ -77,6 +77,13 @@ public class Home extends BaseActivity{
 
                 } else if (position == 2) { //classes
 
+                    Intent task_intent = new Intent(Home.this,Classes.class);
+                    //task_intent.putExtra("institution_code",institution_code);
+                    task_intent.putExtra("institution_name",institutionName);
+                    task_intent.putExtra("role", "admin");
+                    startActivity(task_intent);
+
+
                 }
                 else if (position == 3) {   //allotments
 

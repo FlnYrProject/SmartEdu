@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#2A2A2A">
+
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Section Name:"
+        android:id="@+id/textView36"
+        android:layout_marginTop="33dp"
+        android:textSize="25sp"
+        android:textColor="#ffff"
+        android:layout_below="@+id/container_toolbar"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="30dp"
+        android:id="@+id/newsectionname"
+        android:background="#FFFFFF"
+        android:layout_below="@+id/textView36"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Class Teacher:"
+        android:id="@+id/textview"
+        android:textSize="25sp"
+        android:textColor="#ffff"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="38dp"
+        android:layout_below="@+id/newClassGrade" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/sectionclassteacherselection"
+        android:layout_below="@+id/textview"
+        android:layout_alignParentStart="true" />
+
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Class Teacher Subject:"
+        android:id="@+id/subjecttxt"
+        android:textSize="25sp"
+        android:textColor="#ffff"
+        android:layout_marginTop="32dp"
+        android:layout_below="@+id/classteacherselection"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="30dp"
+        android:id="@+id/classteachersubject"
+        android:background="#FFFFFF"
+        android:layout_below="@+id/subjecttxt"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add"
+        android:id="@+id/addsectionButton"
+        android:layout_gravity="center_horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="#20BF9F"
+        android:textSize="15sp"
+        android:textColor="#ffffff" />
+
+
+</LinearLayout>
