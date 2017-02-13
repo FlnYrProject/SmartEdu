@@ -48,6 +48,7 @@ public class NewClass extends BaseActivity {
     DatabaseReference databaseReference;
 
     String teacher;
+    String teacherserial;
 
 
     @Override
@@ -67,6 +68,7 @@ public class NewClass extends BaseActivity {
         addClassButton = (Button) findViewById(R.id.addClassButton);
         classteachersubject=(EditText)findViewById(R.id.classteachersubject);
 
+        final HashMap<String,String> teacherserialidmap=new HashMap<>();
 
 
         databaseReference = Constants.databaseReference.child(Constants.TEACHER_TABLE).child(institutionName);
@@ -85,41 +87,36 @@ public class NewClass extends BaseActivity {
                 }else{
 
                     Toast.makeText(getApplicationContext(),teachersmap.size() + " teachers found ",Toast.LENGTH_LONG).show();
-
-
-
-
                     teacherLt = new ArrayList<>();
+
                     for ( String key : teachersmap.keySet() ) {
-                        System.out.println( key );
+                        System.out.println( key );          //key is teacher user id
+                        teacher=key;
 
-                        databaseReference = Constants.databaseReference.child(Constants.TEACHER_TABLE).child(institutionName).child(key);
-
+                       databaseReference = Constants.databaseReference.child(Constants.TEACHER_TABLE).child(institutionName).child(teacher);
 
                         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
+                                teacherserial=(String) dataSnapshot.getValue();
+                            }
 
-                              teacher=(String) dataSnapshot.getValue();
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
 
-                                databaseReference = Constants.databaseReference.child(Constants.USER_DETAILS_TABLE).child(teacher);
-
-                                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        HashMap<String, String> teachermap=(HashMap<String, String>)dataSnapshot.getValue();
-                                        teacherLt.add(teachermap.get("name"));
+                            }
+                        });
 
 
-                                    }
+                        databaseReference = Constants.databaseReference.child(Constants.USER_DETAILS_TABLE).child(teacher);
+                        teacherserialidmap.put(teacherserial,teacher);
 
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
+                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                HashMap<String, String> teachermap=(HashMap<String, String>)dataSnapshot.getValue();
+                                teacherLt.add(teacherserial + ". " + teachermap.get("name"));
 
-                                    }
-                                });
-
-                                Log.d("ta",teacher);
 
                             }
 
@@ -129,8 +126,8 @@ public class NewClass extends BaseActivity {
                             }
                         });
 
-                    }
 
+                    }
 
 
                     teacheradapter = new ArrayAdapter(NewClass.this, android.R.layout.simple_list_item_1, teacherLt);
@@ -141,9 +138,13 @@ public class NewClass extends BaseActivity {
                     addClassButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+
+                            String[] itemValues = classteacherspinner.getSelectedItem().toString().split("\\. ");
                             classname = classGradeName.getText().toString().trim();
                             classsection = newSection.getText().toString().trim();
-                            classteachername=classteacherspinner.getSelectedItem().toString();
+                            classteachername=itemValues[1];
+                            teacherserial=itemValues[0];
+                            String selectedteacherid=teacherserialidmap.get(teacherserial);
                             subjectofclassteacher=classteachersubject.getText().toString();
 
                             if( (classname.equals("")) || (classsection.equals("")) || (classteachername.equals("")) || subjectofclassteacher.equals("")) {
@@ -155,16 +156,14 @@ public class NewClass extends BaseActivity {
                                 databaseReference = Constants.databaseReference.child(Constants.CLASS_TABLE).child(institutionName).child(classname).child(classsection);
 
                                 databaseReference.child("id").setValue(institutionName + "_" + classname + "_" + classsection);
+                                databaseReference.child("teacher").child(selectedteacherid).child("subject").setValue(subjectofclassteacher);
+                                databaseReference.child("teacher").child(selectedteacherid).child("class_teacher").setValue("1");
 
-
-                                HashMap<String,Object> subjectmap=new HashMap<String, Object>();
-                                subjectmap.put(subjectofclassteacher,teacher);
-                                subjectmap.put("class_teacher",teacher);
-                                databaseReference.updateChildren(subjectmap);
+                                databaseReference.child(subjectofclassteacher).setValue(selectedteacherid);
 
 
 
-                                addAllotment(classname,classsection,teacher, subjectofclassteacher);
+                                addAllotment(classname,classsection,selectedteacherid, subjectofclassteacher);
 
                                 Toast.makeText(NewClass.this, "New Class Added", Toast.LENGTH_LONG).show();
                                 Intent to_admin_classes = new Intent(NewClass.this, Classes.class);

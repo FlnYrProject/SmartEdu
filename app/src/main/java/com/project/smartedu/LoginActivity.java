@@ -142,6 +142,7 @@ public class LoginActivity extends AppCompatActivity {
                 HashMap<String, String> map=(HashMap<String, String>)dataSnapshot.getValue();
 
                 for(int x=0;x<map.size();x++){
+
                     String userId=firebaseAuth.getCurrentUser().getUid();
                     boolean ifadmin=map.containsKey(userId);
 
