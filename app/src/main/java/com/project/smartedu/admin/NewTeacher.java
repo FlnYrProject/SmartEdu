@@ -21,12 +21,16 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class NewTeacher extends BaseActivity {
@@ -34,7 +38,7 @@ public class NewTeacher extends BaseActivity {
     String name;
 
     int age=0;
-    int serial=-1;
+    int serial;
     String email;
 
     Button addTeacherButton;
@@ -166,8 +170,11 @@ public class NewTeacher extends BaseActivity {
                 if(task.isSuccessful()) {
 
                     databaseReference = Constants.databaseReference.child(Constants.USER_DETAILS_TABLE);
-                    databaseReference.child(firebaseAuth.getCurrentUser().getUid()).child("name").setValue(Name);
                     teacherfirebaseUser = firebaseAuth.getCurrentUser();
+                    databaseReference.child(teacherfirebaseUser.getUid()).child("name").setValue(Name);
+                    DatabaseReference dataReference = databaseReference.child(teacherfirebaseUser.getUid()).child("role").child("teacher").push();
+                    dataReference.setValue(institutionName);
+
 
                     Toast.makeText(getApplicationContext(), "Teacher User Registration Successful ", Toast.LENGTH_LONG).show();
 
@@ -196,33 +203,55 @@ public class NewTeacher extends BaseActivity {
 
     protected void addTeacher(FirebaseUser firebaseUser){
 
-        databaseReference = Constants.databaseReference.child(Constants.TEACHER_TABLE).child(institutionName).push();
-
-        databaseReference.setValue(firebaseUser.getUid());
+        databaseReference = Constants.databaseReference.child(Constants.TEACHER_TABLE).child(institutionName);
 
 
-
-
-                        Toast.makeText(getApplicationContext(), "Teacher details successfully stored", Toast.LENGTH_LONG).show();
-
-            firebaseAuth.signInWithEmailAndPassword(admin_email,pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()){
-                            Intent i = new Intent(NewTeacher.this, Teachers.class);
-                            i.putExtra("institution_name", institutionName);
-                            i.putExtra("role", role);
-                            startActivity(i);
-                        }else{
-                            Toast.makeText(getApplicationContext(), "signed out due to some error,please sign in again", Toast.LENGTH_LONG).show();
-                            firebaseAuth.signOut();
-                            startActivity(new Intent(NewTeacher.this, LoginActivity.class));
-
-                        }
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                HashMap<String, String> teachermap=(HashMap<String, String>)dataSnapshot.getValue();
+                if(teachermap==null){
+                    serial=1;
+                }else{
+                    serial=teachermap.size() + 1 ;
                 }
-            });
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        databaseReference.child(firebaseUser.getUid()).setValue(String.valueOf(serial));
+
+        Toast.makeText(getApplicationContext(), "Teacher details successfully stored", Toast.LENGTH_LONG).show();
+
+        loginAdminBack();
 
     }
+
+
+
+   protected void loginAdminBack(){
+
+       firebaseAuth.signInWithEmailAndPassword(admin_email,pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+           @Override
+           public void onComplete(@NonNull Task<AuthResult> task) {
+               if(task.isSuccessful()){
+                   Intent i = new Intent(NewTeacher.this, Teachers.class);
+                   i.putExtra("institution_name", institutionName);
+                   i.putExtra("role", role);
+                   startActivity(i);
+               }else{
+                   Toast.makeText(getApplicationContext(), "signed out due to some error,please sign in again", Toast.LENGTH_LONG).show();
+                   firebaseAuth.signOut();
+                   startActivity(new Intent(NewTeacher.this, LoginActivity.class));
+
+               }
+           }
+       });
+
+   }
 
 }

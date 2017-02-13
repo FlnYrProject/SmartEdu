@@ -73,7 +73,6 @@ public class Teachers extends AppCompatActivity {
         role=from_home.getStringExtra("role");
         institutionName=from_home.getStringExtra("institution_name");
 
-
        
         createIDs=(Button)findViewById(R.id.shareCode);
         teacherList = (ListView) findViewById(R.id.teacherList);
@@ -99,35 +98,19 @@ public class Teachers extends AppCompatActivity {
 
                     teacherLt = new ArrayList<>();
                     for ( String key : teachersmap.keySet() ) {
-                        System.out.println( key );
 
-                        databaseReference = Constants.databaseReference.child(Constants.TEACHER_TABLE).child(institutionName).child(key);
+                        System.out.println( key );              //key is teacher user id
 
+                      //  databaseReference = Constants.databaseReference.child(Constants.TEACHER_TABLE).child(institutionName).child(key);
+
+                        databaseReference = Constants.databaseReference.child(Constants.USER_DETAILS_TABLE).child(key);
 
                         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                final String teacher=(String) dataSnapshot.getValue();
-
-                                databaseReference = Constants.databaseReference.child(Constants.USER_DETAILS_TABLE).child(teacher);
-
-                                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        HashMap<String, String> teachermap=(HashMap<String, String>)dataSnapshot.getValue();
-                                        teacherLt.add(teachermap.get("name"));
-                                        showList();
-
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                });
-
-                                Log.d("ta",teacher);
+                                HashMap<String, String> teachermap=(HashMap<String, String>)dataSnapshot.getValue();
+                                teacherLt.add(teachermap.get("name"));
+                                showList();
 
                             }
 

@@ -30,6 +30,7 @@ import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
+import com.project.smartedu.database.TeacherTable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -160,7 +161,7 @@ public class Classes extends BaseActivity {
 
 
 
-                databaseReference=databaseReference.child(item);
+                databaseReference=databaseReference.child(classname);
 
 
 
@@ -205,7 +206,7 @@ public class Classes extends BaseActivity {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         final String item = ((TextView) view).getText().toString();
                         sectioname=item;
-                        sectionSelected(item);
+                        sectionSelected(sectioname);
 
                     }
                 });
@@ -305,31 +306,16 @@ public class Classes extends BaseActivity {
                     subjectLt = new ArrayList<>();
                     for ( String subjectkey : classdetailsmap.keySet() ) {
                         System.out.println(  subjectkey );
-                        if(subjectkey!="id" || subjectkey!="class_teacher")
-                        subjectLt.add( subjectkey );
+                        if(subjectkey!="id" || subjectkey!="teacher")
+                        subjectLt.add( subjectkey + " by " + classdetailsmap.get(subjectkey));
 
                     }
 
                     ArrayAdapter subjectadapter = new ArrayAdapter(Classes.this, android.R.layout.simple_list_item_1, subjectLt);
                     classSubjectList.setAdapter(subjectadapter);
 
+                    dialog_heading.setText("Subjects:");
 
-                    DatabaseReference dataReference=Constants.databaseReference.child(Constants.USER_DETAILS_TABLE).child(classdetailsmap.get("class_teacher"));
-
-                    dataReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-
-                            HashMap<String, String> classteacher=(HashMap<String, String>)dataSnapshot.getValue();
-                            dialog_heading.setText("Class Teacher : " +classteacher.get("name") + "\n" + "Subjects:");
-
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
 
                     classSection_details.show();
 
@@ -878,6 +864,7 @@ public class Classes extends BaseActivity {
 
 
     /*
+
     protected  void addSectionCall(final String selectedClass)
     {
         final Dialog newSection=new Dialog(Classes.this);
@@ -886,6 +873,22 @@ public class Classes extends BaseActivity {
         done=(Button)newSection.findViewById(R.id.addsectionButton);
         getNewSection=(EditText)newSection.findViewById(R.id.newsectionname);
         classTeacherSubject=(EditText)newSection.findViewById(R.id.classteachersubject);
+
+        ArrayList<String> teacherLt = new TeacherTable().getAllTeachersWithSerial(institutionName);
+
+        if(teacherLt==null){
+
+            Toast.makeText(Classes.this, "no teacher is added in this institution", Toast.LENGTH_LONG).show();
+
+        }else{
+
+            ArrayAdapter teacheradapter = new ArrayAdapter(Classes.this, android.R.layout.simple_spinner_item, teacherLt);
+            newsectionclassteacher.setAdapter(teacheradapter);
+            newSection.show();
+
+
+        }
+
 
 
 
@@ -927,7 +930,109 @@ public class Classes extends BaseActivity {
 
 
 
-        newSection.show();
+
+
+
+
+
+
+        done.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String[] itemValues = newsectionclassteacher.getSelectedItem().toString().split("\\. ");
+                String selectedTeacher=itemValues[1];
+                String teacherserial=itemValues[0];
+               // final String selectedTeacher=newsectionclassteacher.getSelectedItem().toString();
+                if( (getNewSection.getText().toString().equals("")) || (newsectionclassteacher.getSelectedItem().equals("")) || (classTeacherSubject.getText().equals("")) )
+                {
+                    Toast.makeText(Classes.this,"Information incomplete",Toast.LENGTH_LONG).show();
+                }else
+                {
+                    String sectionname=getNewSection.getText().toString();
+                    databaseReference=Constants.databaseReference.child(Constants.INSTITUTION_TABLE).child(classname);
+
+                    if(databaseReference.child(sectionname)==null){
+
+                        databaseReference.child(sectionname).child("id").setValue(institutionName + "_" + classname + "_" + sectionname);
+                        String teacheruserid=new TeacherTable().getTeacherWithNameAndSerial(institutionName,teacherserial);
+
+
+                    }else{
+                        Toast.makeText(Classes.this,"Section already added. Type Another section name",Toast.LENGTH_LONG).show();
+
+                    }
+
+
+
+                    ParseQuery<ParseObject> newSectionQuery=ParseQuery.getQuery(ClassGradeTable.TABLE_NAME);
+                    newSectionQuery.whereEqualTo(ClassGradeTable.CLASS_GRADE,selectedClass);
+                    newSectionQuery.whereEqualTo(ClassGradeTable.INSTITUTION,ParseObject.createWithoutData(InstitutionTable.TABLE_NAME,institution_code));
+                    newSectionQuery.findInBackground(new FindCallback<ParseObject>() {
+                        @Override
+                        public void done(List<ParseObject> sectionsList, ParseException e) {
+                            if(e==null)
+                            {
+                                Log.d("classSection",sectionsList.size() + " Sections");
+                                int flag=0;
+                                if(sectionsList.size()!=0)
+                                {
+                                    for(int x=0;x<sectionsList.size();x++)
+                                    {
+                                        if((sectionsList.get(x).getString(ClassGradeTable.SECTION)).equalsIgnoreCase(getNewSection.getText().toString())){
+                                            Toast.makeText(Classes.this,"Section already added. Type Another section name",Toast.LENGTH_LONG).show();
+                                            flag=1;
+                                            break;
+                                        }
+                                    }
+                                    if(flag==0)
+                                    {
+
+                                        final ParseObject newSectionObject=new ParseObject(ClassGradeTable.TABLE_NAME);
+                                        newSectionObject.put(ClassGradeTable.CLASS_GRADE,selectedClass);
+                                        newSectionObject.put(ClassGradeTable.SECTION,getNewSection.getText().toString());
+                                        newSectionObject.put(ClassGradeTable.INSTITUTION,ParseObject.createWithoutData(InstitutionTable.TABLE_NAME, institution_code));
+                                        newSectionObject.saveEventually(new SaveCallback() {
+                                            @Override
+                                            public void done(ParseException e) {
+
+
+                                                ParseObject newClass=new ParseObject(ClassTable.TABLE_NAME);
+                                                newClass.put(ClassTable.SUBJECT, classTeacherSubject.getText().toString());
+                                                newClass.put(ClassTable.IF_CLASS_TEACHER, true);
+                                                newClass.put(ClassTable.CLASS_NAME, newSectionObject);
+                                                String selectedteacherObjectId=teacherMap.get(selectedTeacher);
+                                                ParseUser  teacheruser=(ParseUser)(ParseObject.createWithoutData(TeacherTable.TABLE_NAME, selectedteacherObjectId)).get(TeacherTable.TEACHER_USER_REF);
+                                                newClass.put(ClassTable.TEACHER_USER_REF, teacheruser);
+                                                newClass.saveEventually();
+
+
+
+
+                                            }
+                                        });
+                                        newSection.dismiss();
+                                    }
+                                }else
+                                {
+                                    Log.d("classSection","error in query logic");
+                                }
+                            }else
+                            {
+                                Log.d("classSection","error");
+                            }
+                        }
+                    });
+
+
+
+                }
+            }
+        });             //end os on click of done button while adding new section
+
+
+
+
+
 
 
         done.setOnClickListener(new View.OnClickListener() {
@@ -1005,8 +1110,9 @@ public class Classes extends BaseActivity {
                 }
             }
         });             //end os on click of done button while adding new section
-    }
-*/
+
+    }*/
+
 
     @Override
     protected void onPostResume() {
