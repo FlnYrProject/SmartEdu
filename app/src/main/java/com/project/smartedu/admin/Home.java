@@ -52,10 +52,11 @@ public class Home extends BaseActivity{
 
 
     ArrayList<String> taskLt;
+    HashMap<String,String> taskidmap; //to map task to its  id
+
+
     ArrayList<String> teacherLt;
     ArrayList<String> teacheruseridLt;
-
-
     HashMap<String,String> teachersusermap; //to map teacher to its user id
     ArrayList<String> tempteacherlt;
 
@@ -231,6 +232,7 @@ public class Home extends BaseActivity{
             pd.setCancelable(false);
             pd.show();
             taskLt.clear();
+            taskidmap.clear();
         }
 
         @Override
@@ -250,7 +252,7 @@ public class Home extends BaseActivity{
                                 Log.d("key",key);
                                 HashMap<String,String> taskmap=( HashMap<String,String>)retTaskList.get(key);
                                 // Toast.makeText(getApplicationContext(),taskmap.get("name") + " " + taskmap.get("date"),Toast.LENGTH_LONG).show();
-                                System.out.print(taskmap.get("name") + " " + taskmap.get("date"));
+                               /// System.out.print(taskmap.get("name") + " " + taskmap.get("date"));
 
 
 
@@ -260,7 +262,10 @@ public class Home extends BaseActivity{
 
                                 String dateString = formatter.format(new Date(Long.parseLong(taskmap.get("date"))));
 
-                                taskLt.add(taskmap.get("name")+ "\n" + taskmap.get("description") + "\n" + dateString);
+                                String entry=taskmap.get("name")+ "\n" + taskmap.get("description") + "\n" + dateString;
+                                Log.d("key",key);
+                                taskidmap.put(entry,key);
+                                taskLt.add(entry);
 
                             }
 
@@ -298,6 +303,7 @@ public class Home extends BaseActivity{
             Toast.makeText(getApplicationContext(),taskLt.size() + " tasks found",Toast.LENGTH_LONG).show();
 
             AdminUserPrefs.taskItems=taskLt;
+            AdminUserPrefs.taskidmap=taskidmap;
 
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -327,6 +333,7 @@ public class Home extends BaseActivity{
         adminUserPrefs=new AdminUserPrefs(getApplicationContext());
 
         taskLt=AdminUserPrefs.taskItems;
+        taskidmap=AdminUserPrefs.taskidmap;
         teacherLt=AdminUserPrefs.teacherLt;
         teacheruseridLt=AdminUserPrefs.teacheruseridLt;
         teachersusermap=AdminUserPrefs.teachersusermap;

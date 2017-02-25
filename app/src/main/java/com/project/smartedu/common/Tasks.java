@@ -1,5 +1,6 @@
 package com.project.smartedu.common;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -12,8 +13,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CalendarView;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,6 +33,7 @@ import com.project.smartedu.Constants;
 import com.project.smartedu.R;
 import com.project.smartedu.admin.AdminUserPrefs;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,11 +50,34 @@ public class Tasks extends BaseActivity {
 
     ArrayAdapter adapter=null;
     ArrayList<String> taskLt;
-    List<String> items;
+
 
 
     DatabaseReference databaseReference;
     FirebaseAuth firebaseAuth;
+
+    TextView myTitle;
+    TextView myDesc;
+    TextView myDate;
+    Button okButton;
+    Button delButton;
+    Button editButton;
+    Button EditButton;
+    int Year;
+    int Month;
+    int Day;
+    int Yearcal;
+    int Monthcal;
+    int Daycal;
+    Date date1;
+    CalendarView calendar;
+    EditText Title;
+    EditText Desc;
+    EditText Date;
+    String taskid;
+
+    String [] items;
+    ImageButton cal;
 
 
 
@@ -96,6 +127,203 @@ public class Tasks extends BaseActivity {
 
 
 
+
+
+
+        taskList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, final View view,
+                                    final int position, final long id) {
+
+
+                // selected item
+                String[] product = ((TextView) view).getText().toString().split("\n");
+                final String[] details = new String[3];
+                int i = 0;
+
+                for (String x : product) {
+                    details[i++] = x;
+                }
+
+                final Dialog dialog = new Dialog(Tasks.this);
+                dialog.setContentView(R.layout.activity_show_details);
+                dialog.setTitle("Task Details");
+
+                setDialogSize(dialog);
+
+                myTitle = (TextView) dialog.findViewById(R.id.start_time);
+                myDesc = (TextView) dialog.findViewById(R.id.end_time);
+                myDate = (TextView) dialog.findViewById(R.id.date);
+
+                myTitle.setText(details[0].trim());
+                myDesc.setText(details[1]);
+
+                myDate.setText(details[2].trim());
+
+                String[] date = details[2].split("/");
+                final String[] datedetails = new String[3];
+                int j = 0;
+
+                for (String x : date) {
+                    datedetails[j++] = x;
+                }
+
+                Day = Integer.parseInt(datedetails[0]);
+                Month = Integer.parseInt(datedetails[1]);
+                Year = Integer.parseInt(datedetails[2]);
+
+                String string_date = String.valueOf(Day) + "-" + String.valueOf(Month) + "-" + String.valueOf(Year);
+                //Toast.makeText(Tasks.this, "date = " + string_date, Toast.LENGTH_LONG).show();
+                SimpleDateFormat f = new SimpleDateFormat("dd-MM-yyyy");
+                Date d = null;
+                try {
+                    d = f.parse(string_date);
+                } catch (java.text.ParseException e) {
+                    e.printStackTrace();
+                }
+                final long milliseconds = d.getTime();
+
+
+
+                final String entry=details[0].trim()+"\n"+details[1]+"\n"+String.valueOf(milliseconds);
+
+                taskid=AdminUserPrefs.taskidmap.get(entry);
+
+                Log.d("taskid",entry);
+
+                okButton = (Button) dialog.findViewById(R.id.doneButton);
+                delButton = (Button) dialog.findViewById(R.id.doneButton);
+                editButton = (Button) dialog.findViewById(R.id.editButton);
+
+
+                okButton.setOnClickListener(new View.OnClickListener() {
+
+                    public void onClick(View v) {
+
+                        dialog.dismiss();
+
+                    }
+                });
+
+                delButton.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+
+                        DatabaseReference dataRef=Constants.databaseReference.child(Constants.TASK_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child(role).child(taskid);
+                       dataRef.removeValue();
+                        AdminUserPrefs.taskidmap.remove(entry);
+                        AdminUserPrefs.taskItems.remove(entry);
+
+
+                        onRestart();
+
+
+                        dialog.dismiss();
+
+                    }
+                });
+
+                editButton.setOnClickListener(new View.OnClickListener() {
+
+                    public void onClick(View v) {
+
+
+                        final Dialog dialog_in = new Dialog(Tasks.this);
+                        dialog_in.setContentView(R.layout.activity_new_event_teacher);
+                        dialog_in.setTitle("Edit Details");
+
+                        Title = (EditText) dialog_in.findViewById(R.id.taskTitle);
+                        Desc = (EditText) dialog_in.findViewById(R.id.scheduleinfo);
+                        myDate = (TextView) dialog_in.findViewById(R.id.date);
+                        EditButton = (Button) dialog_in.findViewById(R.id.editButton);
+                        cal = (ImageButton) dialog_in.findViewById(R.id.test);
+                        Title.setText(details[0]);
+                        Desc.setText(details[1]);
+                        myDate.setText(details[2]);
+                        final int[] flag = {0};
+                        cal.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                myDate.setText(details[2]);
+                                open(view);
+                                flag[0] = 1;
+                                myDate.setText(String.valueOf(Daycal) + "/" + String.valueOf(Monthcal) + "/" + String.valueOf(Yearcal));
+                            }
+                        });
+
+                        EditButton.setOnClickListener(new View.OnClickListener() {
+                            public void onClick(View v) {
+
+                                if (Title.equals("") || Desc.equals("") ) {
+                                    Toast.makeText(getApplicationContext(), "Event details cannot be empty!", Toast.LENGTH_LONG).show();
+                                } else {
+
+                                    DatabaseReference dataRef=Constants.databaseReference.child(Constants.TASK_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child(role).child(taskid);
+
+                                    databaseReference.child("name").setValue(((EditText) dialog_in.findViewById(R.id.taskTitle)).getText().toString());
+                                    databaseReference.child("description").setValue(((EditText) dialog_in.findViewById(R.id.scheduleinfo)).getText().toString());
+
+                                    if (flag[0] == 1) {
+                                        Day = Daycal;
+                                        Month = Monthcal;
+                                        Year = Yearcal;
+                                    } else {
+                                        String[] datenew = myDate.getText().toString().split("/");
+
+                                        final String[] datedetailsnew = new String[3];
+                                        int j = 0;
+
+                                        for (String x : datenew) {
+                                            datedetailsnew[j++] = x;
+                                        }
+                                        Log.d("Post retrieval", datedetailsnew[0]);
+                                        Toast.makeText(getApplicationContext(), datedetailsnew[0], Toast.LENGTH_LONG);
+                                        Day = Integer.parseInt(datedetailsnew[0]);
+                                        Month = Integer.parseInt(datedetailsnew[1]);
+                                        Year = Integer.parseInt(datedetailsnew[2]);
+                                    }
+                                    String string_date = String.valueOf(Day) + "-" + String.valueOf(Month) + "-" + String.valueOf(Year);
+                                    Toast.makeText(getApplicationContext(), "updated date = " + Day + "/" + Month + "/" + Year, Toast.LENGTH_LONG).show();
+
+                                    SimpleDateFormat f = new SimpleDateFormat("dd-MM-yyyy");
+                                    Date d = null;
+
+                                    try {
+                                        d = f.parse(string_date);
+                                    } catch (java.text.ParseException e1) {
+                                        e1.printStackTrace();
+                                    }
+                                    long newmilliseconds = d.getTime();
+                                    databaseReference.child("date").setValue(String.valueOf(newmilliseconds));
+
+
+
+                                    dialog_in.dismiss();
+                                    onRestart();
+                                }
+                            }
+
+                        });
+
+                        dialog_in.show();
+                        // taskLt.set(position, Title.getText().toString() + "\n" + Desc.getText().toString() + "\n" + myDate.getText().toString());
+                        //adapter.notifyDataSetChanged();
+                        dialog.dismiss();
+                    }
+                });
+
+                dialog.show();
+                //recreate();
+
+
+            }
+        });
+
+
+
+
+
+
+
+
     }
 
 
@@ -104,6 +332,38 @@ public class Tasks extends BaseActivity {
 
         adapter = new ArrayAdapter(Tasks.this, android.R.layout.simple_list_item_1, taskLt);
         taskList.setAdapter(adapter);
+    }
+
+
+
+    public void open(View view)
+    {
+
+        final Dialog dialogcal = new Dialog(Tasks.this);
+        dialogcal.setContentView(R.layout.activity_calendar2);
+        dialogcal.setTitle("Select Date");
+        calendar= (CalendarView)dialogcal.findViewById(R.id.calendar);
+
+        calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
+
+                date1=null;
+                Yearcal = year;
+                Monthcal = month+1;
+                Daycal = dayOfMonth;
+                date1 = new Date(Yearcal - 1900, Monthcal-1, Daycal);
+                DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(getApplicationContext());
+                myDate.setText(dateFormat.format(date1), TextView.BufferType.EDITABLE);
+                Toast.makeText(getApplicationContext(), Daycal + "/" + Monthcal + "/" + Yearcal, Toast.LENGTH_LONG).show();
+                dialogcal.dismiss();
+
+            }
+        });
+        dialogcal.show();
+
+
+
     }
 
 }
