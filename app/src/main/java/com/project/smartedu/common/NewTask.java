@@ -23,6 +23,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.R;
+import com.project.smartedu.admin.AdminUserPrefs;
 import com.project.smartedu.database.Task;
 
 import java.text.DateFormat;
@@ -113,8 +114,15 @@ public class NewTask extends BaseActivity {
                     databaseReference = Constants.databaseReference.child(Constants.TASK_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child(role).push();
 
                     databaseReference.child("name").setValue(myTitle);
-                    databaseReference.child("description").setValue(myTitle);
+                    databaseReference.child("description").setValue(myDesc);
                     databaseReference.child("date").setValue(String.valueOf(milliseconds));
+
+
+
+                    String entry=myTitle+"\n"+myDesc+"\n"+String.valueOf(milliseconds);
+
+                    if(role.equals("admin"))
+                    AdminUserPrefs.taskItems.add(entry);
 
 
 

@@ -1,9 +1,14 @@
 package com.project.smartedu;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.os.Handler;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -26,8 +31,12 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.project.smartedu.admin.Home;
 
+import java.text.ParseException;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Objects;
 
+import static android.R.attr.name;
 import static com.project.smartedu.Constants.databaseReference;
 
 public class LoginActivity extends AppCompatActivity {
@@ -39,6 +48,9 @@ public class LoginActivity extends AppCompatActivity {
     ProgressDialog progressDialog;
     FirebaseAuth firebaseAuth;
     DatabaseReference databaseReference;
+boolean ifadmin;
+String institutionName;
+    UserPrefs userPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,9 +65,26 @@ public class LoginActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReference=Constants.databaseReference;
 
+        userPrefs=new UserPrefs(getApplicationContext());
+
         if(firebaseAuth.getCurrentUser()!=null){
 
-        adminCheck();
+        //adminCheck();
+
+            //check shared prefs
+            if(userPrefs.isAdmin()){
+
+                    Intent toAdminConsole=new Intent(LoginActivity.this, Home.class);
+                toAdminConsole.putExtra("institution_name",userPrefs.getInstitution());
+                    startActivity(toAdminConsole);
+
+            }else{
+
+
+                Intent toChooseRole=new Intent(LoginActivity.this, ChooseRole.class);
+                startActivity(toChooseRole);
+
+            }
 
         }
 
@@ -73,7 +102,12 @@ public class LoginActivity extends AppCompatActivity {
 
                 String email=emailInput.getText().toString().trim();
                 String password=passwordInput.getText().toString().trim();
+                progressDialog.setMessage("Logging In");
+                progressDialog.show();
+              //  firebase_login authTask = new firebase_login(LoginActivity.this);
                 clickedLogin(email,password);
+              //  authTask.execute(email, password);
+
             }
         });
 
@@ -86,51 +120,53 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(toSignUp);
     }
 
-    private void clickedLogin(String email,String password){
-
-        if( TextUtils.isEmpty(email) || TextUtils.isEmpty(password)  ){
-
-            Toast.makeText(getApplicationContext(),"Fields left blank",Toast.LENGTH_LONG).show();
-
-        }else{
 
 
+    private void clickedLogin(String email,String password) {
 
-            progressDialog.setMessage("Logging In...");
-            progressDialog.show();
+        ifadmin = false;
+        institutionName=null;
+
+        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
+
+            Toast.makeText(getApplicationContext(), "Fields left blank", Toast.LENGTH_LONG).show();
+            progressDialog.dismiss();
+
+        } else {
 
 
-
-
-            firebaseAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
-                    progressDialog.dismiss();
-                    if(task.isSuccessful()){
+
+                    if (task.isSuccessful()) {
 
 
-                        Toast.makeText(getApplicationContext(),"User Login Successful",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "User Login Successful", Toast.LENGTH_LONG).show();
                         adminCheck();
 
+                    } else {
 
-                    }else{
+                        Toast.makeText(getApplicationContext(), "User Login Failed", Toast.LENGTH_LONG).show();
+                        progressDialog.dismiss();
 
-                        Toast.makeText(getApplicationContext(),"User Login Failed",Toast.LENGTH_LONG).show();
 
                     }
 
 
-
                 }
+
+
             });
+
 
         }
 
     }
 
 
-    public void adminCheck(){
 
+    public void adminCheck(){
 
         databaseReference= databaseReference.child(Constants.INSTITUTION_TABLE);
 
@@ -139,30 +175,41 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                HashMap<String, String> map=(HashMap<String, String>)dataSnapshot.getValue();
 
-                for(int x=0;x<map.size();x++){
+                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
 
-                    String userId=firebaseAuth.getCurrentUser().getUid();
-                    boolean ifadmin=map.containsKey(userId);
-
-
-                    if(ifadmin) {
-                       String name=map.get(userId);
-
-                        Toast.makeText(getApplicationContext(), "Welcome " + name + " admin", Toast.LENGTH_LONG).show();
-                        Intent toAdminConsole=new Intent(LoginActivity.this, Home.class);
-                        startActivity(toAdminConsole);
-                        break;
-                    }else{
-
-                        Intent toChooseRole=new Intent(LoginActivity.this, ChooseRole.class);
-                        startActivity(toChooseRole);
+                        if (ds.getKey().equals(firebaseAuth.getCurrentUser().getUid())) {
+                            ifadmin = true;
+                            institutionName = ds.getValue().toString();
+                        //    Log.d("inds",ifadmin + institutionName);
+                            break;
+                        }
 
                     }
 
-                }
 
+                String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+
+                 userPrefs.setUserDetails(FirebaseAuth.getInstance().getCurrentUser().getUid(),null,emailInput.getText().toString(),passwordInput.getText().toString());
+
+                userPrefs.setIfAdmin(ifadmin,institutionName);
+                progressDialog.dismiss();
+
+                if (ifadmin) {
+
+
+                    Toast.makeText(getApplicationContext(), "Welcome " + institutionName + " admin", Toast.LENGTH_LONG).show();
+                    Intent toAdminConsole = new Intent(LoginActivity.this, Home.class);
+                    toAdminConsole.putExtra("institution_name",institutionName);
+                    startActivity(toAdminConsole);
+
+                } else {
+
+                    Intent toChooseRole = new Intent(LoginActivity.this, ChooseRole.class);
+                    startActivity(toChooseRole);
+
+                }
 
             }
 
@@ -173,8 +220,8 @@ public class LoginActivity extends AppCompatActivity {
         });
 
 
-
     }
+
 
 
 }

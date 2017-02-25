@@ -43,6 +43,7 @@ public class SignUp extends AppCompatActivity {
     ProgressDialog progressDialog;
     FirebaseAuth firebaseAuth;
     DatabaseReference databaseReference;
+    UserPrefs userPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,13 +60,27 @@ public class SignUp extends AppCompatActivity {
         progressDialog = new ProgressDialog(this);
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReference= Constants.databaseReference;
+        userPrefs=new UserPrefs(getApplicationContext());
 
 
 
         Log.d("signup", "onCreate: " + firebaseAuth);
 
         if(firebaseAuth.getCurrentUser()!=null){
-            adminCheck();
+           // adminCheck();
+            if(userPrefs.isAdmin()){
+
+                Intent toAdminConsole=new Intent(SignUp.this, Home.class);
+                toAdminConsole.putExtra("institution_name",userPrefs.getInstitution());
+                startActivity(toAdminConsole);
+
+            }else{
+
+
+                Intent toChooseRole=new Intent(SignUp.this, ChooseRole.class);
+                startActivity(toChooseRole);
+
+            }
 
         }
 

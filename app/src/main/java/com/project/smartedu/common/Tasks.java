@@ -1,7 +1,11 @@
 package com.project.smartedu.common;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.R;
+import com.project.smartedu.admin.AdminUserPrefs;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -42,6 +47,18 @@ public class Tasks extends BaseActivity {
 
     DatabaseReference databaseReference;
     FirebaseAuth firebaseAuth;
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     @Override
@@ -72,79 +89,10 @@ public class Tasks extends BaseActivity {
 
         taskList=(ListView)findViewById(R.id.taskList);
 
-
-        databaseReference = Constants.databaseReference.child(Constants.TASK_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child(role);
-
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                HashMap<String, String> taskmap=(HashMap<String, String>)dataSnapshot.getValue();
-
-                if(taskmap==null){
-
-                    Toast.makeText(getApplicationContext(),"No tasks added",Toast.LENGTH_LONG).show();
-
-                }else{
-
-                    Toast.makeText(getApplicationContext(),taskmap.size() + " tasks found ",Toast.LENGTH_LONG).show();
-
-
-                    taskLt = new ArrayList<>();
-                    for ( String key : taskmap.keySet() ) {
-                        System.out.println( key );
-
-                        databaseReference = Constants.databaseReference.child(Constants.TASK_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child(role).child(key);
-
-
-                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                HashMap<String, String> task=(HashMap<String, String>)dataSnapshot.getValue();
-                                String name = task.get("name");
-                                name += "\n";
-                                name += task.get("description");
-
-                                name += "\n";
-
-
-                                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-
-                                Toast.makeText(getApplicationContext(),task.get("date"),Toast.LENGTH_LONG).show();
-                               Log.d("date",task.get("date"));
-                                 String dateString = formatter.format(new Date(Long.parseLong(task.get("date"))));
-                                  name += dateString;
-
-                                taskLt.add(name);
-                                Log.d("ta",taskLt.get(taskLt.size()-1));
-
-                                showList();
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-
-                    }
-
-                    Log.d("here","here");
-
-                    Log.d("ta","size =" + taskLt.size());
-
-
-
-                }
-
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+        if(role.equals("admin")) {
+            taskLt = AdminUserPrefs.taskItems;           //load data afterwards
+        }
+        showList();
 
 
 
