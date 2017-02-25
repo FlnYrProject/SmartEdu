@@ -32,6 +32,7 @@ import com.project.smartedu.R;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class NewTeacher extends BaseActivity {
 
@@ -204,28 +205,34 @@ public class NewTeacher extends BaseActivity {
     protected void addTeacher(FirebaseUser firebaseUser){
 
         databaseReference = Constants.databaseReference.child(Constants.TEACHER_TABLE).child(institutionName);
-
+/*
 
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                HashMap<String, String> teachermap=(HashMap<String, String>)dataSnapshot.getValue();
-                if(teachermap==null){
-                    serial=1;
-                }else{
-                    serial=teachermap.size() + 1 ;
-                }
+                HashMap<String, Object> teachermap=(HashMap<String, Object>)dataSnapshot.getValue();
+
+                    serial=teachermap.size()  ;
+                Toast.makeText(getApplicationContext(), " serial = " + serial, Toast.LENGTH_LONG).show();
+
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        });*/
+
+        serial=AdminUserPrefs.teacherLt.size()+1;
+
+        String entry=String.valueOf(serial)+ ". " + teacherName.getText().toString().trim();        //saving to local list
+        AdminUserPrefs.teacherLt.add(entry);
+        AdminUserPrefs.teacheruseridLt.add(firebaseUser.getUid());
+        AdminUserPrefs.teachersusermap.put(entry,firebaseUser.getUid());
 
         databaseReference.child(firebaseUser.getUid()).setValue(String.valueOf(serial));
 
-        Toast.makeText(getApplicationContext(), "Teacher details successfully stored", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Teacher details successfully stored with serial = " + serial, Toast.LENGTH_LONG).show();
 
         loginAdminBack();
 

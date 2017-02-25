@@ -79,64 +79,11 @@ public class Teachers extends AppCompatActivity {
 
 
 //        firebaseAuth=FirebaseAuth.getInstance();
-        databaseReference = Constants.databaseReference.child(Constants.TEACHER_TABLE).child(institutionName);
+
+        teacherLt=AdminUserPrefs.teacherLt;         //load data remaining
 
 
-
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                HashMap<String, String> teachersmap=(HashMap<String, String>)dataSnapshot.getValue();
-
-                if(teachersmap==null){
-
-                    Toast.makeText(getApplicationContext(),"No teachers added",Toast.LENGTH_LONG).show();
-
-                }else{
-
-                    Toast.makeText(getApplicationContext(),teachersmap.size() + " teachers found ",Toast.LENGTH_LONG).show();
-
-                    teacherLt = new ArrayList<>();
-                    for ( String key : teachersmap.keySet() ) {
-
-                        System.out.println( key );              //key is teacher user id
-
-                      //  databaseReference = Constants.databaseReference.child(Constants.TEACHER_TABLE).child(institutionName).child(key);
-
-                        databaseReference = Constants.databaseReference.child(Constants.USER_DETAILS_TABLE).child(key);
-
-                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                HashMap<String, String> teachermap=(HashMap<String, String>)dataSnapshot.getValue();
-                                teacherLt.add(teachermap.get("name"));
-                                showList();
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-
-                    }
-
-
-                }
-
-
-
-
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
+        showList();
 
 
 
