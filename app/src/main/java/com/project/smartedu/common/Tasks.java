@@ -74,13 +74,14 @@ public class Tasks extends BaseActivity {
     EditText Title;
     EditText Desc;
     EditText Date;
-    String taskid;
+    String taskid="";
 
     String [] items;
     ImageButton cal;
 
 
 
+    HashMap<String,String> taskidmap;
 
 
 
@@ -99,6 +100,12 @@ public class Tasks extends BaseActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
+        taskidmap=AdminUserPrefs.taskidmap;
+
+        for ( String key :AdminUserPrefs.taskidmap.keySet() ){
+            Log.d("keyi",key);
+        }
 
         Bundle fromhome= getIntent().getExtras();
         role = fromhome.getString("role");
@@ -184,11 +191,16 @@ public class Tasks extends BaseActivity {
 
 
 
-                final String entry=details[0].trim()+"\n"+details[1]+"\n"+String.valueOf(milliseconds);
+                final String entry=details[0].trim()+"\n"+details[1]+"\n"+details[2].trim();
 
-                taskid=AdminUserPrefs.taskidmap.get(entry);
 
-                Log.d("taskid",entry);
+                for ( String key :taskidmap.keySet() ){
+                    Log.d("keyi","key = " +key);
+                }
+
+                    taskid=taskidmap.get(entry);
+
+                Log.d("taskid","taskid = " +taskid);
 
                 okButton = (Button) dialog.findViewById(R.id.doneButton);
                 delButton = (Button) dialog.findViewById(R.id.doneButton);
@@ -258,8 +270,10 @@ public class Tasks extends BaseActivity {
 
                                     DatabaseReference dataRef=Constants.databaseReference.child(Constants.TASK_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child(role).child(taskid);
 
-                                    databaseReference.child("name").setValue(((EditText) dialog_in.findViewById(R.id.taskTitle)).getText().toString());
-                                    databaseReference.child("description").setValue(((EditText) dialog_in.findViewById(R.id.scheduleinfo)).getText().toString());
+                                    Log.d("title"," "+ ((EditText) dialog_in.findViewById(R.id.taskTitle)).getText().toString());
+                                    Log.d("info"," " +((EditText) dialog_in.findViewById(R.id.scheduleinfo)).getText().toString() );
+                                    dataRef.child("name").setValue(((EditText) dialog_in.findViewById(R.id.taskTitle)).getText().toString());
+                                    dataRef.child("description").setValue(((EditText) dialog_in.findViewById(R.id.scheduleinfo)).getText().toString());
 
                                     if (flag[0] == 1) {
                                         Day = Daycal;
@@ -292,7 +306,23 @@ public class Tasks extends BaseActivity {
                                         e1.printStackTrace();
                                     }
                                     long newmilliseconds = d.getTime();
-                                    databaseReference.child("date").setValue(String.valueOf(newmilliseconds));
+
+                                    String newtitle= ((EditText) dialog_in.findViewById(R.id.taskTitle)).getText().toString();
+                                            String newDesc=((EditText) dialog_in.findViewById(R.id.scheduleinfo)).getText().toString();
+                                            String newDate=String.valueOf(newmilliseconds);
+                                   dataRef.child("name").setValue(newtitle);
+                                    dataRef.child("description").setValue(newDesc);
+                                    dataRef.child("date").setValue(newDate);
+
+
+
+                                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                                    String dateString = formatter.format(new Date(milliseconds));
+                                    String newentry=newtitle+ "\n" + newDesc + "\n" + dateString;
+                                    AdminUserPrefs.taskidmap.remove(entry);
+                                    AdminUserPrefs.taskItems.remove(entry);
+                                    AdminUserPrefs.taskidmap.put(newentry,taskid);
+                                   AdminUserPrefs.taskItems.add(newentry);
 
 
 
