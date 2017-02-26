@@ -25,6 +25,7 @@ public class AdminUserPrefs {
 
 
     public static ArrayList<String> taskItems;
+    public static HashMap<String,String> taskidmap; //to map teacher to its user id
     public static ArrayList<String> teacherLt;
     public static ArrayList<String> teacheruseridLt;
     public static HashMap<String,String> teachersusermap; //to map teacher to its user id
@@ -32,6 +33,7 @@ public class AdminUserPrefs {
 
     static {
        taskItems=new ArrayList<>();
+        taskidmap=new HashMap<>();
         teacherLt=new ArrayList<>();
         teacheruseridLt=new ArrayList<>();
         teachersusermap=new HashMap<>();
