@@ -3,6 +3,8 @@ package com.project.smartedu.admin;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.project.smartedu.database.Schedule;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -25,10 +27,15 @@ public class AdminUserPrefs {
 
 
     public static ArrayList<String> taskItems;
-    public static HashMap<String,String> taskidmap; //to map teacher to its user id
+    public static HashMap<String,String> taskidmap; //to map task to its id
+
     public static ArrayList<String> teacherLt;
     public static ArrayList<String> teacheruseridLt;
     public static HashMap<String,String> teachersusermap; //to map teacher to its user id
+
+
+    public static HashMap<String,ArrayList<Schedule>> schedulesmaplt; // a map frpom day to its schedules
+
 
 
     static {
@@ -37,6 +44,7 @@ public class AdminUserPrefs {
         teacherLt=new ArrayList<>();
         teacheruseridLt=new ArrayList<>();
         teachersusermap=new HashMap<>();
+        schedulesmaplt=new HashMap<>();
 
     }
 

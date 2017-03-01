@@ -26,9 +26,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.project.smartedu.Constants;
 import com.project.smartedu.R;
+import com.project.smartedu.admin.AdminUserPrefs;
+import com.project.smartedu.database.*;
+import com.project.smartedu.database.Schedule;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -63,6 +67,9 @@ public class Schedule_days extends Fragment {
     DatabaseReference databaseReference;
     FirebaseAuth firebaseAuth;
 
+    ArrayList<com.project.smartedu.database.Schedule> scheduleslt;
+    HashMap<String,ArrayList<com.project.smartedu.database.Schedule>> schedulesmaplt;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -81,21 +88,157 @@ public class Schedule_days extends Fragment {
         firebaseAuth = FirebaseAuth.getInstance();
 
         Log.d("institution", institutionName);
+        scheduleslt= AdminUserPrefs.schedulesmaplt.get(day);
 
-        databaseReference = databaseReference.child(Constants.SCHEDULES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child(day);
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+        items = new String[scheduleslt.size()];
 
-            }
+        if(scheduleslt.size()==0){
+            scheduleList.setVisibility(View.INVISIBLE);
+            noschedule.setText("No Schedule Added");
+        }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+        for(int i=0;i<scheduleslt.size();i++){
+            Schedule scheduleobject=scheduleslt.get(i);
+            long start = TimeUnit.MILLISECONDS.toMinutes(scheduleobject.getStart_time());
+            long end = TimeUnit.MILLISECONDS.toMinutes(scheduleobject.getEnd_time());
+            String scheduleitem = start + "\n" + end + "\n" + scheduleobject.getInfo();
+            items[i] = scheduleitem;
+        }
+        scheduleLt = new ArrayList<>(Arrays.asList(items));
+        adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, scheduleLt);
+        scheduleList.setAdapter(adapter);
+
+
+
+
+
+
+
+
+
+
+
+
+        scheduleList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, final View view,
+                                    final int position, final long id) {
+
+
+                // selected item
+                String[] scheduleobject = ((TextView) view).getText().toString().split("\n");
+                final String[] details = new String[3];
+                int i = 0;
+
+                for (String x : scheduleobject) {
+                    details[i++] = x;
+                }
+
+                final Dialog show_dialog = new Dialog(getActivity());
+                show_dialog.setContentView(R.layout.show_schedule_details);
+                show_dialog.setTitle("Schedule Details");
+
+                starttimedisplay = (TextView) show_dialog.findViewById(R.id.start_time);
+                endtimedisplay = (TextView) show_dialog.findViewById(R.id.end_time);
+                infodisplay = (TextView) show_dialog.findViewById(R.id.info);
+
+                starttimedisplay.setText(details[0].trim());
+                endtimedisplay.setText(details[1].trim());
+
+                infodisplay.setText(details[2].trim());
+
+                String[] sttimes = details[0].split(":");
+                long time = TimeUnit.MINUTES.toMillis(Integer.parseInt(sttimes[0]) * 60 + Integer.parseInt(sttimes[1]));
+
+                final String[] scheduleId = new String[1];
+
+
+                okButton = (Button) show_dialog.findViewById(R.id.doneButton);
+                delButton = (Button) show_dialog.findViewById(R.id.doneButton);
+                editButton = (Button) show_dialog.findViewById(R.id.editButton);
+
+
+                okButton.setOnClickListener(new View.OnClickListener() {
+
+                    public void onClick(View v) {
+
+                        show_dialog.dismiss();
+
+                    }
+                });
+
+                delButton.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+
+                     //   ParseObject.createWithoutData(ScheduleTable.TABLE_NAME, scheduleId[0]).deleteEventually();
+                        show_dialog.dismiss();
+
+                    }
+                });
+
+                editButton.setOnClickListener(new View.OnClickListener() {
+
+                    public void onClick(View v) {
+
+
+                        final Dialog dialog_in = new Dialog(getActivity());
+                        dialog_in.setContentView(R.layout.activity_edit_schedule);
+                        dialog_in.setTitle("Edit Details");
+
+
+                        Desc = (EditText) dialog_in.findViewById(R.id.scheduleinfo);
+
+                        EditButton = (Button) dialog_in.findViewById(R.id.editButton);
+
+                        Desc.setText(details[2]);
+
+
+                        EditButton.setOnClickListener(new View.OnClickListener() {
+                            public void onClick(View v) {
+
+
+                                //edit shedule info and save
+                                dialog_in.dismiss();
+                            }
+
+                        });
+
+                        dialog_in.show();
+                        show_dialog.dismiss();
+                    }
+                });
+
+                show_dialog.show();
+                //recreate();
+
 
             }
         });
-        return  getView();
+
+
+
+
+
+
+
+
+
+        scheduleAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //add new schedule method
+               // newSchedule(v);
+            }
+        });
+
+
+
+
+
+
+
+        return schedule;
     }
+
         /*
 
         ParseQuery<ParseObject> scheduleQuery = ParseQuery.getQuery(ScheduleTable.TABLE_NAME);
