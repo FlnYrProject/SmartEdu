@@ -33,6 +33,7 @@ import com.project.smartedu.R;
 import com.project.smartedu.SignUp;
 import com.project.smartedu.UserPrefs;
 import com.project.smartedu.common.Tasks;
+import com.project.smartedu.database.Schedule;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -59,6 +60,124 @@ public class Home extends BaseActivity{
     ArrayList<String> teacheruseridLt;
     HashMap<String,String> teachersusermap; //to map teacher to its user id
     ArrayList<String> tempteacherlt;
+
+    ArrayList<Schedule> scheduleslt;
+    HashMap<String,ArrayList<Schedule>> schedulesmaplt;
+    HashMap<Schedule,String> schedulekeymap;        //to map schedule to the key
+
+
+
+
+
+
+    private class ScheduleItems extends AsyncTask<Void, Void, Void> {
+
+        private Context async_context;
+        private ProgressDialog pd;
+        String cursorday;
+
+        public ScheduleItems(Context context,String day){
+            this.async_context = context;
+            pd = new ProgressDialog(async_context);
+            cursorday=day;
+            databaseReference = Constants.databaseReference.child(Constants.SCHEDULES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child(cursorday);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd.setMessage("Fetching Schedules");
+            pd.setCancelable(false);
+            pd.show();
+            scheduleslt.clear();
+            schedulesmaplt.remove(cursorday);
+            schedulekeymap.clear();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            final Object lock = new Object();
+            final Object lock2 = new Object();
+
+
+
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    synchronized (lock) {
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+
+                            HashMap<String, HashMap<String,String>> retScheduleList = (HashMap<String, HashMap<String,String>>) ds.getValue();
+
+
+
+                            for ( String key : retScheduleList.keySet() ) {
+                                //  Toast.makeText(getApplicationContext(),"here",Toast.LENGTH_LONG).show();
+                                Log.d("key",key);
+                                HashMap<String,String> taskmap=retScheduleList.get(key);
+
+                                String info=taskmap.get("info");
+                                long start_date=Long.parseLong(taskmap.get("start_time"));
+                                long end_date=Long.parseLong(taskmap.get("end_time"));
+
+                                Schedule schedule=new Schedule(cursorday,start_date,end_date,info);
+                                schedulekeymap.put(schedule,key);
+                                scheduleslt.add(schedule);
+
+                            }
+
+
+
+
+                        }
+
+
+
+                        lock.notifyAll();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+
+            });
+
+            synchronized (lock){
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //Handles the stuff after the synchronisation with the firebase listener has been achieved
+            //The main UI is already idle by this moment
+            super.onPostExecute(aVoid);
+
+            //Show the log in progress_bar for at least a few milliseconds
+            Toast.makeText(getApplicationContext(),scheduleslt.size() + " schedules found on " + cursorday,Toast.LENGTH_LONG).show();
+
+            schedulesmaplt.put(cursorday,scheduleslt);
+            AdminUserPrefs.schedulesmaplt=schedulesmaplt;
+            AdminUserPrefs.schedulekeymap=schedulekeymap;
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    pd.dismiss();
+                }
+            }, 500);  // 100 milliseconds
+        }
+        //end firebase_async_class
+    }
+
 
 
 
@@ -338,7 +457,9 @@ public class Home extends BaseActivity{
         teacheruseridLt=AdminUserPrefs.teacheruseridLt;
         teachersusermap=AdminUserPrefs.teachersusermap;
         tempteacherlt=new ArrayList<>();
-
+        schedulesmaplt=AdminUserPrefs.schedulesmaplt;
+        scheduleslt=new ArrayList<>();
+        schedulekeymap=AdminUserPrefs.schedulekeymap;
 
         logout=(Button)findViewById(R.id.lo);
 

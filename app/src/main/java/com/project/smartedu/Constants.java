@@ -23,6 +23,10 @@ public class Constants {
 
 
 
+  public static final String[] days= {"monday","tuesday","wednesday","thursday","friday","saturday","sunday"};
+
+
+
 
 
 
