@@ -23,7 +23,7 @@ public class Constants {
 
 
 
-  public static final String[] days= {"monday","tuesday","wednesday","thursday","friday","saturday","sunday"};
+  public static final String[] days= {"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
 
 
 

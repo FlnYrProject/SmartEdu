@@ -47,7 +47,7 @@ public class Schedule_days extends Fragment {
     Spinner startmins;
     Spinner endhours;
     Spinner endmins;
-    String [] items;
+    String[] items;
     ArrayList<String> scheduleLt;
     ArrayAdapter adapter=null;
     TextView starttimedisplay;
@@ -88,30 +88,33 @@ public class Schedule_days extends Fragment {
         firebaseAuth = FirebaseAuth.getInstance();
 
         Log.d("institution", institutionName);
-        scheduleslt= AdminUserPrefs.schedulesmaplt.get(day);
 
-        items = new String[scheduleslt.size()];
 
-        if(scheduleslt.size()==0){
-            scheduleList.setVisibility(View.INVISIBLE);
-            noschedule.setText("No Schedule Added");
+        if (AdminUserPrefs.schedulesmaplt.containsKey(day)){
+            scheduleslt = AdminUserPrefs.schedulesmaplt.get(day);
+            if (scheduleslt.size() == 0) {
+                scheduleList.setVisibility(View.INVISIBLE);
+                noschedule.setText("No Schedule Added");
+            } else {
+                items = new String[scheduleslt.size()];
+
+
+                for (int i = 0; i < scheduleslt.size(); i++) {
+                    Schedule scheduleobject = scheduleslt.get(i);
+                    long start = TimeUnit.MILLISECONDS.toMinutes(scheduleobject.getStart_time());
+                    long end = TimeUnit.MILLISECONDS.toMinutes(scheduleobject.getEnd_time());
+                    String scheduleitem = start + "\n" + end + "\n" + scheduleobject.getInfo();
+                    items[i] = scheduleitem;
+                }
+                scheduleLt = new ArrayList<>(Arrays.asList(items));
+                adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, scheduleLt);
+                scheduleList.setAdapter(adapter);
+
+
+            }
+    }else{
+            scheduleslt=new ArrayList<>();
         }
-
-        for(int i=0;i<scheduleslt.size();i++){
-            Schedule scheduleobject=scheduleslt.get(i);
-            long start = TimeUnit.MILLISECONDS.toMinutes(scheduleobject.getStart_time());
-            long end = TimeUnit.MILLISECONDS.toMinutes(scheduleobject.getEnd_time());
-            String scheduleitem = start + "\n" + end + "\n" + scheduleobject.getInfo();
-            items[i] = scheduleitem;
-        }
-        scheduleLt = new ArrayList<>(Arrays.asList(items));
-        adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, scheduleLt);
-        scheduleList.setAdapter(adapter);
-
-
-
-
-
 
 
 
@@ -402,7 +405,7 @@ public class Schedule_days extends Fragment {
 
             Toast.makeText(getActivity(), "schedule added ", Toast.LENGTH_LONG).show();
             dialog.dismiss();
-            Intent reload=new Intent(getActivity(),Schedule.class);
+            Intent reload=new Intent(getActivity(), com.project.smartedu.common.Schedule.class);
             reload.putExtra("institutionName",institutionName);
             reload.putExtra("day", day);
             reload.putExtra("role", role);
