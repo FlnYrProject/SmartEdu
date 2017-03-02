@@ -34,7 +34,8 @@ public class AdminUserPrefs {
     public static HashMap<String,String> teachersusermap; //to map teacher to its user id
 
 
-    public static HashMap<String,ArrayList<Schedule>> schedulesmaplt; // a map frpom day to its schedules
+    public static HashMap<String,ArrayList<Schedule>> schedulesmaplt; // a map from day to its schedules
+   public static HashMap<Schedule,String> schedulekeymap;        ///to map schedule to key
 
 
 
@@ -45,6 +46,7 @@ public class AdminUserPrefs {
         teacheruseridLt=new ArrayList<>();
         teachersusermap=new HashMap<>();
         schedulesmaplt=new HashMap<>();
+        schedulekeymap=new HashMap<>();
 
     }
 

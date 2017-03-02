@@ -63,7 +63,7 @@ public class Home extends BaseActivity{
 
     ArrayList<Schedule> scheduleslt;
     HashMap<String,ArrayList<Schedule>> schedulesmaplt;
-
+    HashMap<Schedule,String> schedulekeymap;        //to map schedule to the key
 
 
 
@@ -91,6 +91,7 @@ public class Home extends BaseActivity{
             pd.show();
             scheduleslt.clear();
             schedulesmaplt.remove(cursorday);
+            schedulekeymap.clear();
         }
 
         @Override
@@ -114,14 +115,13 @@ public class Home extends BaseActivity{
                                 //  Toast.makeText(getApplicationContext(),"here",Toast.LENGTH_LONG).show();
                                 Log.d("key",key);
                                 HashMap<String,String> taskmap=retScheduleList.get(key);
-                                                                // Toast.makeText(getApplicationContext(),taskmap.get("name") + " " + taskmap.get("date"),Toast.LENGTH_LONG).show();
-                                /// System.out.print(taskmap.get("name") + " " + taskmap.get("date"));
 
                                 String info=taskmap.get("info");
                                 long start_date=Long.parseLong(taskmap.get("start_time"));
                                 long end_date=Long.parseLong(taskmap.get("end_time"));
 
                                 Schedule schedule=new Schedule(cursorday,start_date,end_date,info);
+                                schedulekeymap.put(schedule,key);
                                 scheduleslt.add(schedule);
 
                             }
@@ -166,6 +166,7 @@ public class Home extends BaseActivity{
 
             schedulesmaplt.put(cursorday,scheduleslt);
             AdminUserPrefs.schedulesmaplt=schedulesmaplt;
+            AdminUserPrefs.schedulekeymap=schedulekeymap;
 
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -458,6 +459,7 @@ public class Home extends BaseActivity{
         tempteacherlt=new ArrayList<>();
         schedulesmaplt=AdminUserPrefs.schedulesmaplt;
         scheduleslt=new ArrayList<>();
+        schedulekeymap=AdminUserPrefs.schedulekeymap;
 
         logout=(Button)findViewById(R.id.lo);
 

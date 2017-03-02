@@ -68,7 +68,7 @@ public class Schedule_days extends Fragment {
     FirebaseAuth firebaseAuth;
 
     ArrayList<com.project.smartedu.database.Schedule> scheduleslt;
-    HashMap<String,ArrayList<com.project.smartedu.database.Schedule>> schedulesmaplt;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -225,8 +225,8 @@ public class Schedule_days extends Fragment {
         scheduleAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //add new schedule method
-               // newSchedule(v);
+
+                newSchedule(v);
             }
         });
 
@@ -238,6 +238,230 @@ public class Schedule_days extends Fragment {
 
         return schedule;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public void newSchedule(final View view)
+    {
+        final Dialog dialog = new Dialog(getActivity());
+        dialog.setContentView(R.layout.new_schedule);
+        dialog.setTitle("Select Date");
+        final Button addnew=(Button)dialog.findViewById(R.id.add);
+        info=(EditText)dialog.findViewById(R.id.info);
+
+        final String[] hours= new String[24];
+        for(int i=0;i<24;i++)
+        {
+            hours[i]=String.valueOf(i);
+        }
+        final String[] mins=new String[60];
+        for(int i=0;i<60;i++)
+        {
+            mins[i]=String.valueOf(i);
+        }
+        starthours = (Spinner)dialog.findViewById(R.id.start_hours);
+        startmins = (Spinner)dialog.findViewById(R.id.start_mins);
+        endhours = (Spinner)dialog.findViewById(R.id.end_hours);
+        endmins = (Spinner)dialog.findViewById(R.id.end_mins);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_spinner_item, hours);
+        starthours.setAdapter(adapter);
+        adapter=new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_spinner_item, mins);
+        startmins.setAdapter(adapter);
+        starthours.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                int selectedstarthours = Integer.parseInt(starthours.getSelectedItem().toString());
+                String[] hours_end = new String[24 - selectedstarthours];
+                int x = selectedstarthours;
+                for (int i = 0; i < 24 - selectedstarthours; i++) {
+                    hours_end[i] = String.valueOf(x);
+                    x++;
+                }
+                ArrayAdapter<String> adapter_end = new ArrayAdapter<String>(getActivity(),
+                        android.R.layout.simple_spinner_item, hours_end);
+                endhours.setAdapter(adapter_end);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+
+
+
+        /*startmins.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                int selectedstartmins = Integer.parseInt(startmins.getSelectedItem().toString());
+                String[] mins_end = new String[60 - selectedstartmins];
+                int x = selectedstartmins + 1;
+                for (int i = 0; i < 59 - selectedstartmins; i++) {
+                    mins_end[i] = String.valueOf(x);
+                    x++;
+                }
+                ArrayAdapter<String> adapter_end = new ArrayAdapter<String>(getActivity(),
+                        android.R.layout.simple_spinner_item, mins_end);
+                endmins.setAdapter(adapter_end);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });*/
+
+
+
+
+
+
+        endhours.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                int selectedendhours = Integer.parseInt(endhours.getSelectedItem().toString());
+                if(!(selectedendhours==Integer.parseInt(starthours.getSelectedItem().toString()))) {
+                    String[] mins_end = new String[60];
+                    for (int i = 0; i < 60; i++) {
+                        mins_end[i] = String.valueOf(i);
+                    }
+
+                    ArrayAdapter<String> adapter_end = new ArrayAdapter<String>(getActivity(),
+                            android.R.layout.simple_spinner_item, mins_end);
+                    endmins.setAdapter(adapter_end);
+                }else
+                {
+                    int selectedstartmins = Integer.parseInt(startmins.getSelectedItem().toString());
+                    String[] mins_end = new String[60 - selectedstartmins];
+                    int x = selectedstartmins + 1;
+                    for (int i = 0; i < 59 - selectedstartmins; i++) {
+                        mins_end[i] = String.valueOf(x);
+                        x++;
+                    }
+                    ArrayAdapter<String> adapter_end = new ArrayAdapter<String>(getActivity(),
+                            android.R.layout.simple_spinner_item, mins_end);
+                    endmins.setAdapter(adapter_end);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        addnew.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                add(view, dialog);
+                //dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    public void  add(View v, Dialog dialog)
+    {   flag=0;
+        int start=Integer.parseInt(starthours.getSelectedItem().toString())*60 + Integer.parseInt(startmins.getSelectedItem().toString());
+        int end=Integer.parseInt(endhours.getSelectedItem().toString())*60 + Integer.parseInt(endmins.getSelectedItem().toString());
+        long startmilli= TimeUnit.MINUTES.toMillis(start);
+        long endmilli=TimeUnit.MINUTES.toMillis(end);
+        if(info.getText().toString().equals(""))
+        {
+            Toast.makeText(getActivity(), "add schedule info ", Toast.LENGTH_LONG).show();
+        }else if(checkTimeClash(startmilli,endmilli))
+        {
+            Toast.makeText(getActivity(), "selected time overlaps with other schedule in this or some other institute", Toast.LENGTH_LONG).show();
+        }else
+        {
+
+            Schedule newSchedule=new Schedule(day,startmilli,endmilli,info.getText().toString());
+            scheduleslt.add(newSchedule);
+            AdminUserPrefs.schedulesmaplt.put(day,scheduleslt);     //reflecting to local data
+
+            //add to the server
+
+            databaseReference=Constants.databaseReference.child(Constants.SCHEDULES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child(day).push();
+            databaseReference.child("info").setValue(info.getText().toString());
+            databaseReference.child("start_time").setValue(String.valueOf(startmilli));
+            databaseReference.child("end_time").setValue(String.valueOf(endmilli));
+
+
+            Toast.makeText(getActivity(), "schedule added ", Toast.LENGTH_LONG).show();
+            dialog.dismiss();
+            Intent reload=new Intent(getActivity(),Schedule.class);
+            reload.putExtra("institutionName",institutionName);
+            reload.putExtra("day", day);
+            reload.putExtra("role", role);
+            startActivity(reload);
+        }
+    }
+
+
+
+
+
+
+
+
+    public boolean checkTimeClash(long start,long end)
+    {   // Log.d("user", "checking and flag = " + String.valueOf(flag));
+        final int[] check = new int[1];
+
+
+        for (int i = 0; i < scheduleslt.size(); i++) {
+
+            Schedule schedule = scheduleslt.get(i);
+            long ret_start = schedule.getStart_time();
+            long ret_end = schedule.getEnd_time();
+            if (start >= ret_start && start < ret_end) {
+                //flag=1;
+                check[0] = 1;
+                return true;
+                //break;
+            }
+            if (end > ret_start && end <= ret_end) {
+                //Schedule_days.this.flag = 1;
+                check[0] = 1;
+                return true;
+                // break;
+            }
+            if (start < ret_start && end > ret_end) {
+                Schedule_days.this.flag = 1;
+                check[0] = 1;
+                return true;
+                // break;
+            }
+        }
+
+
+
+        return false;
+    }
+
+
+
+
+
+
+
+
+
+
+
 
         /*
 
