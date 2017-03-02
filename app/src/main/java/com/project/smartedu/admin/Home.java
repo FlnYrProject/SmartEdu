@@ -76,11 +76,10 @@ public class Home extends BaseActivity{
         private ProgressDialog pd;
         String cursorday;
 
-        public ScheduleItems(Context context,String day){
+        public ScheduleItems(Context context){
             this.async_context = context;
             pd = new ProgressDialog(async_context);
-            cursorday=day;
-            databaseReference = Constants.databaseReference.child(Constants.SCHEDULES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child(cursorday);
+           // cursorday=day;
         }
 
         @Override
@@ -90,8 +89,8 @@ public class Home extends BaseActivity{
             pd.setCancelable(false);
             pd.show();
             scheduleslt.clear();
-            schedulesmaplt.remove(cursorday);
-            schedulekeymap.clear();
+            schedulesmaplt.clear();
+            //schedulekeymap.clear();
         }
 
         @Override
@@ -99,58 +98,148 @@ public class Home extends BaseActivity{
             final Object lock = new Object();
             final Object lock2 = new Object();
 
+            for(int x=0;x<Constants.days.length;x++){
+                cursorday=Constants.days[x];
+              //  schedulesmaplt.remove(cursorday);
+                scheduleslt.clear();
+                databaseReference = Constants.databaseReference.child(Constants.SCHEDULES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child(cursorday);
+
+                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+/*
+
+                        synchronized (lock) {
+                            for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                                HashMap<String, HashMap<String,String>> retTaskList = (HashMap<String, HashMap<String,String>>) ds.getValue();
+                                //   Toast.makeText(getApplicationContext(),"here in",Toast.LENGTH_LONG).show();
+
+                                for ( String key : retTaskList.keySet() ) {
+                                    //  Toast.makeText(getApplicationContext(),"here",Toast.LENGTH_LONG).show();
+                                    Log.d("key",key);
+                                    HashMap<String,String> taskmap=( HashMap<String,String>)retTaskList.get(key);
+                                    // Toast.makeText(getApplicationContext(),taskmap.get("name") + " " + taskmap.get("date"),Toast.LENGTH_LONG).show();
+                                    /// System.out.print(taskmap.get("name") + " " + taskmap.get("date"));
 
 
-            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    synchronized (lock) {
-                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
 
-                            HashMap<String, HashMap<String,String>> retScheduleList = (HashMap<String, HashMap<String,String>>) ds.getValue();
+                                    String info = taskmap.get("info");
+                                    long start_date = Long.parseLong(taskmap.get("start_time"));
+                                    long end_date = Long.parseLong(taskmap.get("end_time"));
+
+                                    Schedule schedule = new Schedule(cursorday, start_date, end_date, info);
+                                    schedulekeymap.put(schedule, key);
+                                    scheduleslt.add(schedule);
+                                }
 
 
 
-                            for ( String key : retScheduleList.keySet() ) {
-                                //  Toast.makeText(getApplicationContext(),"here",Toast.LENGTH_LONG).show();
-                                Log.d("key",key);
-                                HashMap<String,String> taskmap=retScheduleList.get(key);
+                            }
+                            lock.notifyAll();
+                        }
 
-                                String info=taskmap.get("info");
-                                long start_date=Long.parseLong(taskmap.get("start_time"));
-                                long end_date=Long.parseLong(taskmap.get("end_time"));
+*/
 
-                                Schedule schedule=new Schedule(cursorday,start_date,end_date,info);
-                                schedulekeymap.put(schedule,key);
-                                scheduleslt.add(schedule);
+
+
+
+
+
+
+
+
+
+
+                        synchronized (lock) {
+                            for (DataSnapshot ds : dataSnapshot.getChildren()) {
+
+                              /*  HashMap<String, HashMap<String, String>> retScheduleList = new HashMap<String, HashMap<String, String>>();
+                                retScheduleList = (HashMap<String, HashMap<String, String>>) ds.getValue();
+
+
+
+                                for (String key : retScheduleList.keySet()) {
+                                    //  Toast.makeText(getApplicationContext(),"here",Toast.LENGTH_LONG).show();
+                                    Log.d("key", key);
+                                    HashMap<String, String> taskmap = retScheduleList.get(key);
+
+                                    String info = taskmap.get("info");
+                                    long start_date = Long.parseLong(taskmap.get("start_time"));
+                                    long end_date = Long.parseLong(taskmap.get("end_time"));
+
+                                    Schedule schedule = new Schedule(cursorday, start_date, end_date, info);
+                                    schedulekeymap.put(schedule, key);
+                                    scheduleslt.add(schedule);
+
+                                }
+
+
+
+
+*/
+                            HashMap<String, String> retScheduleList = new HashMap<String, String>();
+                             retScheduleList = (HashMap<String, String>) ds.getValue();
+                             HashMap<String, String> taskmap = retScheduleList;
+                             try {
+                             String info = taskmap.get("info");
+                             long start_date = Long.parseLong(taskmap.get("start_time"));
+                             long end_date = Long.parseLong(taskmap.get("end_time"));
+
+
+
+
+                                     Schedule schedule = new Schedule(cursorday, start_date, end_date, info);
+                                 Log.d("sskey",ds.getKey());
+                                     schedulekeymap.put(schedule, ds.getKey());
+                                     scheduleslt.add(schedule);
+
+
+
+                             }catch (NullPointerException npe){
+
+                             }
+
+
+
 
                             }
 
 
 
-
+                            lock.notifyAll();
                         }
+                    }
 
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
+                    }
 
-                        lock.notifyAll();
+                });
+
+                synchronized (lock){
+                    try {
+                        lock.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+                schedulesmaplt.put(cursorday,scheduleslt);
+                if(scheduleslt.size()!=0) {
+                    Log.d("day", cursorday);
+                    Toast.makeText(getApplicationContext(),schedulesmaplt.get(cursorday).size() + " schedules found on " +cursorday,Toast.LENGTH_LONG).show();
 
                 }
 
-            });
 
-            synchronized (lock){
-                try {
-                    lock.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             }
+
+
+
+
+
 
             return null;
         }
@@ -162,9 +251,12 @@ public class Home extends BaseActivity{
             super.onPostExecute(aVoid);
 
             //Show the log in progress_bar for at least a few milliseconds
-            Toast.makeText(getApplicationContext(),scheduleslt.size() + " schedules found on " + cursorday,Toast.LENGTH_LONG).show();
+            for(int x=0;x<Constants.days.length;x++){
+                Toast.makeText(getApplicationContext(),schedulesmaplt.get(Constants.days[x]).size() + " schedules found on " +Constants.days[x],Toast.LENGTH_LONG).show();
 
-            schedulesmaplt.put(cursorday,scheduleslt);
+            }
+
+           // schedulesmaplt.put(cursorday,scheduleslt);
             AdminUserPrefs.schedulesmaplt=schedulesmaplt;
             AdminUserPrefs.schedulekeymap=schedulekeymap;
 
@@ -315,6 +407,7 @@ public class Home extends BaseActivity{
             handler.postDelayed(new Runnable() {
                 public void run() {
                     pd.dismiss();
+                    loadScheduleData();
                 }
             }, 500);  // 100 milliseconds
         }
@@ -428,6 +521,7 @@ public class Home extends BaseActivity{
             handler.postDelayed(new Runnable() {
                 public void run() {
                     pd.dismiss();
+                    loadTeacherData();
                 }
             }, 500);  // 100 milliseconds
         }
@@ -518,6 +612,12 @@ public class Home extends BaseActivity{
                 }
                 else if (position == 3) {   //allotments
 
+                    Intent task_intent = new Intent(Home.this, com.project.smartedu.common.Schedule.class);
+                    //task_intent.putExtra("institution_code",institution_code);
+                    task_intent.putExtra("institution_name",institutionName);
+                    task_intent.putExtra("role", "admin");
+                    startActivity(task_intent);
+
                 }
 
             }
@@ -536,7 +636,10 @@ public class Home extends BaseActivity{
 
 
 
-            loadTeacherData();
+         //   loadTeacherData();
+
+
+       // loadScheduleData();
 
 
 
@@ -557,6 +660,17 @@ public class Home extends BaseActivity{
 
     }
 
+
+    private void loadScheduleData(){
+
+
+            ScheduleItems scheduleasync = new ScheduleItems(Home.this);        //get teacher data
+            scheduleasync.execute();
+
+
+
+
+    }
 
 
 }
