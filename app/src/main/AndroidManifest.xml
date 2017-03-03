@@ -16,13 +16,11 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            </activity>
+        </activity>
         <activity
             android:name=".SignUp"
             android:label="@string/title_activity_sign_up"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".admin.Home"
             android:label="@string/title_activity_home"
@@ -62,7 +60,12 @@
         <activity
             android:name=".common.Schedule"
             android:label="@string/title_activity_schedule"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".common.parent_choose_child" />
+        <activity android:name=".common.select_institution" />
+        <activity android:name=".student.Home" />
+        <activity android:name=".parent.Home" />
+        <activity android:name=".teacher.Home"></activity>
     </application>
 
 </manifest>

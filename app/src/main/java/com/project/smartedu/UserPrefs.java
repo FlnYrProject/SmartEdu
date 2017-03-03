@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 /**
  * Created by Shubham Bhasin on 24-Feb-17.
  */
@@ -35,6 +38,14 @@ public class UserPrefs {
     public static final String USER_ID= "userid";
 
     public static final String INSTITUION= "adminInst";
+
+
+
+    public static HashMap<String,ArrayList<String>> roleslistmap;
+
+    static {
+        roleslistmap=new HashMap<>();
+    }
 
     public UserPrefs(Context context){
         this._context = context;
@@ -78,6 +89,7 @@ public class UserPrefs {
         // Clearing all data from Shared Preferences
         editor.clear();
         editor.commit();
+        roleslistmap.clear();
 
         // After logout redirect user to Loing Activity
         Intent i = new Intent(_context, LoginActivity.class);

@@ -32,6 +32,7 @@ import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.R;
 import com.project.smartedu.admin.AdminUserPrefs;
+import com.project.smartedu.database.Task;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -225,10 +226,13 @@ public class Tasks extends BaseActivity {
                         AdminUserPrefs.taskItems.remove(entry);
 
 
-                        onRestart();
 
 
                         dialog.dismiss();
+
+                        Intent reload=new Intent(Tasks.this,Tasks.class);
+                        reload.putExtra("role",role);
+                        startActivity(reload);
 
                     }
                 });
@@ -327,7 +331,11 @@ public class Tasks extends BaseActivity {
 
 
                                     dialog_in.dismiss();
-                                    onRestart();
+                                    Intent reload=new Intent(Tasks.this,Tasks.class);
+                                    reload.putExtra("role",role);
+                                    startActivity(reload);
+
+                                   // onRestart();
                                 }
                             }
 
