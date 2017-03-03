@@ -89,9 +89,17 @@ public class Schedule_days extends Fragment {
 
         Log.d("institution", institutionName);
 
+        scheduleslt=new ArrayList<>();
 
-        if (AdminUserPrefs.schedulesmaplt.containsKey(day)){
-            scheduleslt = AdminUserPrefs.schedulesmaplt.get(day);
+        for(Schedule sch:AdminUserPrefs.schedulekeymap.keySet()){
+            if(sch.getDay().equals(day)){
+                scheduleslt.add(sch);
+            }
+        }
+
+
+
+
             if (scheduleslt.size() == 0) {
                 scheduleList.setVisibility(View.INVISIBLE);
                 noschedule.setText("No Schedule Added");
@@ -112,9 +120,7 @@ public class Schedule_days extends Fragment {
 
 
             }
-    }else{
-            scheduleslt=new ArrayList<>();
-        }
+
 
 
 
@@ -393,7 +399,6 @@ public class Schedule_days extends Fragment {
 
             Schedule newSchedule=new Schedule(day,startmilli,endmilli,info.getText().toString());
             scheduleslt.add(newSchedule);
-            AdminUserPrefs.schedulesmaplt.put(day,scheduleslt);     //reflecting to local data
 
             //add to the server
 
@@ -401,6 +406,8 @@ public class Schedule_days extends Fragment {
             databaseReference.child("info").setValue(info.getText().toString());
             databaseReference.child("start_time").setValue(String.valueOf(startmilli));
             databaseReference.child("end_time").setValue(String.valueOf(endmilli));
+
+            AdminUserPrefs.schedulekeymap.put(newSchedule,databaseReference.getKey());     //reflecting to local data
 
 
             Toast.makeText(getActivity(), "schedule added ", Toast.LENGTH_LONG).show();
