@@ -203,7 +203,7 @@ public class Tasks extends BaseActivity {
                 Log.d("taskid","taskid = " +taskid);
 
                 okButton = (Button) dialog.findViewById(R.id.doneButton);
-                delButton = (Button) dialog.findViewById(R.id.doneButton);
+                delButton = (Button) dialog.findViewById(R.id.delButton);
                 editButton = (Button) dialog.findViewById(R.id.editButton);
 
 

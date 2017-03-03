@@ -68,7 +68,7 @@ public class Schedule_days extends Fragment {
     FirebaseAuth firebaseAuth;
 
     ArrayList<com.project.smartedu.database.Schedule> scheduleslt;
-
+    HashMap<String,Schedule> localScheduleMap;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -90,6 +90,7 @@ public class Schedule_days extends Fragment {
         Log.d("institution", institutionName);
 
         scheduleslt=new ArrayList<>();
+        localScheduleMap=new HashMap<>();
 
         for(Schedule sch:AdminUserPrefs.schedulekeymap.keySet()){
             if(sch.getDay().equals(day)){
@@ -113,6 +114,7 @@ public class Schedule_days extends Fragment {
                     long end = TimeUnit.MILLISECONDS.toMinutes(scheduleobject.getEnd_time());
                     String scheduleitem = start + "\n" + end + "\n" + scheduleobject.getInfo();
                     items[i] = scheduleitem;
+                    localScheduleMap.put(scheduleitem,scheduleobject);
                 }
                 scheduleLt = new ArrayList<>(Arrays.asList(items));
                 adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, scheduleLt);
@@ -156,13 +158,13 @@ public class Schedule_days extends Fragment {
                 infodisplay.setText(details[2].trim());
 
                 String[] sttimes = details[0].split(":");
-                long time = TimeUnit.MINUTES.toMillis(Integer.parseInt(sttimes[0]) * 60 + Integer.parseInt(sttimes[1]));
+//                long time = TimeUnit.MINUTES.toMillis(Integer.parseInt(sttimes[0]) * 60 + Integer.parseInt(sttimes[1]));
 
                 final String[] scheduleId = new String[1];
 
 
                 okButton = (Button) show_dialog.findViewById(R.id.doneButton);
-                delButton = (Button) show_dialog.findViewById(R.id.doneButton);
+                delButton = (Button) show_dialog.findViewById(R.id.delButton);
                 editButton = (Button) show_dialog.findViewById(R.id.editButton);
 
 
@@ -178,7 +180,15 @@ public class Schedule_days extends Fragment {
                 delButton.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
 
-                     //   ParseObject.createWithoutData(ScheduleTable.TABLE_NAME, scheduleId[0]).deleteEventually();
+                        String selecteditem=((TextView) view).getText().toString();
+                        Schedule selectedSchedule=localScheduleMap.get(selecteditem);
+
+                      databaseReference=Constants.databaseReference.child(Constants.SCHEDULES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child(day).child(AdminUserPrefs.schedulekeymap.get(selectedSchedule));
+                        databaseReference.removeValue();        //removing from server
+
+                        localScheduleMap.remove(selecteditem);
+                        AdminUserPrefs.schedulekeymap.remove(selectedSchedule);     //remove from local data
+                        scheduleslt.remove(selectedSchedule);
                         show_dialog.dismiss();
 
                     }
@@ -194,6 +204,17 @@ public class Schedule_days extends Fragment {
                         dialog_in.setTitle("Edit Details");
 
 
+
+
+                        final String selecteditem=((TextView) view).getText().toString();
+                        final Schedule selectedSchedule=localScheduleMap.get(selecteditem);
+
+                        databaseReference=Constants.databaseReference.child(Constants.SCHEDULES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child(day).child(AdminUserPrefs.schedulekeymap.get(selectedSchedule));
+
+
+
+
+
                         Desc = (EditText) dialog_in.findViewById(R.id.scheduleinfo);
 
                         EditButton = (Button) dialog_in.findViewById(R.id.editButton);
@@ -203,6 +224,24 @@ public class Schedule_days extends Fragment {
 
                         EditButton.setOnClickListener(new View.OnClickListener() {
                             public void onClick(View v) {
+                                databaseReference.child("info").setValue(Desc.getText().toString());    //to server
+
+                                localScheduleMap.remove(selecteditem);
+                                String key= AdminUserPrefs.schedulekeymap.get(selectedSchedule);
+                                AdminUserPrefs.schedulekeymap.remove(selectedSchedule);     //remove from local data
+                                scheduleslt.remove(selectedSchedule);
+
+
+
+
+                                Schedule neweditschedule=new Schedule(day,selectedSchedule.getStart_time(),selectedSchedule.getEnd_time(),Desc.getText().toString());
+                                long start = TimeUnit.MILLISECONDS.toMinutes(selectedSchedule.getStart_time());
+                                long end = TimeUnit.MILLISECONDS.toMinutes(selectedSchedule.getEnd_time());
+                                String editedscheduleitem = start + "\n" + end + "\n" + Desc.getText().toString();
+                                localScheduleMap.put(editedscheduleitem,neweditschedule);
+                                AdminUserPrefs.schedulekeymap.put(neweditschedule,key);
+                                scheduleslt.add(neweditschedule);
+
 
 
                                 //edit shedule info and save
