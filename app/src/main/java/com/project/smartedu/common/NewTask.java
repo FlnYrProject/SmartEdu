@@ -115,11 +115,19 @@ public class NewTask extends BaseActivity {
 
                     databaseReference.child("name").setValue(myTitle);
                     databaseReference.child("description").setValue(myDesc);
-                    databaseReference.child("date").setValue(String.valueOf(milliseconds));
+                    databaseReference.child("date").setValue(String.valueOf(milliseconds));     //adding to server
+
+
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
 
 
-                    String entry=myTitle+"\n"+myDesc+"\n"+String.valueOf(milliseconds);
+                    String dateString = formatter.format(new Date(milliseconds));
+
+                 //   String entry=mm+ "\n" + taskmap.get("description") + "\n" + dateString;
+
+
+                    String entry=myTitle+"\n"+myDesc+"\n"+dateString;
 
                     if(role.equals("admin"))
                     AdminUserPrefs.taskItems.add(entry);

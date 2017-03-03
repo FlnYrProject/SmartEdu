@@ -486,10 +486,12 @@ public class Home extends BaseActivity{
             @Override
             public void onClick(View v) {
                 firebaseAuth.signOut();
-                startActivity(new Intent(Home.this, LoginActivity.class));
+                userPrefs.clearUserDetails();
+               // startActivity(new Intent(Home.this, LoginActivity.class));
             }
         });
 
+       userPrefs=new UserPrefs(Home.this);
 
 
         Intent from_login = getIntent();
@@ -577,15 +579,15 @@ public class Home extends BaseActivity{
     private void loadData(){
 
 
-           // loadTaskData();
+            loadTaskData();
 
 
 
 
-         //   loadTeacherData();
 
 
-       loadScheduleData();
+
+
 
 
 
