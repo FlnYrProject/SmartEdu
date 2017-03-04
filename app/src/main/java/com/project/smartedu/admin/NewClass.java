@@ -135,7 +135,7 @@ public class NewClass extends BaseActivity {
 
     protected void  addAllotment(String classname,String section, String teacheruid, final String subject){
 
-        databaseReference= Constants.databaseReference.child(Constants.ALLOTMENTS_TABLE).child(institutionName).child(teacheruid).child(institutionName+"_"+classname+"_"+section).push();
+        databaseReference= Constants.databaseReference.child(Constants.ALLOTMENTS_TABLE).child(institutionName).child(teacheruid).child(institutionName+"_"+classname+"_"+section);
         databaseReference.child("subject").setValue(subject);
         databaseReference.child("class_teacher").setValue("1");
 
