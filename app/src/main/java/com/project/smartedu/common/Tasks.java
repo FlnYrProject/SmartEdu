@@ -102,6 +102,8 @@ public class Tasks extends BaseActivity {
         setSupportActionBar(toolbar);
 
 
+        Log.d("classsize", String.valueOf(AdminUserPrefs.classes.size()));
+
         taskidmap=AdminUserPrefs.taskidmap;
 
         for ( String key :AdminUserPrefs.taskidmap.keySet() ){

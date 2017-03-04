@@ -92,6 +92,7 @@ public class UserPrefs {
         editor.clear();
         editor.commit();
         roleslistmap.clear();
+        parentchildinstmap.clear();
 
         // After logout redirect user to Loing Activity
         Intent i = new Intent(_context, LoginActivity.class);
