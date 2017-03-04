@@ -41,6 +41,7 @@ public class AdminUserPrefs {
 
 
     static {
+
        taskItems=new ArrayList<>();
         taskidmap=new HashMap<>();
         teacherLt=new ArrayList<>();

@@ -70,149 +70,60 @@ public class NewClass extends BaseActivity {
 
         final HashMap<String,String> teacherserialidmap=new HashMap<>();
 
-
         databaseReference = Constants.databaseReference.child(Constants.TEACHER_TABLE).child(institutionName);
 
+        if(AdminUserPrefs.teacherLt.size()==0){
+
+            Toast.makeText(getApplicationContext(),"Add teachers first",Toast.LENGTH_LONG).show();
+
+        }else{
+
+            teacheradapter = new ArrayAdapter(NewClass.this, android.R.layout.simple_list_item_1, AdminUserPrefs.teacherLt);
+            classteacherspinner.setAdapter(teacheradapter);
+
+            addClassButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    String[] itemValues = classteacherspinner.getSelectedItem().toString().split("\\. ");
+                    classname = classGradeName.getText().toString().trim();
+                    classsection = newSection.getText().toString().trim();
+                    classteachername=itemValues[1];
+                    teacherserial=itemValues[0];
+                    String selectedteacherid=AdminUserPrefs.teachersusermap.get( classteacherspinner.getSelectedItem().toString()); //getting user id through selected entry
+                    subjectofclassteacher=classteachersubject.getText().toString();
+
+                    if( (classname.equals("")) || (classsection.equals("")) || (classteachername.equals("")) || subjectofclassteacher.equals("")) {
+                        Toast.makeText(getApplicationContext(), "New Class details cannot be empty!", Toast.LENGTH_LONG).show();
+                    } else {
 
 
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                HashMap<String, String> teachersmap=(HashMap<String, String>)dataSnapshot.getValue();
 
-                if(teachersmap==null){
+                        databaseReference = Constants.databaseReference.child(Constants.CLASS_TABLE).child(institutionName).child(classname).child(classsection);
 
-                    Toast.makeText(getApplicationContext(),"No teachers present in the institute",Toast.LENGTH_LONG).show();
+                        databaseReference.child("id").setValue(institutionName + "_" + classname + "_" + classsection);
+                        databaseReference.child("teacher").child(selectedteacherid).child("subject").setValue(subjectofclassteacher);
+                        databaseReference.child("teacher").child(selectedteacherid).child("class_teacher").setValue("1");
 
-                }else{
-
-                    Toast.makeText(getApplicationContext(),teachersmap.size() + " teachers found ",Toast.LENGTH_LONG).show();
-                    teacherLt = new ArrayList<>();
-
-                    for ( String key : teachersmap.keySet() ) {
-                        System.out.println( key );          //key is teacher user id
-                        teacher=key;
-
-                       databaseReference = Constants.databaseReference.child(Constants.TEACHER_TABLE).child(institutionName).child(teacher);
-
-                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                teacherserial=(String) dataSnapshot.getValue();
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
+                        databaseReference.child("subject").child(subjectofclassteacher).setValue(selectedteacherid);
 
 
-                        databaseReference = Constants.databaseReference.child(Constants.USER_DETAILS_TABLE).child(teacher);
-                        teacherserialidmap.put(teacherserial,teacher);
 
-                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                HashMap<String, String> teachermap=(HashMap<String, String>)dataSnapshot.getValue();
-                                teacherLt.add(teacherserial + ". " + teachermap.get("name"));
+                        addAllotment(classname,classsection,selectedteacherid, subjectofclassteacher);
 
+                        Toast.makeText(NewClass.this, "New Class Added", Toast.LENGTH_LONG).show();
+                        Intent to_admin_classes = new Intent(NewClass.this, Classes.class);
+                        to_admin_classes.putExtra("institution_name", institutionName);
+                        to_admin_classes.putExtra("role", role);
+                        startActivity(to_admin_classes);
 
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
 
 
                     }
-
-
-                    teacheradapter = new ArrayAdapter(NewClass.this, android.R.layout.simple_list_item_1, teacherLt);
-                    classteacherspinner.setAdapter(teacheradapter);
-
-               
-
-                    addClassButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-                            String[] itemValues = classteacherspinner.getSelectedItem().toString().split("\\. ");
-                            classname = classGradeName.getText().toString().trim();
-                            classsection = newSection.getText().toString().trim();
-                            classteachername=itemValues[1];
-                            teacherserial=itemValues[0];
-                            String selectedteacherid=teacherserialidmap.get(teacherserial);
-                            subjectofclassteacher=classteachersubject.getText().toString();
-
-                            if( (classname.equals("")) || (classsection.equals("")) || (classteachername.equals("")) || subjectofclassteacher.equals("")) {
-                                Toast.makeText(getApplicationContext(), "New Class details cannot be empty!", Toast.LENGTH_LONG).show();
-                            } else {
-
-
-
-                                databaseReference = Constants.databaseReference.child(Constants.CLASS_TABLE).child(institutionName).child(classname).child(classsection);
-
-                                databaseReference.child("id").setValue(institutionName + "_" + classname + "_" + classsection);
-                                databaseReference.child("teacher").child(selectedteacherid).child("subject").setValue(subjectofclassteacher);
-                                databaseReference.child("teacher").child(selectedteacherid).child("class_teacher").setValue("1");
-
-                                databaseReference.child(subjectofclassteacher).setValue(selectedteacherid);
-
-
-
-                                addAllotment(classname,classsection,selectedteacherid, subjectofclassteacher);
-
-                                Toast.makeText(NewClass.this, "New Class Added", Toast.LENGTH_LONG).show();
-                                Intent to_admin_classes = new Intent(NewClass.this, Classes.class);
-                                to_admin_classes.putExtra("institution_name", institutionName);
-                                to_admin_classes.putExtra("role", role);
-                                startActivity(to_admin_classes);
-
-
-
-                            }
-                        }
-                    });
-
-
-
                 }
+            });
 
-
-
-
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        }
 
 
 
@@ -224,13 +135,12 @@ public class NewClass extends BaseActivity {
 
     protected void  addAllotment(String classname,String section, String teacheruid, final String subject){
 
-        databaseReference= Constants.databaseReference.child(Constants.ALLOTMENTS_TABLE).child(institutionName).child(teacheruid).child(institutionName+"_"+classname+"_"+section);
+        databaseReference= Constants.databaseReference.child(Constants.ALLOTMENTS_TABLE).child(institutionName).child(teacheruid).child(institutionName+"_"+classname+"_"+section).push();
         databaseReference.child("subject").setValue(subject);
         databaseReference.child("class_teacher").setValue("1");
 
 
     }
-
 
 
 
