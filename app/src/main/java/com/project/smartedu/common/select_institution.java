@@ -122,7 +122,7 @@ public class select_institution extends BaseActivity {
     }
 
     protected void loadInstitution(String institutionName){
-        
+
         if (role.equalsIgnoreCase("teacher")) {
            Intent teacher_home_page = new Intent(select_institution.this, Home.class);
             teacher_home_page.putExtra("role", role);

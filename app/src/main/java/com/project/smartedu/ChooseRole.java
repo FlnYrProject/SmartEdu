@@ -89,6 +89,16 @@ public class ChooseRole extends BaseActivity {
 
                                 if(ds.getKey().equalsIgnoreCase("parent")){
                                     parentinst.add(retRolesList.get(key));
+
+                                    ArrayList<String> instlist;
+                                    if( UserPrefs.parentchildinstmap.containsKey(key)){
+                                        instlist=UserPrefs.parentchildinstmap.get(key);
+                                    }else{
+                                        instlist=new ArrayList<String>();
+                                    }
+                                    instlist.add(retRolesList.get(key));
+                                    UserPrefs.parentchildinstmap.put(key,instlist);
+
                                 }else if(ds.getKey().equalsIgnoreCase("student")){
                                     studentinst.add(retRolesList.get(key));
                                 }else if(ds.getKey().equalsIgnoreCase("teacher")){

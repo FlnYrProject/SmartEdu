@@ -65,7 +65,9 @@
         <activity android:name=".common.select_institution" />
         <activity android:name=".student.Home" />
         <activity android:name=".parent.Home" />
-        <activity android:name=".teacher.Home"></activity>
+        <activity android:name=".teacher.Home" />
+        <activity android:name=".teacher.Classes" />
+        <activity android:name=".common.view_messages"></activity>
     </application>
 
 </manifest>

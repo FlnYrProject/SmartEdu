@@ -42,9 +42,11 @@ public class UserPrefs {
 
 
     public static HashMap<String,ArrayList<String>> roleslistmap;
+    public static HashMap<String,ArrayList<String>> parentchildinstmap;
 
     static {
-        roleslistmap=new HashMap<>();
+        roleslistmap=new HashMap<>();           //role type mapped to list of institutions
+        parentchildinstmap=new HashMap<>();     //child user id to list of institutions
     }
 
     public UserPrefs(Context context){
