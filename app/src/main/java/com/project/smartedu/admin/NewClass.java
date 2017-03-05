@@ -102,8 +102,8 @@ public class NewClass extends BaseActivity {
                         databaseReference = Constants.databaseReference.child(Constants.CLASS_TABLE).child(institutionName).child(classname).child(classsection);
 
                         databaseReference.child("id").setValue(institutionName + "_" + classname + "_" + classsection);
-                        databaseReference.child("teacher").child(selectedteacherid).child("subject").setValue(subjectofclassteacher);
-                        databaseReference.child("teacher").child(selectedteacherid).child("class_teacher").setValue("1");
+                        //databaseReference.child("teacher").child(selectedteacherid).child("subject").setValue(subjectofclassteacher);
+                        databaseReference.child("teacher").child(selectedteacherid).setValue("1");
 
                         databaseReference.child("subject").child(subjectofclassteacher).setValue(selectedteacherid);
 
@@ -135,10 +135,8 @@ public class NewClass extends BaseActivity {
 
     protected void  addAllotment(String classname,String section, String teacheruid, final String subject){
 
-        databaseReference= Constants.databaseReference.child(Constants.ALLOTMENTS_TABLE).child(institutionName).child(teacheruid).child(institutionName+"_"+classname+"_"+section);
-        databaseReference.child("subject").setValue(subject);
-        databaseReference.child("class_teacher").setValue("1");
-
+        databaseReference= Constants.databaseReference.child(Constants.ALLOTMENTS_TABLE).child(institutionName).child(teacheruid).push();
+        databaseReference.setValue(institutionName+"_"+classname+"_"+section);
 
     }
 

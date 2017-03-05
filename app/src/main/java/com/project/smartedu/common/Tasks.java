@@ -31,6 +31,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.R;
+import com.project.smartedu.UserPrefs;
 import com.project.smartedu.admin.AdminUserPrefs;
 import com.project.smartedu.database.Task;
 
@@ -104,9 +105,9 @@ public class Tasks extends BaseActivity {
 
         Log.d("classsize", String.valueOf(AdminUserPrefs.classes.size()));
 
-        taskidmap=AdminUserPrefs.taskidmap;
+        taskidmap= UserPrefs.taskidmap;
 
-        for ( String key :AdminUserPrefs.taskidmap.keySet() ){
+        for ( String key :UserPrefs.taskidmap.keySet() ){
             Log.d("keyi",key);
         }
 
@@ -131,7 +132,7 @@ public class Tasks extends BaseActivity {
         taskList=(ListView)findViewById(R.id.taskList);
 
         if(role.equals("admin")) {
-            taskLt = AdminUserPrefs.taskItems;           //load data afterwards
+            taskLt =UserPrefs.taskItems;           //load data afterwards
         }
         showList();
 
@@ -224,8 +225,8 @@ public class Tasks extends BaseActivity {
 
                         DatabaseReference dataRef=Constants.databaseReference.child(Constants.TASK_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child(role).child(taskid);
                        dataRef.removeValue();
-                        AdminUserPrefs.taskidmap.remove(entry);
-                        AdminUserPrefs.taskItems.remove(entry);
+                    UserPrefs.taskidmap.remove(entry);
+                       UserPrefs.taskItems.remove(entry);
 
 
 
@@ -325,10 +326,10 @@ public class Tasks extends BaseActivity {
                                     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
                                     String dateString = formatter.format(new Date(milliseconds));
                                     String newentry=newtitle+ "\n" + newDesc + "\n" + dateString;
-                                    AdminUserPrefs.taskidmap.remove(entry);
-                                    AdminUserPrefs.taskItems.remove(entry);
-                                    AdminUserPrefs.taskidmap.put(newentry,taskid);
-                                   AdminUserPrefs.taskItems.add(newentry);
+                                    UserPrefs.taskidmap.remove(entry);
+                                    UserPrefs.taskItems.remove(entry);
+                                   UserPrefs.taskidmap.put(newentry,taskid);
+                                  UserPrefs.taskItems.add(newentry);
 
 
 

@@ -10,9 +10,13 @@ public class Class {
 
     String classid;
     HashMap<String,String> subjects;        //map from subject name to teacher id
-    HashMap<String,HashMap<String,String>> teachers;    //map from  teacher id to the details
+    HashMap<String,String> teachers;    //map from  teacher id to the details
 
-    public Class(String classid, HashMap<String, String> subjects, HashMap<String, HashMap<String, String>> teachers) {
+    public Class(){
+
+    }
+
+    public Class(String classid, HashMap<String, String> subjects, HashMap<String, String> teachers) {
         this.classid = classid;
         this.subjects = subjects;
         this.teachers = teachers;
@@ -26,11 +30,11 @@ public class Class {
         this.classid = classid;
     }
 
-    public HashMap<String, HashMap<String, String>> getTeachers() {
+    public HashMap<String,String> getTeachers() {
         return teachers;
     }
 
-    public void setTeachers(HashMap<String, HashMap<String, String>> teachers) {
+    public void setTeachers(HashMap<String, String> teachers) {
         this.teachers = teachers;
     }
 

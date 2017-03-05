@@ -26,6 +26,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.project.smartedu.Constants;
 import com.project.smartedu.R;
+import com.project.smartedu.UserPrefs;
 import com.project.smartedu.admin.AdminUserPrefs;
 import com.project.smartedu.database.*;
 import com.project.smartedu.database.Schedule;
@@ -92,7 +93,7 @@ public class Schedule_days extends Fragment {
         scheduleslt=new ArrayList<>();
         localScheduleMap=new HashMap<>();
 
-        for(Schedule sch:AdminUserPrefs.schedulekeymap.keySet()){
+        for(Schedule sch:UserPrefs.schedulekeymap.keySet()){
             if(sch.getDay().equals(day)){
                 scheduleslt.add(sch);
             }
@@ -183,11 +184,11 @@ public class Schedule_days extends Fragment {
                         String selecteditem=((TextView) view).getText().toString();
                         Schedule selectedSchedule=localScheduleMap.get(selecteditem);
 
-                      databaseReference=Constants.databaseReference.child(Constants.SCHEDULES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child(day).child(AdminUserPrefs.schedulekeymap.get(selectedSchedule));
+                      databaseReference=Constants.databaseReference.child(Constants.SCHEDULES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child(day).child(UserPrefs.schedulekeymap.get(selectedSchedule));
                         databaseReference.removeValue();        //removing from server
 
                         localScheduleMap.remove(selecteditem);
-                        AdminUserPrefs.schedulekeymap.remove(selectedSchedule);     //remove from local data
+                        UserPrefs.schedulekeymap.remove(selectedSchedule);     //remove from local data
                         scheduleslt.remove(selectedSchedule);
                         show_dialog.dismiss();
                         Intent reload=new Intent(getActivity(), com.project.smartedu.common.Schedule.class);
@@ -214,7 +215,7 @@ public class Schedule_days extends Fragment {
                         final String selecteditem=((TextView) view).getText().toString();
                         final Schedule selectedSchedule=localScheduleMap.get(selecteditem);
 
-                        databaseReference=Constants.databaseReference.child(Constants.SCHEDULES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child(day).child(AdminUserPrefs.schedulekeymap.get(selectedSchedule));
+                        databaseReference=Constants.databaseReference.child(Constants.SCHEDULES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child(day).child(UserPrefs.schedulekeymap.get(selectedSchedule));
 
 
 
@@ -232,8 +233,8 @@ public class Schedule_days extends Fragment {
                                 databaseReference.child("info").setValue(Desc.getText().toString());    //to server
 
                                 localScheduleMap.remove(selecteditem);
-                                String key= AdminUserPrefs.schedulekeymap.get(selectedSchedule);
-                                AdminUserPrefs.schedulekeymap.remove(selectedSchedule);     //remove from local data
+                                String key= UserPrefs.schedulekeymap.get(selectedSchedule);
+                                UserPrefs.schedulekeymap.remove(selectedSchedule);     //remove from local data
                                 scheduleslt.remove(selectedSchedule);
 
 
@@ -244,7 +245,7 @@ public class Schedule_days extends Fragment {
                                 long end = TimeUnit.MILLISECONDS.toMinutes(selectedSchedule.getEnd_time());
                                 String editedscheduleitem = start + "\n" + end + "\n" + Desc.getText().toString();
                                 localScheduleMap.put(editedscheduleitem,neweditschedule);
-                                AdminUserPrefs.schedulekeymap.put(neweditschedule,key);
+                                UserPrefs.schedulekeymap.put(neweditschedule,key);
                                 scheduleslt.add(neweditschedule);
                                 dialog_in.dismiss();
 
@@ -430,7 +431,7 @@ public class Schedule_days extends Fragment {
             databaseReference.child("start_time").setValue(String.valueOf(startmilli));
             databaseReference.child("end_time").setValue(String.valueOf(endmilli));
 
-            AdminUserPrefs.schedulekeymap.put(newSchedule,databaseReference.getKey());     //reflecting to local data
+            UserPrefs.schedulekeymap.put(newSchedule,databaseReference.getKey());     //reflecting to local data
 
 
             Toast.makeText(getActivity(), "schedule added ", Toast.LENGTH_LONG).show();
