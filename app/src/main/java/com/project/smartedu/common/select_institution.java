@@ -75,7 +75,7 @@ public class select_institution extends BaseActivity {
         ArrayList<String> institutionLt;
 
 
-        if( (!UserPrefs.roleslistmap.containsKey(role)) || (UserPrefs.roleslistmap.get(role).size()==0) ) {
+        if( !(UserPrefs.roleslistmap.containsKey(role)) || (UserPrefs.roleslistmap.get(role).size()==0) ) {
             noinsti.setVisibility(View.VISIBLE);
         }else {
             institutionLt= UserPrefs.roleslistmap.get(role);
