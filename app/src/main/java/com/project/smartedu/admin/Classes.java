@@ -30,10 +30,12 @@ import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
+import com.project.smartedu.database.Class;
 import com.project.smartedu.database.TeacherTable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -71,6 +73,7 @@ public class Classes extends BaseActivity {
     String classname,sectioname;
 
 
+    HashMap<String,ArrayList<String>> classtosectionmap;
     DatabaseReference databaseReference;
 
     @Override
@@ -97,43 +100,59 @@ public class Classes extends BaseActivity {
 
       
         classList = (ListView) findViewById(R.id.classList);
-       
 
-        databaseReference= Constants.databaseReference.child(Constants.CLASS_TABLE).child(institutionName);
+        classLt = new ArrayList<>();
 
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                HashMap<String, String> classmap=(HashMap<String, String>)dataSnapshot.getValue();
+        classtosectionmap=new HashMap<>();    //class to section mao
 
-                if(classmap==null){
+        if(AdminUserPrefs.classes.size()==0){
 
-                    Toast.makeText(getApplicationContext(),"No classes added",Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplication(),"No classes added",Toast.LENGTH_LONG).show();
+
+        }else{
+
+
+            HashSet<String> classes=new HashSet<>();
+
+            for(int x=0;x<AdminUserPrefs.classes.size();x++){
+                Class cls=AdminUserPrefs.classes.get(x);
+                String[] classkeydecode=cls.getClassid().split("_");
+                String clsname=classkeydecode[1];
+                String section=classkeydecode[2];
+                classes.add(clsname);
+
+                if(classtosectionmap.containsKey(clsname)){
+
+                    ArrayList<String> tempsectionlist=classtosectionmap.get(clsname);
+                    tempsectionlist.add(section);
+                    classtosectionmap.put(clsname,tempsectionlist);
+                    Toast.makeText(getApplicationContext(),tempsectionlist.size() + " sections in "+ clsname,Toast.LENGTH_LONG ).show();
 
                 }else{
-
-                    Toast.makeText(getApplicationContext(),classmap.size() + " classes found ",Toast.LENGTH_LONG).show();
-                    classLt = new ArrayList<>();
-
-                    for ( String classname : classmap.keySet() ) {
-                        System.out.println( classname );
-                        classLt.add(classname);
-
-                    }
-
-                    ArrayAdapter adapter = new ArrayAdapter(Classes.this, android.R.layout.simple_list_item_1, classLt);
-                    classList.setAdapter(adapter);
-
-
+                    ArrayList<String> tempsectionlist=new ArrayList<>();
+                    tempsectionlist.add(section);
+                    classtosectionmap.put(clsname,tempsectionlist);
                 }
 
             }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
 
+            for(String cls:classes){
+                classLt.add(cls);
             }
-        });
+
+            ArrayAdapter adapter = new ArrayAdapter(Classes.this, android.R.layout.simple_list_item_1, classLt);
+            classList.setAdapter(adapter);
+
+
+        }
+
+
+
+
+
+
+
 
 
 
@@ -160,46 +179,11 @@ public class Classes extends BaseActivity {
                 addSectionButton.setText("Add Section");
 
 
+                sectionLt = classtosectionmap.get(classname);
+                Toast.makeText(getApplicationContext(),sectionLt.size() + " sections found ",Toast.LENGTH_LONG).show();
 
-                databaseReference=databaseReference.child(classname);
-
-
-
-
-                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        HashMap<String, String> classsectionmap=(HashMap<String, String>)dataSnapshot.getValue();
-
-                        if(classsectionmap==null){
-
-                            Toast.makeText(getApplicationContext(),"No sections added",Toast.LENGTH_LONG).show();
-
-                        }else{
-
-                            Toast.makeText(getApplicationContext(),classsectionmap.size() + " sections found ",Toast.LENGTH_LONG).show();
-
-                            classLt = new ArrayList<>();
-                            for ( String sectionname : classsectionmap.keySet() ) {
-                                System.out.println( sectionname );
-                                sectionLt.add(sectionname);
-
-                            }
-                            ArrayAdapter adapter = new ArrayAdapter(Classes.this, android.R.layout.simple_list_item_1, sectionLt);
-                            classSectionList.setAdapter(adapter);
-
-
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-
-
+                ArrayAdapter adapter = new ArrayAdapter(Classes.this, android.R.layout.simple_list_item_1, sectionLt);
+                classSectionList.setAdapter(adapter);
 
                 classSectionList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
@@ -226,7 +210,7 @@ public class Classes extends BaseActivity {
                 deleteClassButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                       // deleteClassGrade(item);
+                        // deleteClassGrade(item);
                         class_info.dismiss();
                     }
                 });
@@ -234,7 +218,7 @@ public class Classes extends BaseActivity {
                 addSectionButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                       // addSectionCall(item);
+                        // addSectionCall(item);
 
                     }
                 });
@@ -242,13 +226,6 @@ public class Classes extends BaseActivity {
 
             }
         });
-
-
-
-
-
-
-
 
 
 
@@ -280,56 +257,53 @@ public class Classes extends BaseActivity {
 
 
 
-        databaseReference=databaseReference.child(section);
+      //  databaseReference=databaseReference.child(section);
+
+
+        String selectedclassid=institutionName+"_"+classname+"_"+sectioname;
+        Class cls=new Class();
+
+        for(int x=0;x<AdminUserPrefs.classes.size();x++){
+
+           if(AdminUserPrefs.classes.get(x).getClassid().equals(selectedclassid)){
+               cls=AdminUserPrefs.classes.get(x);
+               break;
+           }
+
+        }
+
+
+        ArrayList<String> subjectLt = new ArrayList<String>();
+
+        //Toast.makeText(getApplicationContext(),classdetailsmap.size() + " sections found ",Toast.LENGTH_LONG).show();
+
+        subjectLt = new ArrayList<>();
+
+        for ( String subjectentry : cls.getSubjects().keySet() ) {
+            //System.out.println(  subjectkey );
+            String teacherid= cls.getSubjects().get(subjectentry);
+
+            String teacher=AdminUserPrefs.teachersuserreversemap.get(teacherid);
+
+            String[] teacheritems=teacher.split("\\. ");
+            String teacher_serial=teacheritems[0];
+            String teacher_name=teacheritems[1];
+
+            subjectLt.add( subjectentry + " by " + teacher_name + " ( " + teacher_serial + " ) ");
+
+        }
+
+        ArrayAdapter subjectadapter = new ArrayAdapter(Classes.this, android.R.layout.simple_list_item_1, subjectLt);
+        classSubjectList.setAdapter(subjectadapter);
+
+        dialog_heading.setText("Subjects:");
+
+
+        classSection_details.show();
 
 
 
 
-
-
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-
-                HashMap<String, String> classdetailsmap=(HashMap<String, String>)dataSnapshot.getValue();
-
-                if(classdetailsmap==null){
-
-                    Toast.makeText(getApplicationContext(),"No details added",Toast.LENGTH_LONG).show();
-
-                }else{
-                    ArrayList<String> subjectLt = new ArrayList<String>();
-
-                    //Toast.makeText(getApplicationContext(),classdetailsmap.size() + " sections found ",Toast.LENGTH_LONG).show();
-
-                    subjectLt = new ArrayList<>();
-                    for ( String subjectkey : classdetailsmap.keySet() ) {
-                        System.out.println(  subjectkey );
-                        if(subjectkey!="id" || subjectkey!="teacher")
-                        subjectLt.add( subjectkey + " by " + classdetailsmap.get(subjectkey));
-
-                    }
-
-                    ArrayAdapter subjectadapter = new ArrayAdapter(Classes.this, android.R.layout.simple_list_item_1, subjectLt);
-                    classSubjectList.setAdapter(subjectadapter);
-
-                    dialog_heading.setText("Subjects:");
-
-
-                    classSection_details.show();
-
-                }
-
-
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 
         /*    to be done
         deleteSectionButton.setOnClickListener(new View.OnClickListener() {

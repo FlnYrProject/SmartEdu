@@ -10,9 +10,9 @@ import java.util.HashMap;
 public class Allotments {
 
     String teacherid;
-    HashMap<String,HashMap<String,String>> allots; //map from class id to the details
+    HashMap<String,String> allots; //map from class id to the details
 
-    public Allotments(String teacherid, HashMap<String, HashMap<String, String>> allots) {
+    public Allotments(String teacherid, HashMap<String, String> allots) {
         this.teacherid = teacherid;
         this.allots = allots;
     }
@@ -25,11 +25,11 @@ public class Allotments {
         this.teacherid = teacherid;
     }
 
-    public HashMap<String, HashMap<String, String>> getAllots() {
+    public HashMap<String, String> getAllots() {
         return allots;
     }
 
-    public void setAllots(HashMap<String, HashMap<String, String>> allots) {
+    public void setAllots(HashMap<String, String> allots) {
         this.allots = allots;
     }
 }

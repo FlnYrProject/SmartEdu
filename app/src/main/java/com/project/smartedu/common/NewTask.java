@@ -23,6 +23,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.R;
+import com.project.smartedu.UserPrefs;
 import com.project.smartedu.admin.AdminUserPrefs;
 import com.project.smartedu.database.Task;
 
@@ -130,7 +131,7 @@ public class NewTask extends BaseActivity {
                     String entry=myTitle+"\n"+myDesc+"\n"+dateString;
 
                     if(role.equals("admin"))
-                    AdminUserPrefs.taskItems.add(entry);
+                    UserPrefs.taskItems.add(entry);
 
 
 

@@ -63,6 +63,7 @@ public class Home extends BaseActivity{
     ArrayList<String> teacherLt;
     ArrayList<String> teacheruseridLt;
     HashMap<String,String> teachersusermap; //to map teacher to its user id
+    HashMap<String,String> teachersuserreversemap; //to map user id to teacher
     ArrayList<String> tempteacherlt;
 
     ArrayList<Schedule> scheduleslt;
@@ -110,7 +111,8 @@ public class Home extends BaseActivity{
                         for (DataSnapshot ds : dataSnapshot.getChildren()) {
 
                             Log.d("ds.key",ds.getKey());             //teacher id
-                            HashMap<String,HashMap<String,String>> allotmentsmap= (HashMap<String, HashMap<String, String>>) ds.getValue();
+                            HashMap<String,String> allotmentsmap= (HashMap<String,String>) ds.getValue();
+
 
                             Allotments retAllotment=new Allotments(ds.getKey(),allotmentsmap);
                             AdminUserPrefs.allotmments.add(retAllotment);
@@ -157,6 +159,9 @@ public class Home extends BaseActivity{
             //The main UI is already idle by this moment
             super.onPostExecute(aVoid);
 
+
+            int size=AdminUserPrefs.allotmments.size();
+            Toast.makeText(getApplicationContext(),size + " allotments found",Toast.LENGTH_LONG).show();
 
 
 
@@ -231,7 +236,7 @@ public class Home extends BaseActivity{
                                     Log.d("id", String.valueOf(classdetailmap.get("id")));               //class id
 
                                     HashMap<String,String> subjects=(HashMap<String, String>) classdetailmap.get("subject");
-                                    HashMap<String,HashMap<String,String>> teachers= (HashMap<String, HashMap<String, String>>) classdetailmap.get("teacher");
+                                    HashMap<String,String> teachers= (HashMap<String, String>) classdetailmap.get("teacher");
 
                                     Class retClass=new Class(String.valueOf(classdetailmap.get("id")),subjects,teachers);
                                     AdminUserPrefs.classes.add(retClass);
@@ -280,6 +285,8 @@ public class Home extends BaseActivity{
             //The main UI is already idle by this moment
             super.onPostExecute(aVoid);
 
+            int size=AdminUserPrefs.classes.size();
+            Toast.makeText(getApplicationContext(),size + " classes found",Toast.LENGTH_LONG).show();
 
 
 
@@ -432,7 +439,7 @@ public class Home extends BaseActivity{
 
 
            // AdminUserPrefs.schedulesmaplt=schedulesmaplt;
-            AdminUserPrefs.schedulekeymap=schedulekeymap;
+        UserPrefs.schedulekeymap=schedulekeymap;
 
             //Show the log in progress_bar for at least a few milliseconds
             Handler handler = new Handler();
@@ -486,6 +493,7 @@ public class Home extends BaseActivity{
             teacherLt.clear();
             teacheruseridLt.clear();
             teachersusermap.clear();
+            teachersuserreversemap.clear();
         }
 
         @Override
@@ -551,6 +559,8 @@ public class Home extends BaseActivity{
                                     Toast.makeText(getApplicationContext(),entry,Toast.LENGTH_LONG).show();
                                     teacherLt.add(entry);
                                     teachersusermap.put(entry, teacheruseridLt.get(finalI));
+                                    teachersuserreversemap.put(teacheruseridLt.get(finalI),entry);
+
                                 }
                             }
                             lock2.notifyAll();
@@ -591,6 +601,7 @@ public class Home extends BaseActivity{
 
             AdminUserPrefs.teacherLt=teacherLt;
             AdminUserPrefs.teachersusermap=teachersusermap;
+            AdminUserPrefs.teachersuserreversemap=teachersuserreversemap;
             AdminUserPrefs.teacheruseridLt=teacheruseridLt;
 
             Handler handler = new Handler();
@@ -704,8 +715,8 @@ public class Home extends BaseActivity{
             //Show the log in progress_bar for at least a few milliseconds
             Toast.makeText(getApplicationContext(),taskLt.size() + " tasks found",Toast.LENGTH_LONG).show();
 
-            AdminUserPrefs.taskItems=taskLt;
-            AdminUserPrefs.taskidmap=taskidmap;
+            UserPrefs.taskItems=taskLt;
+         UserPrefs.taskidmap=taskidmap;
 
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -733,17 +744,20 @@ public class Home extends BaseActivity{
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        userPrefs=new UserPrefs(Home.this);
         adminUserPrefs=new AdminUserPrefs(getApplicationContext());
 
-        taskLt=AdminUserPrefs.taskItems;
-        taskidmap=AdminUserPrefs.taskidmap;
+
+        taskLt=UserPrefs.taskItems;
+        taskidmap=UserPrefs.taskidmap;
         teacherLt=AdminUserPrefs.teacherLt;
         teacheruseridLt=AdminUserPrefs.teacheruseridLt;
         teachersusermap=AdminUserPrefs.teachersusermap;
+        teachersuserreversemap=AdminUserPrefs.teachersuserreversemap;
         tempteacherlt=new ArrayList<>();
         //schedulesmaplt=AdminUserPrefs.schedulesmaplt;
         scheduleslt=new ArrayList<>();
-        schedulekeymap=AdminUserPrefs.schedulekeymap;
+        schedulekeymap=UserPrefs.schedulekeymap;
 
         logout=(Button)findViewById(R.id.lo);
 
@@ -756,7 +770,6 @@ public class Home extends BaseActivity{
             }
         });
 
-       userPrefs=new UserPrefs(Home.this);
 
 
         Intent from_login = getIntent();
@@ -769,7 +782,7 @@ public class Home extends BaseActivity{
         gridview.setAdapter(new ImageAdapter(this, densityX,densityY, "admin"));
 
 
-       // loadData();
+        loadData();
 
 
 
@@ -799,6 +812,8 @@ public class Home extends BaseActivity{
                     task_intent.putExtra("institution_name",institutionName);
                     task_intent.putExtra("role", "admin");
                     startActivity(task_intent);
+
+                  //  loadAllotmentData();
 
                 }
                 else if (position == 3) {   //allotments

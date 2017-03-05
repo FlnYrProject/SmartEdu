@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import com.project.smartedu.database.Schedule;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -44,9 +46,17 @@ public class UserPrefs {
     public static HashMap<String,ArrayList<String>> roleslistmap;
     public static HashMap<String,ArrayList<String>> parentchildinstmap;
 
+    public static ArrayList<String> taskItems;
+    public static HashMap<String,String> taskidmap; //to map task to its id
+    // public static HashMap<String,ArrayList<Schedule>> schedulesmaplt; // a map from day to its schedules
+    public static HashMap<Schedule,String> schedulekeymap;        ///to map schedule to key
+
     static {
         roleslistmap=new HashMap<>();           //role type mapped to list of institutions
         parentchildinstmap=new HashMap<>();     //child user id to list of institutions
+        taskItems=new ArrayList<>();
+        taskidmap=new HashMap<>();
+        schedulekeymap=new HashMap<>();
     }
 
     public UserPrefs(Context context){
@@ -91,8 +101,7 @@ public class UserPrefs {
         // Clearing all data from Shared Preferences
         editor.clear();
         editor.commit();
-        roleslistmap.clear();
-        parentchildinstmap.clear();
+        clearAllSavedData();
 
         // After logout redirect user to Loing Activity
         Intent i = new Intent(_context, LoginActivity.class);
@@ -114,6 +123,15 @@ public class UserPrefs {
 
     public String getInstitution(){
         return pref.getString(INSTITUION,null);
+    }
+
+    public void clearAllSavedData(){
+        roleslistmap.clear();
+        parentchildinstmap.clear();
+        taskidmap.clear();
+        taskItems.clear();
+        schedulekeymap.clear();
+
     }
 
 

@@ -29,16 +29,15 @@ public class AdminUserPrefs {
     private static final String PREF_NAME = "AdminUserDetails";
 
 
-    public static ArrayList<String> taskItems;
-    public static HashMap<String,String> taskidmap; //to map task to its id
+
 
     public static ArrayList<String> teacherLt;
     public static ArrayList<String> teacheruseridLt;
     public static HashMap<String,String> teachersusermap; //to map teacher to its user id
+    public static HashMap<String,String> teachersuserreversemap; //to map user id to teacher
 
 
-   // public static HashMap<String,ArrayList<Schedule>> schedulesmaplt; // a map from day to its schedules
-   public static HashMap<Schedule,String> schedulekeymap;        ///to map schedule to key
+
 
     public static ArrayList<Class> classes;
     public static ArrayList<Allotments> allotmments;
@@ -47,13 +46,13 @@ public class AdminUserPrefs {
 
     static {
 
-       taskItems=new ArrayList<>();
-        taskidmap=new HashMap<>();
+
         teacherLt=new ArrayList<>();
         teacheruseridLt=new ArrayList<>();
         teachersusermap=new HashMap<>();
+        teachersuserreversemap=new HashMap<>();
        // schedulesmaplt=new HashMap<>();
-        schedulekeymap=new HashMap<>();
+
 
         classes=new ArrayList<Class>();
         allotmments=new ArrayList<>();
