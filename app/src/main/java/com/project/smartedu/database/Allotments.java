@@ -12,6 +12,10 @@ public class Allotments {
     String teacherid;
     HashMap<String,String> allots; //map from class id to the details
 
+    public Allotments() {
+
+    }
+
     public Allotments(String teacherid, HashMap<String, String> allots) {
         this.teacherid = teacherid;
         this.allots = allots;
