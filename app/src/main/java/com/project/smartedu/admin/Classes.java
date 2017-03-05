@@ -30,6 +30,7 @@ import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
+import com.project.smartedu.database.Allotments;
 import com.project.smartedu.database.Class;
 import com.project.smartedu.database.TeacherTable;
 
@@ -75,6 +76,7 @@ public class Classes extends BaseActivity {
 
     HashMap<String,ArrayList<String>> classtosectionmap;
     DatabaseReference databaseReference;
+    Class selectedclass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -261,12 +263,11 @@ public class Classes extends BaseActivity {
 
 
         String selectedclassid=institutionName+"_"+classname+"_"+sectioname;
-        Class cls=new Class();
 
         for(int x=0;x<AdminUserPrefs.classes.size();x++){
 
            if(AdminUserPrefs.classes.get(x).getClassid().equals(selectedclassid)){
-               cls=AdminUserPrefs.classes.get(x);
+               selectedclass=AdminUserPrefs.classes.get(x);
                break;
            }
 
@@ -279,9 +280,9 @@ public class Classes extends BaseActivity {
 
         subjectLt = new ArrayList<>();
 
-        for ( String subjectentry : cls.getSubjects().keySet() ) {
+        for ( String subjectentry : selectedclass.getSubjects().keySet() ) {
             //System.out.println(  subjectkey );
-            String teacherid= cls.getSubjects().get(subjectentry);
+            String teacherid= selectedclass.getSubjects().get(subjectentry);
 
             String teacher=AdminUserPrefs.teachersuserreversemap.get(teacherid);
 
@@ -289,7 +290,7 @@ public class Classes extends BaseActivity {
             String teacher_serial=teacheritems[0];
             String teacher_name=teacheritems[1];
 
-            subjectLt.add( subjectentry + " by " + teacher_name + " ( " + teacher_serial + " ) ");
+            subjectLt.add( subjectentry + " by " + teacher_name + " ( id = " + teacher_serial + " ) ");
 
         }
 
@@ -305,7 +306,6 @@ public class Classes extends BaseActivity {
 
 
 
-        /*    to be done
         deleteSectionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -314,14 +314,14 @@ public class Classes extends BaseActivity {
                 confirm_message = (TextView) confirm_delete.findViewById(R.id.confirm_message);
                 cancel = (Button) confirm_delete.findViewById(R.id.cancelButton);
                 proceed = (Button) confirm_delete.findViewById(R.id.proceedButton);
-                confirm_message.setText("All data related to  " + item + ",including students,attendance,uploads etc, will be deleted permanently!!");
+                confirm_message.setText("All data related to class " + classname + " - " + sectioname + ",including students,attendance,uploads etc, will be deleted permanently!!");
                 confirm_delete.show();
                 proceed.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         confirm_delete.dismiss();
-                        deleteClass(classSectionObject);
-                        deleteStudent(classSectionObject);
+                        //deleteClass(classSectionObject);          //to be done
+                        //deleteStudent(classSectionObject);           //to be done
 
                     }
                 });
@@ -335,7 +335,7 @@ public class Classes extends BaseActivity {
 
             }
         });
-        */
+
 
 
 
@@ -345,6 +345,7 @@ public class Classes extends BaseActivity {
                 classSection_details.dismiss();
             }
         });
+
 
         addSubjectButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -367,153 +368,172 @@ public class Classes extends BaseActivity {
         ifclassteacher=(CheckBox)newSubejectDialog.findViewById(R.id.ifclassteacher);
 
 
-        final HashMap<String,String> teacherusermap=new HashMap<>();
+        //final HashMap<String,String> teacherusermap=new HashMap<>();
 
-        final DatabaseReference dataReference = Constants.databaseReference.child(Constants.TEACHER_TABLE).child(institutionName);
-
-
-        dataReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                HashMap<String, String> teachersmap=(HashMap<String, String>)dataSnapshot.getValue();
-
-                if(teachersmap==null){
-
-                    Toast.makeText(getApplicationContext(),"No teachers present in the institute",Toast.LENGTH_LONG).show();
-
-                }else{
-
-                    Toast.makeText(getApplicationContext(),teachersmap.size() + " teachers found ",Toast.LENGTH_LONG).show();
+        //final DatabaseReference dataReference = Constants.databaseReference.child(Constants.TEACHER_TABLE).child(institutionName);
 
 
+        if(AdminUserPrefs.teacherLt.size()==0){
+
+            Toast.makeText(getApplicationContext(),"Add teachers first",Toast.LENGTH_LONG).show();
+
+        }else {
 
 
-                    teacherLt = new ArrayList<>();
-                    index=1;
-                    for ( final String key : teachersmap.keySet() ) {
-                        System.out.println( key );
-
-                        databaseReference = Constants.databaseReference.child(Constants.TEACHER_TABLE).child(institutionName).child(key);
-
-
-                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                String teacher=(String) dataSnapshot.getValue();
-
-                                databaseReference = Constants.databaseReference.child(Constants.USER_DETAILS_TABLE).child(teacher);
-
-                                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        HashMap<String, String> teachermap=(HashMap<String, String>)dataSnapshot.getValue();
-                                        teacherLt.add(index + teachermap.get("name"));
-                                        teacherusermap.put(index + teachermap.get("name"),key);
-                                        index++;
-
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-
-                                    }
-                                });
-
-                                Log.d("ta",teacher);
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
-
-                    }
+           final ArrayAdapter teacheradapter = new ArrayAdapter(Classes.this, android.R.layout.simple_list_item_1, AdminUserPrefs.teacherLt);
+            subjectTeacherSpinner.setAdapter(teacheradapter);
+            newSubejectDialog.show();
+            addSubject.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String subjectname = newSubject.getText().toString().trim();
+                    String teacheruserkey=AdminUserPrefs.teachersusermap.get( subjectTeacherSpinner.getSelectedItem().toString());
 
 
 
-                    ArrayAdapter teacheradapter = new ArrayAdapter(Classes.this, android.R.layout.simple_list_item_1, teacherLt);
-                    subjectTeacherSpinner.setAdapter(teacheradapter);
+                    if(!subjectname.equals("")) {
 
+                        //adding data to class databse
+                        databaseReference = Constants.databaseReference.child(Constants.CLASS_TABLE).child(institutionName).child(classname).child(sectioname);
+                        HashMap<String, Object> newsubjectmap = new HashMap<String, Object>();
+                        newsubjectmap.put(subjectname, teacheruserkey);
+                        databaseReference.child("subject").updateChildren(newsubjectmap);       //server change
 
-                }
-
-
-
-
-
-
-
-                addSubject.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        String subjectname = newSubject.getText().toString().trim();
-                        String teacheruserkey=subjectTeacherSpinner.getSelectedItem().toString();
-
-
-
-                        if(subjectname.equals("")) {
-
-                            databaseReference = Constants.databaseReference.child(Constants.CLASS_TABLE).child(institutionName).child(classname).child(sectioname);
-                            HashMap<String, Object> newsubjectmap = new HashMap<String, Object>();
-                            newsubjectmap.put(subjectname, teacheruserkey);
-                            databaseReference.updateChildren(newsubjectmap);
-
-
-                            databaseReference= Constants.databaseReference.child(Constants.ALLOTMENTS_TABLE).child(institutionName).child(teacheruserkey).child(institutionName+"_"+classname+"_"+sectioname);
-                            HashMap<String, Object> newallotmentmap = new HashMap<String, Object>();
-                            newallotmentmap.put("subject", subjectname);
-
-                            if(ifclassteacher.isChecked()) {
-
-                                newallotmentmap.put("class_teacher", "1");
-
-                            }else{
-                                newallotmentmap.put("class_teacher", "0");
-                            }
-                            databaseReference.updateChildren(newallotmentmap);
-
-
+                        HashMap<String, Object> newteachermap = new HashMap<String, Object>();
+                        if(ifclassteacher.isChecked()){
+                            newteachermap.put(teacheruserkey, "1");
+                            databaseReference.child("teacher").updateChildren(newteachermap);       //server change
                         }else{
+                            newteachermap.put(teacheruserkey,"0");
+                            databaseReference.child("teacher").updateChildren(newteachermap);
+                        }
 
-                            Toast.makeText(getApplicationContext(),"enter complete details",Toast.LENGTH_LONG).show();
+
+
+                            //add ddata to classes
+                        int classindex=0;
+                        for(int x=0;x<AdminUserPrefs.classes.size();x++){
+                            Class c=AdminUserPrefs.classes.get(x);
+                            if(c.getClassid().equals(selectedclass.getClassid())){
+
+                                AdminUserPrefs.classes.get(x).getSubjects().put(subjectname,teacheruserkey);
+                                if(ifclassteacher.isChecked()) {
+                                    AdminUserPrefs.classes.get(x).getTeachers().put(teacheruserkey, "1");
+                                }else{
+                                    AdminUserPrefs.classes.get(x).getTeachers().put(teacheruserkey, "0");
+                                }
+
+                            }
+                        }
+
+
+                        //add data to allotments
+                        boolean altalreadypresent=false;
+                        boolean teacheralreadypresent=false;
+                        Allotments altifonlyteachpresent=new Allotments();
+                        Allotments altifbothpresent=new Allotments();
+
+                        int index=0;
+                        for(int x=0;x<AdminUserPrefs.allotmments.size();x++){       //check if enrtry is already present
+                            Allotments altmt=AdminUserPrefs.allotmments.get(x);
+                            teacheralreadypresent=false;
+                            if(altmt.getTeacherid().equals(teacheruserkey)) {
+                                teacheralreadypresent=true;
+                                index=x;
+
+                                altifonlyteachpresent=altmt;
+                                HashMap<String, String> mp = altmt.getAllots();
+
+                                for (String clsid : mp.keySet()) {
+
+                                    if (mp.get(clsid).equals(institutionName+"_"+classname+"_"+sectioname)){
+                                        altalreadypresent=true;
+                                        altifbothpresent=altmt;
+
+                                        index=x;
+                                        break;
+                                    }
+
+                                }
+                            }
+
+                            if(teacheralreadypresent){
+                                break;
+                            }
 
                         }
 
 
+
+                        if( (!altalreadypresent)  ) {
+                            //server cahnges
+                            databaseReference = Constants.databaseReference.child(Constants.ALLOTMENTS_TABLE).child(institutionName).child(teacheruserkey).push();
+                            databaseReference.setValue(selectedclass.getClassid());
+
+                            //local changes
+
+                            if(teacheralreadypresent){
+
+
+                                AdminUserPrefs.allotmments.get(index).getAllots().put(databaseReference.getKey(),selectedclass.getClassid());
+
+                            //    Toast.makeText(getApplicationContext(),"t present",Toast.LENGTH_LONG).show();
+
+
+                            }else {
+                                Toast.makeText(getApplicationContext(),"t not present",Toast.LENGTH_LONG).show();
+                                HashMap<String, String> allotmap = new HashMap<String, String>();
+                                allotmap.put(databaseReference.getKey(), selectedclass.getClassid());
+                                Allotments newAllot = new Allotments(teacheruserkey, allotmap);
+                              //  Toast.makeText(getApplicationContext(),"sp = "+AdminUserPrefs.allotmments.size(),Toast.LENGTH_LONG).show();
+                                AdminUserPrefs.allotmments.add(newAllot);
+                              //  Toast.makeText(getApplicationContext(),"sn="+AdminUserPrefs.allotmments.size(),Toast.LENGTH_LONG).show();
+
+
+                            }
+
+                        }else{      //only local changes required
+
+                            if(teacheralreadypresent) {
+                                //nothing as both are present
+                                Toast.makeText(getApplicationContext(),"Already present",Toast.LENGTH_LONG).show();
+                            }
+
+
+
+
+
+
+                        }
+
+
+
+
+                        newSubejectDialog.dismiss();
+                        for(int x=0;x<AdminUserPrefs.allotmments.size();x++){
+                            Log.d("altteacher",AdminUserPrefs.allotmments.get(x).getTeacherid());
+                            for(String s:AdminUserPrefs.allotmments.get(x).getAllots().keySet()){
+                                Log.d("alt",s+ " " + AdminUserPrefs.allotmments.get(x).getAllots().get(s));
+
+                            }
+                        }
+                        newSubejectDialog.dismiss();
+                        sectionSelected(sectioname);
+
+                    }else{
+
+                        Toast.makeText(getApplicationContext(),"enter complete details",Toast.LENGTH_LONG).show();
+                      //  newSubejectDialog.dismiss();
+
                     }
-                });
+
+
+                }
+            });
 
 
 
-
-
-
-
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        }
 
 
 

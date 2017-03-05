@@ -23,6 +23,8 @@ import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
+import com.project.smartedu.database.Allotments;
+import com.project.smartedu.database.Class;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -108,6 +110,17 @@ public class NewClass extends BaseActivity {
                         databaseReference.child("subject").child(subjectofclassteacher).setValue(selectedteacherid);
 
 
+                        Class newClass=new Class();     ///local db changes
+                        newClass.setClassid(institutionName + "_" + classname + "_" + classsection);
+
+                        HashMap<String,String> tmap=new HashMap<String, String>();
+                        tmap.put(selectedteacherid,"1");
+                        newClass.setTeachers(tmap);
+
+                        HashMap<String,String> smap=new HashMap<String, String>();
+                        smap.put(subjectofclassteacher,selectedteacherid);
+                        newClass.setSubjects(smap);
+                        AdminUserPrefs.classes.add(newClass);
 
                         addAllotment(classname,classsection,selectedteacherid, subjectofclassteacher);
 
@@ -137,6 +150,33 @@ public class NewClass extends BaseActivity {
 
         databaseReference= Constants.databaseReference.child(Constants.ALLOTMENTS_TABLE).child(institutionName).child(teacheruid).push();
         databaseReference.setValue(institutionName+"_"+classname+"_"+section);
+
+        boolean ifteacherpresent=false;
+        int index=0;
+
+        for(int x=0;x<AdminUserPrefs.allotmments.size();x++){
+
+            Allotments allotment=AdminUserPrefs.allotmments.get(x);
+
+            if(allotment.getTeacherid().equals(teacheruid)){        //if teacher present
+                ifteacherpresent=true;
+                index=x;
+                break;
+            }
+
+        }
+
+        if(ifteacherpresent){
+
+            AdminUserPrefs.allotmments.get(index).getAllots().put(databaseReference.getKey(),institutionName+"_"+classname+"_"+section);
+
+        }else{
+            HashMap<String, String> allotmap = new HashMap<String, String>();
+            allotmap.put(databaseReference.getKey(), institutionName+"_"+classname+"_"+section );
+            Allotments newAllot = new Allotments(teacheruid, allotmap);
+            AdminUserPrefs.allotmments.add(newAllot);
+        }
+
 
     }
 
