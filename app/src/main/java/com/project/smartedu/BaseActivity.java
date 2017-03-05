@@ -3,38 +3,29 @@ package com.project.smartedu;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.project.smartedu.common.Tasks;
+import com.project.smartedu.navigation.FragmentDrawer;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class BaseActivity extends AppCompatActivity {
+public class BaseActivity extends AppCompatActivity implements FragmentDrawer.FragmentDrawerListener {
 
 
     private static final int RESULT_LOAD_IMAGE = 1;
@@ -310,287 +301,7 @@ public class BaseActivity extends AppCompatActivity {
 
         return inSampleSize;
     }
-/*
-    @Override
-    public void onDrawerItemSelected(View view, int position) {
 
-
-        displayView(position);
-    }
-*/
-    private void displayView(int position) {
-        /*
-
-        if(this.role.equals("Teacher")){
-            if (position == 0) { //dashboard
-               // Intent i = new Intent(getApplicationContext(),MainActivity.class);
-                i.putExtra("role", role);
-               // i.putExtra("institution_code", institution_code);
-                i.putExtra("institutionName",institutionName);
-                startActivity(i);
-            }
-
-            if (position == 1) { //tasks
-                Intent task_intent = new Intent(BaseActivity.this, Tasks.class);
-                //task_intent.putExtra("institution_code", institution_code);
-                task_intent.putExtra("institutionName", institutionName);
-                task_intent.putExtra("role", role);
-                startActivity(task_intent);
-            }
-
-            if (position == 2) { //attendance
-                Intent attendance_intent = new Intent(BaseActivity.this, teacher_classes.class);
-                attendance_intent.putExtra("institution_code",institution_code);
-                attendance_intent.putExtra("institutionName",institutionName);
-                attendance_intent.putExtra("for","attendance");
-                attendance_intent.putExtra("role", role);
-                startActivity(attendance_intent);
-            }
-
-            if (position == 3) { //schedule
-                Intent schedule_intent = new Intent(BaseActivity.this, Schedule.class);
-                schedule_intent.putExtra("institution_code",institution_code);
-                schedule_intent.putExtra("institutionName",institutionName);
-                schedule_intent.putExtra("role", role);
-                startActivity(schedule_intent);
-            }
-
-            if (position == 4) { //assignments
-                Intent upload_intent = new Intent(BaseActivity.this, teacher_classes.class);
-                upload_intent.putExtra("institution_code",institution_code);
-                upload_intent.putExtra("institutionName", institutionName);
-                upload_intent.putExtra("role", role);
-                upload_intent.putExtra("for", "upload");
-                startActivity(upload_intent);
-
-            }
-
-            if (position == 5) { //grades
-                Intent addmarks_intent = new Intent(BaseActivity.this, teacher_classes.class);
-                addmarks_intent.putExtra("institution_code",institution_code);
-                addmarks_intent.putExtra("institutionName", institutionName);
-                addmarks_intent.putExtra("role", role);
-                addmarks_intent.putExtra("for", "exam");
-                startActivity(addmarks_intent);
-            }
-
-            if(position==7) //choose another role
-            {
-                Intent i = new Intent(BaseActivity.this,ChooseRole.class);
-                startActivity(i);
-            }
-
-            if(position==8) //logout
-            {
-                ParseUser.logOut();
-                ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
-                Intent i = new Intent(BaseActivity.this, login.class);
-                startActivity(i);
-            }
-
-        }
-
-        else if(this.role.equals("Student")){
-            if (position == 0) { //dashboard
-                Intent i = new Intent(getApplicationContext(),student_home_activity.class);
-                i.putExtra("institution_code",institution_code);
-                i.putExtra("institutionName",institutionName);
-                i.putExtra("role", role);
-                i.putExtra("institution_code", institution_code);
-                startActivity(i);
-            }
-
-            if (position == 1) { //tasks
-                Intent task_intent = new Intent(BaseActivity.this, Tasks.class);
-                task_intent.putExtra("institution_code",institution_code);
-                task_intent.putExtra("institutionName",institutionName);
-                task_intent.putExtra("role", role);
-                startActivity(task_intent);
-            }
-
-            if (position == 2) { //attendance
-                Intent atten_intent = new Intent(BaseActivity.this, view_attendance.class);
-
-                atten_intent.putExtra("role", role);
-                atten_intent.putExtra("studentId", studentId);
-                atten_intent.putExtra("classId", classId);
-                startActivity(atten_intent);
-            }
-
-            if (position == 3) { //schedule
-                Intent schedule_intent = new Intent(BaseActivity.this, Schedule.class);
-                schedule_intent.putExtra("institution_code",institution_code);
-                schedule_intent.putExtra("institutionName",institutionName);
-                schedule_intent.putExtra("role", role);
-                startActivity(schedule_intent);
-            }
-
-            if (position == 4) { //assignments
-                Intent exam_intent = new Intent(BaseActivity.this, UploadMaterial_students.class);
-                exam_intent.putExtra("institutionName", institutionName);
-                exam_intent.putExtra("institution_code", institution_code);
-                exam_intent.putExtra("id", classId);
-                startActivity(exam_intent);
-            }
-
-            if (position == 5) { //grades
-                Intent exam_intent = new Intent(BaseActivity.this, student_exams.class);
-                exam_intent.putExtra("institutionName", institutionName);
-                exam_intent.putExtra("institution_code", institution_code);
-                exam_intent.putExtra("role", role);
-                exam_intent.putExtra("classId", classId);
-                exam_intent.putExtra("studentId", studentId);
-                startActivity(exam_intent);
-            }
-
-            if(position==7) //choose another role
-            {
-                Intent i = new Intent(BaseActivity.this,ChooseRole.class);
-                startActivity(i);
-            }
-
-            if(position==8) //logout
-            {
-                ParseUser.logOut();
-                ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
-                Intent i = new Intent(BaseActivity.this, login.class);
-                startActivity(i);
-            }
-
-        }
-
-        else if(role.equals("Parent")){
-            if (position == 0) { //dashboard
-                Intent i = new Intent(getApplicationContext(),parent_home_activity.class);
-                i.putExtra("institution_code",institution_code);
-                i.putExtra("institutionName",institutionName);
-                i.putExtra("role", role);
-                startActivity(i);
-            }
-
-            if (position == 1) { //tasks
-                Intent task_intent = new Intent(getApplicationContext(), Tasks.class);
-                task_intent.putExtra("institution_code",institution_code);
-                task_intent.putExtra("institutionName",institutionName);
-                task_intent.putExtra("role", role);
-                startActivity(task_intent);
-            }
-
-            if (position == 2) { //attendance
-                Intent atten_intent = new Intent(getApplicationContext(), view_attendance.class);
-                atten_intent.putExtra("role", "Parent");
-                atten_intent.putExtra("studentId", studentId);
-                atten_intent.putExtra("classId", classId);
-                startActivity(atten_intent);
-            }
-
-            if (position == 3) { //grades
-
-                Intent exam_intent = new Intent(getApplicationContext(), student_exams.class);
-                exam_intent.putExtra("role", "Parent");
-                exam_intent.putExtra("classId", classId);
-                exam_intent.putExtra("studentId", studentId);
-                startActivity(exam_intent);
-
-            }
-
-            if (position == 4) { //messages
-
-                Intent message_intent = new Intent(getApplicationContext(), view_messages.class);
-                message_intent.putExtra("role", "Parent");
-                message_intent.putExtra("classId", classId);
-                message_intent.putExtra("studentId", studentId);
-                message_intent.putExtra("institutionName", institutionName);
-                message_intent.putExtra("institution_code", institution_code);
-                message_intent.putExtra("_for", "received");
-                startActivity(message_intent);
-            }
-
-            if (position == 5) { //settings
-
-            }
-
-            if(position==6) //choose another role
-            {
-                Intent i = new Intent(getApplicationContext(),ChooseRole.class);
-                startActivity(i);
-            }
-
-            if(position==7) //logout
-            {
-                ParseUser.logOut();
-                ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
-                Intent i = new Intent(BaseActivity.this, login.class);
-                startActivity(i);
-            }
-
-        } else if(role.equals("Admin")){
-            if (position == 0) { //dashboard
-                Intent i = new Intent(getApplicationContext(),admin_home.class);
-                i.putExtra("institution_code",institution_code);
-                i.putExtra("institutionName",institutionName);
-                i.putExtra("role", role);
-                startActivity(i);
-            }
-
-            if (position == 1) { //tasks
-                Intent task_intent = new Intent(getApplicationContext(), Tasks.class);
-                task_intent.putExtra("institution_code",institution_code);
-                task_intent.putExtra("institutionName",institutionName);
-                task_intent.putExtra("role", role);
-                startActivity(task_intent);
-            }
-
-            if (position == 2) { //teachers
-
-            }
-
-            if (position == 3) { //classes
-
-
-            }
-
-            if (position == 4) { //allotments
-
-            }
-
-            if (position == 5) { //settings
-
-            }
-
-
-            if(position==6) //logout
-            {
-                ParseUser.logOut();
-                ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
-                Intent i = new Intent(BaseActivity.this, login.class);
-                startActivity(i);
-            }
-
-        } else{
-            if(position==0)
-            {
-
-                ParseUser.logOut();
-                ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
-                Intent i = new Intent(BaseActivity.this, login.class);
-                startActivity(i);
-            }
-        }
-
-
-    }
-
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-        if(ParseUser.getCurrentUser()==null)
-        {
-            Intent nouser=new Intent(getApplicationContext(),login.class);
-            startActivity(nouser);
-        }
-*/
-    }
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
@@ -653,6 +364,286 @@ public class BaseActivity extends AppCompatActivity {
         lp.gravity = Gravity.CENTER;
 
         dialogcal.getWindow().setAttributes(lp);
+
+    }
+
+    @Override
+    public void onDrawerItemSelected(View view, int position) {
+
+
+        displayView(position);
+    }
+
+    private void displayView(int position) {
+
+        if(this.role.equals("Teacher")){
+            if (position == 0) { //dashboard
+                Intent i = new Intent(getApplicationContext(),com.project.smartedu.teacher.Home.class);
+                i.putExtra("role", role);
+                i.putExtra("institution_name",institutionName);
+                startActivity(i);
+            }
+
+            if (position == 1) { //tasks
+                Intent task_intent = new Intent(BaseActivity.this, com.project.smartedu.common.Tasks.class);
+                task_intent.putExtra("role", role);
+                task_intent.putExtra("institution_name", institutionName);
+                startActivity(task_intent);
+            }
+
+            if (position == 2) { //attendance
+                /*
+                Intent attendance_intent = new Intent(BaseActivity.this, teacher_classes.class);
+                attendance_intent.putExtra("institution_code",institution_code);
+                attendance_intent.putExtra("institution_name",institution_name);
+                attendance_intent.putExtra("for","attendance");
+                attendance_intent.putExtra("role", role);
+                startActivity(attendance_intent); */
+            }
+
+            if (position == 3) { //schedule
+                Intent schedule_intent = new Intent(BaseActivity.this, com.project.smartedu.common.Schedule.class);
+                schedule_intent.putExtra("role", role);
+                schedule_intent.putExtra("institution_name",institutionName);
+                startActivity(schedule_intent);
+            }
+
+            if (position == 4) { //assignments
+                /*
+                Intent upload_intent = new Intent(BaseActivity.this, teacher_classes.class);
+                upload_intent.putExtra("institution_code",institution_code);
+                upload_intent.putExtra("institution_name", institution_name);
+                upload_intent.putExtra("role", role);
+                upload_intent.putExtra("for", "upload");
+                startActivity(upload_intent); */
+
+            }
+
+            if (position == 5) { //grades
+                /*
+                Intent addmarks_intent = new Intent(BaseActivity.this, teacher_classes.class);
+                addmarks_intent.putExtra("institution_code",institution_code);
+                addmarks_intent.putExtra("institution_name", institution_name);
+                addmarks_intent.putExtra("role", role);
+                addmarks_intent.putExtra("for", "exam");
+                startActivity(addmarks_intent); */
+            }
+
+            if(position==6) //choose another role
+            {
+                Intent i = new Intent(BaseActivity.this,ChooseRole.class);
+                startActivity(i);
+            }
+
+            if(position==7) //logout
+            {
+                /*
+                ParseUser.logOut();
+                ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
+                Intent i = new Intent(BaseActivity.this, login.class);
+                startActivity(i); */
+            }
+
+        }
+
+        else if(this.role.equals("Student")){
+            if (position == 0) { //dashboard
+                Intent i = new Intent(getApplicationContext(),com.project.smartedu.student.Home.class);
+                i.putExtra("role", role);
+                i.putExtra("institution_name",institutionName);
+                startActivity(i);
+            }
+
+            if (position == 1) { //tasks
+                Intent task_intent = new Intent(BaseActivity.this, com.project.smartedu.common.Tasks.class);
+                task_intent.putExtra("role", role);
+                task_intent.putExtra("institution_name", institutionName);
+                startActivity(task_intent);
+            }
+
+            if (position == 2) { //attendance
+                /*
+                Intent atten_intent = new Intent(BaseActivity.this, student_classes.class);
+
+                atten_intent.putExtra("role", role);
+                atten_intent.putExtra("studentId", studentId);
+                atten_intent.putExtra("classId", classId);
+                atten_intent.putExtra("classGradeId", classGradeId);
+                atten_intent.putExtra("institution_code",institution_code);
+                atten_intent.putExtra("institution_name",institution_name);
+                atten_intent.putExtra("for", "attendance");
+                startActivity(atten_intent); */
+            }
+
+            if (position == 3) { //schedule
+                Intent schedule_intent = new Intent(BaseActivity.this, com.project.smartedu.common.Schedule.class);
+                schedule_intent.putExtra("role", role);
+                schedule_intent.putExtra("institution_name",institutionName);
+                startActivity(schedule_intent);
+            }
+
+            if (position == 4) { //assignments
+                /*
+                Intent exam_intent = new Intent(BaseActivity.this, student_classes.class);
+                exam_intent.putExtra("institution_name", institution_name);
+                exam_intent.putExtra("institution_code", institution_code);
+                exam_intent.putExtra("role", role);
+                exam_intent.putExtra("classGradeId", classGradeId);
+                exam_intent.putExtra("for", "upload");
+                exam_intent.putExtra("id", classId);
+                startActivity(exam_intent); */
+            }
+
+            if (position == 5) { //grades
+                /*
+                Intent exam_intent = new Intent(BaseActivity.this, student_exams.class);
+                exam_intent.putExtra("institution_name", institution_name);
+                exam_intent.putExtra("institution_code", institution_code);
+                exam_intent.putExtra("role", role);
+                exam_intent.putExtra("classId", classId);
+                exam_intent.putExtra("classGradeId", classGradeId);
+                exam_intent.putExtra("studentId", studentId);
+                startActivity(exam_intent); */
+            }
+
+            if(position==6) //choose another role
+            {
+                Intent i = new Intent(BaseActivity.this,ChooseRole.class);
+                startActivity(i);
+            }
+
+            if(position==7) //logout
+            {
+                /*
+                ParseUser.logOut();
+                ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
+                Intent i = new Intent(BaseActivity.this, login.class);
+                startActivity(i); */
+            }
+
+        }
+
+        else if(role.equals("Parent")){
+            if (position == 0) { //dashboard
+                /*
+                Intent i = new Intent(getApplicationContext(),com.project.smartedu.parent.Home.class);
+                i.putExtra("role", role);
+                i.putExtra("institution_name",institutionName);
+
+                i.putExtra("child_username",child_username);
+                startActivity(i); */
+            }
+
+            if (position == 1) { //tasks
+                Intent task_intent = new Intent(BaseActivity.this, com.project.smartedu.common.Tasks.class);
+                task_intent.putExtra("role", role);
+                task_intent.putExtra("institution_name", institutionName);
+                startActivity(task_intent);
+            }
+
+            if (position == 2) { //attendance
+                /*
+                Intent atten_intent = new Intent(getApplicationContext(), student_classes.class);
+                atten_intent.putExtra("role", "Parent");
+                atten_intent.putExtra("studentId", studentId);
+                atten_intent.putExtra("for","attendance");
+                atten_intent.putExtra("classGradeId", classGradeId);
+                atten_intent.putExtra("institution_code",institution_code);
+                atten_intent.putExtra("institution_name",institution_name);
+
+                startActivity(atten_intent); */
+            }
+
+            if (position == 3) { //grades
+                /*
+                Intent exam_intent = new Intent(getApplicationContext(), student_exams.class);
+                exam_intent.putExtra("role", "Parent");
+                exam_intent.putExtra("classId", classId);
+                exam_intent.putExtra("studentId", studentId);
+                exam_intent.putExtra("institution_name", institution_name);
+                exam_intent.putExtra("institution_code", institution_code);
+                exam_intent.putExtra("classGradeId", classGradeId);
+                startActivity(exam_intent); */
+
+            }
+
+            if (position == 4) { //messages
+                /*
+                Intent message_intent = new Intent(getApplicationContext(), view_messages.class);
+                message_intent.putExtra("role", "Parent");
+                message_intent.putExtra("classId", classId);
+                message_intent.putExtra("classGradeId", classGradeId);
+                message_intent.putExtra("studentId", studentId);
+                message_intent.putExtra("institution_name", institution_name);
+                message_intent.putExtra("institution_code", institution_code);
+                message_intent.putExtra("for", "received");
+                startActivity(message_intent); */
+            }
+
+            if(position==5) //choose another role
+            {
+                Intent i = new Intent(getApplicationContext(),ChooseRole.class);
+                startActivity(i);
+            }
+
+            if(position==6) //logout
+            {
+                /*
+                ParseUser.logOut();
+                ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
+                Intent i = new Intent(BaseActivity.this, login.class);
+                startActivity(i); */
+            }
+
+        } else if(role.equals("Admin")){
+            if (position == 0) { //dashboard
+                /*
+                Intent i = new Intent(getApplicationContext(),admin_home.class);
+                i.putExtra("institution_code",institution_code);
+                i.putExtra("institution_name",institution_name);
+                i.putExtra("role", role);
+                startActivity(i); */
+            }
+
+            if (position == 1) { //tasks
+                Intent task_intent = new Intent(BaseActivity.this, com.project.smartedu.common.Tasks.class);
+                task_intent.putExtra("role", role);
+                task_intent.putExtra("institution_name", institutionName);
+                startActivity(task_intent);
+            }
+
+            if (position == 2) { //teachers
+
+            }
+
+            if (position == 3) { //classes
+
+
+            }
+
+
+
+
+            if(position==4) //logout
+            {
+                /*
+                ParseUser.logOut();
+                ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
+                Intent i = new Intent(BaseActivity.this, login.class);
+                startActivity(i); */
+            }
+
+        } else{
+            if(position==0)
+            {
+                /*
+                ParseUser.logOut();
+                ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
+                Intent i = new Intent(BaseActivity.this, login.class);
+                startActivity(i); */
+            }
+        }
+
 
     }
 }

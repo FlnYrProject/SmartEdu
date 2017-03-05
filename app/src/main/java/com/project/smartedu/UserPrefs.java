@@ -124,6 +124,9 @@ public class UserPrefs {
     public String getInstitution(){
         return pref.getString(INSTITUION,null);
     }
+    public String getUserName(){
+        return pref.getString(USER_NAME,null);
+    }
 
     public void clearAllSavedData(){
         roleslistmap.clear();

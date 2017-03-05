@@ -1,6 +1,102 @@
 <resources>
+
     <string name="app_name">SmartEdu</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="action_search">Search</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+
+
+    <string name="nav_item_dashboard">Dashboard</string>
+    <string name="nav_item_dashboard2">Dashboard2</string>
+    <string name="nav_item_dashboard3">Dashboard3</string>
+    <string name="nav_item_tasks">Tasks</string>
+    <string name="nav_item_attendance">Attendance</string>
+    <string name="nav_item_timetable">Time Table</string>
+    <string name="nav_item_assignments">Assignments</string>
+    <string name="nav_item_grades">Grades</string>
+    <string name="nav_item_schedule">Schedule</string>
+
+    <string name="nav_item_anotherrole">Choose another Role</string>
+    <string name="nav_item_logout">Logout</string>
+    <string name="nav_item_messages">Messages</string>
+
+    <string name="nav_item_teachers">Teachers</string>
+    <string name="nav_item_classes">Classes</string>
+    <string name="nav_item_allotments">Allotments</string>
+
+    <!-- navigation drawer item labels  -->
+    <string-array name="nav_drawer_labels_teacher">
+        <item>@string/nav_item_dashboard</item>
+        <item>@string/nav_item_tasks</item>
+        <item>@string/nav_item_attendance</item>
+        <item>@string/nav_item_schedule</item>
+        <item>@string/nav_item_assignments</item>
+        <item>@string/nav_item_grades</item>
+
+        <item>@string/nav_item_anotherrole</item>
+        <item>@string/nav_item_logout</item>
+    </string-array>
+
+
+    <string-array name="nav_drawer_labels_student">
+        <item>@string/nav_item_dashboard</item>
+        <item>@string/nav_item_tasks</item>
+        <item>@string/nav_item_attendance</item>
+        <item>@string/nav_item_schedule</item>
+        <item>@string/nav_item_assignments</item>
+        <item>@string/nav_item_grades</item>
+
+        <item>@string/nav_item_anotherrole</item>
+        <item>@string/nav_item_logout</item>
+    </string-array>
+
+    <string-array name="nav_drawer_labels_parent">
+        <item>@string/nav_item_dashboard</item>
+        <item>@string/nav_item_tasks</item>
+        <item>@string/nav_item_attendance</item>
+        <item>@string/nav_item_grades</item>
+        <item>@string/nav_item_messages</item>
+
+        <item>@string/nav_item_anotherrole</item>
+        <item>@string/nav_item_logout</item>
+    </string-array>
+
+
+    <string-array name="nav_drawer_labels_admin">
+        <item>@string/nav_item_dashboard</item>
+        <item>@string/nav_item_tasks</item>
+        <item>@string/nav_item_teachers</item>
+        <item>@string/nav_item_classes</item>
+
+
+        <item>@string/nav_item_logout</item>
+    </string-array>
+
+    <string-array name="nav_drawer_labels_none">
+
+        <item>@string/nav_item_logout</item>
+    </string-array>
+
+    <string name="navigation_drawer_open">open</string>
+    <string name="navigation_drawer_close">close</string>
+    <string name="title_section1">a</string>
+    <string name="title_section2">b</string>
+    <string name="title_section3">c</string>
+    <string name="title_messages">Messages</string>
+    <string name="title_friends">Friends</string>
+    <string name="title_home">Home</string>
+    <string name="title_activity_splash_screen">SplashScreen</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_login">login</string>
     <string name="title_activity_sign_up">SignUp</string>
+    <string name="title_activity_students">Students</string>
+    <string name="title_activity_new_student">NewStudent</string>
+    <string name="title_activity_student_info">StudentInfo</string>
+
+
     <string name="title_activity_home">Home</string>
     <string name="title_activity_choose_role">ChooseRole</string>
     <string name="title_activity_tasks">Tasks</string>
