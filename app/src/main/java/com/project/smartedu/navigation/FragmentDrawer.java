@@ -157,11 +157,11 @@ public class FragmentDrawer extends Fragment {
     public void setUp(int fragmentId, DrawerLayout drawerLayout, final Toolbar toolbar, String role) {
         containerView = getActivity().findViewById(fragmentId);
         mDrawerLayout = drawerLayout;
-//        Log.d("user",role);
+       Log.d("fragment drawer user",role);
         this.role=role;
 
 
-        if(this.role.equals("Teacher")) {
+        if(role.equalsIgnoreCase("teacher")) {
             titles = getActivity().getResources().getStringArray(R.array.nav_drawer_labels_teacher);
             icons= new int[]{
                     R.drawable.ic_home,
@@ -175,7 +175,8 @@ public class FragmentDrawer extends Fragment {
                     R.drawable.logout_icon
 
             };
-        }else if(this.role.equals("Student"))
+            //Log.d("role", this.role + role );
+        }else if(role.equalsIgnoreCase("student"))
         {
             titles = getActivity().getResources().getStringArray(R.array.nav_drawer_labels_student);
             icons= new int[]{
@@ -190,7 +191,7 @@ public class FragmentDrawer extends Fragment {
                     R.drawable.logout_icon
 
             };
-        }else if(this.role.equals("Parent"))
+        }else if(role.equalsIgnoreCase("parent"))
         {
             titles = getActivity().getResources().getStringArray(R.array.nav_drawer_labels_parent);
             icons= new int[]{
@@ -205,7 +206,7 @@ public class FragmentDrawer extends Fragment {
 
             };
             Log.d("user","Parent role selected");
-        }else if(this.role.equals("Admin"))
+        }else if(role.equalsIgnoreCase("admin"))
         {
             titles = getActivity().getResources().getStringArray(R.array.nav_drawer_labels_admin);
             icons= new int[]{
@@ -217,7 +218,7 @@ public class FragmentDrawer extends Fragment {
                     R.drawable.logout_icon
 
             };
-        }else if(this.role.equals(""))
+        }else if(role.equalsIgnoreCase(""))
         {
             titles = getActivity().getResources().getStringArray(R.array.nav_drawer_labels_none);
             icons= new int[]{

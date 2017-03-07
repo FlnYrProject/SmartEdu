@@ -2,6 +2,7 @@ package com.project.smartedu.navigation;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
         inflater = LayoutInflater.from(context);
         this.data = data;
         this.icons= new int[data.size()];
+        Log.d("fd data size",Integer.toString(data.size()));
         this.icons=icons;
     }
 
