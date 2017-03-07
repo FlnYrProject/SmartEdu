@@ -100,7 +100,7 @@ public class Classes extends BaseActivity {
         role=from_student.getStringExtra("role");
         institutionName=from_student.getStringExtra("institution_name");
 
-      
+
         classList = (ListView) findViewById(R.id.classList);
 
         classLt = new ArrayList<>();
@@ -220,7 +220,7 @@ public class Classes extends BaseActivity {
                 addSectionButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // addSectionCall(item);
+                        addSectionCall(item);
 
                     }
                 });
@@ -259,17 +259,17 @@ public class Classes extends BaseActivity {
 
 
 
-      //  databaseReference=databaseReference.child(section);
+        //  databaseReference=databaseReference.child(section);
 
 
         String selectedclassid=institutionName+"_"+classname+"_"+sectioname;
 
         for(int x=0;x<AdminUserPrefs.classes.size();x++){
 
-           if(AdminUserPrefs.classes.get(x).getClassid().equals(selectedclassid)){
-               selectedclass=AdminUserPrefs.classes.get(x);
-               break;
-           }
+            if(AdminUserPrefs.classes.get(x).getClassid().equals(selectedclassid)){
+                selectedclass=AdminUserPrefs.classes.get(x);
+                break;
+            }
 
         }
 
@@ -380,7 +380,7 @@ public class Classes extends BaseActivity {
         }else {
 
 
-           final ArrayAdapter teacheradapter = new ArrayAdapter(Classes.this, android.R.layout.simple_list_item_1, AdminUserPrefs.teacherLt);
+            final ArrayAdapter teacheradapter = new ArrayAdapter(Classes.this, android.R.layout.simple_list_item_1, AdminUserPrefs.teacherLt);
             subjectTeacherSpinner.setAdapter(teacheradapter);
             newSubejectDialog.show();
             addSubject.setOnClickListener(new View.OnClickListener() {
@@ -410,7 +410,7 @@ public class Classes extends BaseActivity {
 
 
 
-                            //add ddata to classes
+                        //add ddata to classes
                         int classindex=0;
                         for(int x=0;x<AdminUserPrefs.classes.size();x++){
                             Class c=AdminUserPrefs.classes.get(x);
@@ -477,7 +477,7 @@ public class Classes extends BaseActivity {
 
                                 AdminUserPrefs.allotmments.get(index).getAllots().put(databaseReference.getKey(),selectedclass.getClassid());
 
-                            //    Toast.makeText(getApplicationContext(),"t present",Toast.LENGTH_LONG).show();
+                                //    Toast.makeText(getApplicationContext(),"t present",Toast.LENGTH_LONG).show();
 
 
                             }else {
@@ -485,9 +485,9 @@ public class Classes extends BaseActivity {
                                 HashMap<String, String> allotmap = new HashMap<String, String>();
                                 allotmap.put(databaseReference.getKey(), selectedclass.getClassid());
                                 Allotments newAllot = new Allotments(teacheruserkey, allotmap);
-                              //  Toast.makeText(getApplicationContext(),"sp = "+AdminUserPrefs.allotmments.size(),Toast.LENGTH_LONG).show();
+                                //  Toast.makeText(getApplicationContext(),"sp = "+AdminUserPrefs.allotmments.size(),Toast.LENGTH_LONG).show();
                                 AdminUserPrefs.allotmments.add(newAllot);
-                              //  Toast.makeText(getApplicationContext(),"sn="+AdminUserPrefs.allotmments.size(),Toast.LENGTH_LONG).show();
+                                //  Toast.makeText(getApplicationContext(),"sn="+AdminUserPrefs.allotmments.size(),Toast.LENGTH_LONG).show();
 
 
                             }
@@ -523,7 +523,7 @@ public class Classes extends BaseActivity {
                     }else{
 
                         Toast.makeText(getApplicationContext(),"enter complete details",Toast.LENGTH_LONG).show();
-                      //  newSubejectDialog.dismiss();
+                        //  newSubejectDialog.dismiss();
 
                     }
 
@@ -857,7 +857,7 @@ public class Classes extends BaseActivity {
     */
 
 
-    /*
+
 
     protected  void addSectionCall(final String selectedClass)
     {
@@ -868,9 +868,9 @@ public class Classes extends BaseActivity {
         getNewSection=(EditText)newSection.findViewById(R.id.newsectionname);
         classTeacherSubject=(EditText)newSection.findViewById(R.id.classteachersubject);
 
-        ArrayList<String> teacherLt = new TeacherTable().getAllTeachersWithSerial(institutionName);
+        ArrayList<String> teacherLt = AdminUserPrefs.teacherLt;
 
-        if(teacherLt==null){
+        if(teacherLt.size()==0){
 
             Toast.makeText(Classes.this, "no teacher is added in this institution", Toast.LENGTH_LONG).show();
 
@@ -881,231 +881,94 @@ public class Classes extends BaseActivity {
             newSection.show();
 
 
+            done.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String[] itemValues = newsectionclassteacher.getSelectedItem().toString().split("\\. ");
+                    String selectedTeacher=itemValues[1];
+                    String teacherserial=itemValues[0];
+                    String sectionname=getNewSection.getText().toString();
+                    ArrayList<String> secLt=classtosectionmap.get(selectedClass);
+
+                    // final String selectedTeacher=newsectionclassteacher.getSelectedItem().toString();
+                    if( (getNewSection.getText().toString().equals("")) || (newsectionclassteacher.getSelectedItem().equals("")) || (classTeacherSubject.getText().equals("")) )
+                    {
+                        Toast.makeText(Classes.this,"Information incomplete",Toast.LENGTH_LONG).show();
+                    }else if(secLt.contains(sectionname)){//check if section already exists
+
+                        Toast.makeText(Classes.this,"Section already exists",Toast.LENGTH_LONG).show();
+
+                    }else
+                    {
+
+
+
+                        databaseReference=Constants.databaseReference.child(Constants.INSTITUTION_TABLE).child(classname).child(sectionname);
+
+
+                        databaseReference.child("id").setValue(institutionName + "_" + classname + "_" + sectionname);      //changes to server in class table
+                        String teacheruserid=AdminUserPrefs.teachersusermap.get(newsectionclassteacher.getSelectedItem().toString());
+
+                        databaseReference.child("subject").child(classTeacherSubject.getText().toString()).setValue(teacheruserid);
+                        databaseReference.child("teacher").child(teacheruserid).setValue("1");
+
+                        HashMap<String,String> newsectionsubjectmap=new HashMap<String, String>();      //local changes
+                        HashMap<String,String> newsectionteachermap=new HashMap<String, String>();
+                        newsectionsubjectmap.put(classTeacherSubject.getText().toString(),teacheruserid);
+                        newsectionteachermap.put(teacheruserid,"1");
+                        Class cls=new Class(institutionName + "_" + classname + "_" + sectionname,newsectionsubjectmap,newsectionteachermap);
+                        AdminUserPrefs.classes.add(cls);
+
+                        secLt.add(sectionname);
+                        classtosectionmap.put(selectedClass,secLt);     //replacing section list with new one
+
+
+
+
+                        databaseReference=Constants.databaseReference.child(Constants.ALLOTMENTS_TABLE).child(teacheruserid).push();        //changes to server in allotments table
+                        databaseReference.setValue(institutionName + "_" + classname + "_" + sectionname);
+
+                        boolean found=false;
+
+                        for(int x=0;x<AdminUserPrefs.allotmments.size();x++){
+                            Allotments alt=AdminUserPrefs.allotmments.get(x);
+                            if(alt.getTeacherid().equals(teacheruserid)){
+                                index=x;
+                                found=true;
+                                break;
+                            }
+                        }
+
+                        if(found){
+                            Allotments alt=AdminUserPrefs.allotmments.get(index);           //local changes
+                            alt.getAllots().put(databaseReference.getKey(),institutionName + "_" + classname + "_" + sectionname);
+                            AdminUserPrefs.allotmments.remove(index);
+                            AdminUserPrefs.allotmments.add(alt);
+                        }else{
+                            HashMap<String,String> newaltmap=new HashMap<String, String>();
+                            newaltmap.put(databaseReference.getKey(),institutionName + "_" + classname + "_" + sectionname);
+                            Allotments newalt=new Allotments(teacheruserid,newaltmap);
+                            AdminUserPrefs.allotmments.add(newalt);
+                        }
+
+
+
+
+                    }
+                }
+            });             //end os on click of done button while adding new section
+
+
+
+
+
+
+
         }
 
 
 
-
-        final HashMap<String,String> teacherMap=new HashMap<String,String>();
-        ParseQuery teacherListQuery=ParseQuery.getQuery(TeacherTable.TABLE_NAME);
-        teacherListQuery.whereEqualTo(TeacherTable.INSTITUTION, ParseObject.createWithoutData(InstitutionTable.TABLE_NAME, institution_code));
-        teacherListQuery.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> teacherListRet, ParseException e) {
-                if (e == null) {
-                    if (teacherListRet.size() != 0) {
-
-                        ArrayList<String> teacherLt = new ArrayList<String>();
-                        ArrayAdapter teacheradapter = new ArrayAdapter(Classes.this, android.R.layout.simple_spinner_item, teacherLt);
-                        teacheradapter.add("");
-                        //Toast.makeText(Students.this, "here = ", Toast.LENGTH_LONG).show();
-                        for (int x = 0; x < teacherListRet.size(); x++) {
-                            ParseObject teacher = teacherListRet.get(x);
-                            String teacher_name = teacher.getString(TeacherTable.TEACHER_NAME);
-                            teacheradapter.add(teacher_name);
-                            teacherMap.put(teacher_name,teacher.getObjectId());
-                        }
-
-                        newsectionclassteacher.setAdapter(teacheradapter);
-                        newSection.show();
-
-
-                    } else {
-                        Toast.makeText(Classes.this, "no teacher is added in this institution", Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Log.d("teachers", "error");
-                }
-            }
-
-        });
-
-
-
-
-
-
-
-
-
-
-
-        done.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String[] itemValues = newsectionclassteacher.getSelectedItem().toString().split("\\. ");
-                String selectedTeacher=itemValues[1];
-                String teacherserial=itemValues[0];
-               // final String selectedTeacher=newsectionclassteacher.getSelectedItem().toString();
-                if( (getNewSection.getText().toString().equals("")) || (newsectionclassteacher.getSelectedItem().equals("")) || (classTeacherSubject.getText().equals("")) )
-                {
-                    Toast.makeText(Classes.this,"Information incomplete",Toast.LENGTH_LONG).show();
-                }else
-                {
-                    String sectionname=getNewSection.getText().toString();
-                    databaseReference=Constants.databaseReference.child(Constants.INSTITUTION_TABLE).child(classname);
-
-                    if(databaseReference.child(sectionname)==null){
-
-                        databaseReference.child(sectionname).child("id").setValue(institutionName + "_" + classname + "_" + sectionname);
-                        String teacheruserid=new TeacherTable().getTeacherWithNameAndSerial(institutionName,teacherserial);
-
-
-                    }else{
-                        Toast.makeText(Classes.this,"Section already added. Type Another section name",Toast.LENGTH_LONG).show();
-
-                    }
-
-
-
-                    ParseQuery<ParseObject> newSectionQuery=ParseQuery.getQuery(ClassGradeTable.TABLE_NAME);
-                    newSectionQuery.whereEqualTo(ClassGradeTable.CLASS_GRADE,selectedClass);
-                    newSectionQuery.whereEqualTo(ClassGradeTable.INSTITUTION,ParseObject.createWithoutData(InstitutionTable.TABLE_NAME,institution_code));
-                    newSectionQuery.findInBackground(new FindCallback<ParseObject>() {
-                        @Override
-                        public void done(List<ParseObject> sectionsList, ParseException e) {
-                            if(e==null)
-                            {
-                                Log.d("classSection",sectionsList.size() + " Sections");
-                                int flag=0;
-                                if(sectionsList.size()!=0)
-                                {
-                                    for(int x=0;x<sectionsList.size();x++)
-                                    {
-                                        if((sectionsList.get(x).getString(ClassGradeTable.SECTION)).equalsIgnoreCase(getNewSection.getText().toString())){
-                                            Toast.makeText(Classes.this,"Section already added. Type Another section name",Toast.LENGTH_LONG).show();
-                                            flag=1;
-                                            break;
-                                        }
-                                    }
-                                    if(flag==0)
-                                    {
-
-                                        final ParseObject newSectionObject=new ParseObject(ClassGradeTable.TABLE_NAME);
-                                        newSectionObject.put(ClassGradeTable.CLASS_GRADE,selectedClass);
-                                        newSectionObject.put(ClassGradeTable.SECTION,getNewSection.getText().toString());
-                                        newSectionObject.put(ClassGradeTable.INSTITUTION,ParseObject.createWithoutData(InstitutionTable.TABLE_NAME, institution_code));
-                                        newSectionObject.saveEventually(new SaveCallback() {
-                                            @Override
-                                            public void done(ParseException e) {
-
-
-                                                ParseObject newClass=new ParseObject(ClassTable.TABLE_NAME);
-                                                newClass.put(ClassTable.SUBJECT, classTeacherSubject.getText().toString());
-                                                newClass.put(ClassTable.IF_CLASS_TEACHER, true);
-                                                newClass.put(ClassTable.CLASS_NAME, newSectionObject);
-                                                String selectedteacherObjectId=teacherMap.get(selectedTeacher);
-                                                ParseUser  teacheruser=(ParseUser)(ParseObject.createWithoutData(TeacherTable.TABLE_NAME, selectedteacherObjectId)).get(TeacherTable.TEACHER_USER_REF);
-                                                newClass.put(ClassTable.TEACHER_USER_REF, teacheruser);
-                                                newClass.saveEventually();
-
-
-
-
-                                            }
-                                        });
-                                        newSection.dismiss();
-                                    }
-                                }else
-                                {
-                                    Log.d("classSection","error in query logic");
-                                }
-                            }else
-                            {
-                                Log.d("classSection","error");
-                            }
-                        }
-                    });
-
-
-
-                }
-            }
-        });             //end os on click of done button while adding new section
-
-
-
-
-
-
-
-        done.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String selectedTeacher=newsectionclassteacher.getSelectedItem().toString();
-                if( (getNewSection.getText().toString().equals("")) || (newsectionclassteacher.getSelectedItem().equals("")) || (classTeacherSubject.getText().equals("")) )
-                {
-                    Toast.makeText(Classes.this,"Information incomplete",Toast.LENGTH_LONG).show();
-                }else
-                {
-
-
-                    ParseQuery<ParseObject> newSectionQuery=ParseQuery.getQuery(ClassGradeTable.TABLE_NAME);
-                    newSectionQuery.whereEqualTo(ClassGradeTable.CLASS_GRADE,selectedClass);
-                    newSectionQuery.whereEqualTo(ClassGradeTable.INSTITUTION,ParseObject.createWithoutData(InstitutionTable.TABLE_NAME,institution_code));
-                    newSectionQuery.findInBackground(new FindCallback<ParseObject>() {
-                        @Override
-                        public void done(List<ParseObject> sectionsList, ParseException e) {
-                            if(e==null)
-                            {
-                                Log.d("classSection",sectionsList.size() + " Sections");
-                                int flag=0;
-                                if(sectionsList.size()!=0)
-                                {
-                                    for(int x=0;x<sectionsList.size();x++)
-                                    {
-                                        if((sectionsList.get(x).getString(ClassGradeTable.SECTION)).equalsIgnoreCase(getNewSection.getText().toString())){
-                                            Toast.makeText(Classes.this,"Section already added. Type Another section name",Toast.LENGTH_LONG).show();
-                                            flag=1;
-                                            break;
-                                        }
-                                    }
-                                    if(flag==0)
-                                    {
-
-                                        final ParseObject newSectionObject=new ParseObject(ClassGradeTable.TABLE_NAME);
-                                        newSectionObject.put(ClassGradeTable.CLASS_GRADE,selectedClass);
-                                        newSectionObject.put(ClassGradeTable.SECTION,getNewSection.getText().toString());
-                                        newSectionObject.put(ClassGradeTable.INSTITUTION,ParseObject.createWithoutData(InstitutionTable.TABLE_NAME, institution_code));
-                                        newSectionObject.saveEventually(new SaveCallback() {
-                                            @Override
-                                            public void done(ParseException e) {
-
-
-                                                ParseObject newClass=new ParseObject(ClassTable.TABLE_NAME);
-                                                newClass.put(ClassTable.SUBJECT, classTeacherSubject.getText().toString());
-                                                newClass.put(ClassTable.IF_CLASS_TEACHER, true);
-                                                newClass.put(ClassTable.CLASS_NAME, newSectionObject);
-                                                String selectedteacherObjectId=teacherMap.get(selectedTeacher);
-                                                ParseUser  teacheruser=(ParseUser)(ParseObject.createWithoutData(TeacherTable.TABLE_NAME, selectedteacherObjectId)).get(TeacherTable.TEACHER_USER_REF);
-                                                newClass.put(ClassTable.TEACHER_USER_REF, teacheruser);
-                                                newClass.saveEventually();
-
-
-
-
-                                            }
-                                        });
-                                        newSection.dismiss();
-                                    }
-                                }else
-                                {
-                                    Log.d("classSection","error in query logic");
-                                }
-                            }else
-                            {
-                                Log.d("classSection","error");
-                            }
-                        }
-                    });
-
-
-
-                }
-            }
-        });             //end os on click of done button while adding new section
-
-    }*/
+    }
 
 
     @Override
@@ -1119,6 +982,6 @@ public class Classes extends BaseActivity {
     }
 
 
-    
+
 
 }
