@@ -307,6 +307,12 @@ public class Home extends BaseActivity {
             drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar, role);//pass role
             drawerFragment.setDrawerListener(this);
 
+            taskLt = UserPrefs.taskItems;
+            taskidmap = UserPrefs.taskidmap;
+
+            schedulekeymap = UserPrefs.schedulekeymap;
+            scheduleslt = new ArrayList<>();
+
 
 
 
