@@ -3,13 +3,9 @@ package com.project.smartedu.teacher;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
-
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -18,14 +14,10 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
-
-import com.project.smartedu.*;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.ImageAdapter;
@@ -34,9 +26,7 @@ import com.project.smartedu.UserPrefs;
 import com.project.smartedu.common.Schedule;
 import com.project.smartedu.common.Tasks;
 import com.project.smartedu.common.view_messages;
-
 import com.project.smartedu.navigation.FragmentDrawer;
-
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -313,7 +303,7 @@ public class Home extends BaseActivity {
             getSupportActionBar().setTitle("Dashboard");
 
 
-            drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.);
+            drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
             drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar, role);//pass role
             drawerFragment.setDrawerListener(this);
 
