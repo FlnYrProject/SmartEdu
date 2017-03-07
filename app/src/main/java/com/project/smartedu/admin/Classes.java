@@ -911,7 +911,7 @@ public class Classes extends BaseActivity {
 
 
 
-                        databaseReference=Constants.databaseReference.child(Constants.INSTITUTION_TABLE).child(classname).child(sectionname);
+                        databaseReference=Constants.databaseReference.child(Constants.CLASS_TABLE).child(institutionName).child(classname).child(sectionname);
 
 
                         databaseReference.child("id").setValue(institutionName + "_" + classname + "_" + sectionname);      //changes to server in class table
@@ -933,7 +933,7 @@ public class Classes extends BaseActivity {
 
 
 
-                        databaseReference=Constants.databaseReference.child(Constants.ALLOTMENTS_TABLE).child(teacheruserid).push();        //changes to server in allotments table
+                        databaseReference=Constants.databaseReference.child(Constants.ALLOTMENTS_TABLE).child(institutionName).child(teacheruserid).push();        //changes to server in allotments table
                         databaseReference.setValue(institutionName + "_" + classname + "_" + sectionname);
 
                         boolean found=false;
@@ -960,7 +960,7 @@ public class Classes extends BaseActivity {
                         }
 
 
-newSection.dismiss();
+                        newSection.dismiss();
                         showSections(classname);
 
                     }
