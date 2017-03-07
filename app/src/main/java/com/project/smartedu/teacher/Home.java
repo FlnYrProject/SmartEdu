@@ -299,7 +299,7 @@ public class Home extends BaseActivity {
             noti_bar.setTexts(ParseUser.getCurrentUser().getUsername(), role,institution_name); */
             mToolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(mToolbar);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            //getSupportActionBar().setDisplayShowHomeEnabled(true);
             getSupportActionBar().setTitle("Dashboard");
 
 
