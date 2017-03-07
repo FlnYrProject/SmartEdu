@@ -166,64 +166,7 @@ public class Classes extends BaseActivity {
 
                 classname=item;
 
-
-                final Dialog class_info = new Dialog(Classes.this);
-                class_info.setContentView(R.layout.class_details);
-                class_info.setTitle(item);
-
-                setDialogSize(class_info);
-                dialog_heading = (TextView) class_info.findViewById(R.id.description);
-                dialog_heading.setText("Sections");
-                classSectionList = (ListView) class_info.findViewById(R.id.subjectList);
-                ok = (Button) class_info.findViewById(R.id.doneButton);
-                deleteClassButton = (Button) class_info.findViewById(R.id.delClassButton);
-                addSectionButton = (Button) class_info.findViewById(R.id.addSubjectButton);
-                addSectionButton.setText("Add Section");
-
-
-                sectionLt = classtosectionmap.get(classname);
-                Toast.makeText(getApplicationContext(),sectionLt.size() + " sections found ",Toast.LENGTH_LONG).show();
-
-                ArrayAdapter adapter = new ArrayAdapter(Classes.this, android.R.layout.simple_list_item_1, sectionLt);
-                classSectionList.setAdapter(adapter);
-
-                classSectionList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        final String item = ((TextView) view).getText().toString();
-                        sectioname=item;
-                        sectionSelected(sectioname);
-
-                    }
-                });
-
-
-                class_info.show();
-
-
-                ok.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        class_info.dismiss();
-                    }
-                });
-
-
-                deleteClassButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // deleteClassGrade(item);
-                        class_info.dismiss();
-                    }
-                });
-
-                addSectionButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        addSectionCall(item);
-
-                    }
-                });
+                showSections(classname);
 
 
             }
@@ -234,6 +177,70 @@ public class Classes extends BaseActivity {
 
     }
 
+
+    protected void showSections(final String classSelected){
+
+        final Dialog class_info = new Dialog(Classes.this);
+        class_info.setContentView(R.layout.class_details);
+        class_info.setTitle(classSelected);
+
+        setDialogSize(class_info);
+        dialog_heading = (TextView) class_info.findViewById(R.id.description);
+        dialog_heading.setText("Sections");
+        classSectionList = (ListView) class_info.findViewById(R.id.subjectList);
+        ok = (Button) class_info.findViewById(R.id.doneButton);
+        deleteClassButton = (Button) class_info.findViewById(R.id.delClassButton);
+        addSectionButton = (Button) class_info.findViewById(R.id.addSubjectButton);
+        addSectionButton.setText("Add Section");
+
+
+        sectionLt = classtosectionmap.get(classname);
+        Toast.makeText(getApplicationContext(),sectionLt.size() + " sections found ",Toast.LENGTH_LONG).show();
+
+        ArrayAdapter adapter = new ArrayAdapter(Classes.this, android.R.layout.simple_list_item_1, sectionLt);
+        classSectionList.setAdapter(adapter);
+
+        classSectionList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final String item = ((TextView) view).getText().toString();
+                sectioname=item;
+                sectionSelected(sectioname);
+
+            }
+        });
+
+
+        class_info.show();
+
+
+        ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                class_info.dismiss();
+            }
+        });
+
+
+        deleteClassButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // deleteClassGrade(item);
+                class_info.dismiss();
+            }
+        });
+
+        addSectionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addSectionCall(classSelected);
+
+            }
+        });
+
+
+
+    }
 
 
 
@@ -873,6 +880,7 @@ public class Classes extends BaseActivity {
         if(teacherLt.size()==0){
 
             Toast.makeText(Classes.this, "no teacher is added in this institution", Toast.LENGTH_LONG).show();
+            newSection.dismiss();
 
         }else{
 
@@ -952,7 +960,8 @@ public class Classes extends BaseActivity {
                         }
 
 
-
+newSection.dismiss();
+                        showSections(classname);
 
                     }
                 }
