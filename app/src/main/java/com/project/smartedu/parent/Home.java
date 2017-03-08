@@ -4,16 +4,12 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ListAdapter;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -25,14 +21,12 @@ import com.project.smartedu.Constants;
 import com.project.smartedu.ImageAdapter;
 import com.project.smartedu.R;
 import com.project.smartedu.UserPrefs;
-import com.project.smartedu.common.Tasks;
-import com.project.smartedu.common.view_messages;
+import com.project.smartedu.navigation.FragmentDrawer;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 public class Home extends BaseActivity {
 
@@ -48,8 +42,8 @@ public class Home extends BaseActivity {
 
 
 
-    //private Toolbar mToolbar;
-   // private FragmentDrawer drawerFragment;
+    private Toolbar mToolbar;
+    private FragmentDrawer drawerFragment;
 
 
     String classGradeId;
@@ -306,9 +300,10 @@ public class Home extends BaseActivity {
       /*  dbHandler = new MyDBHandler(getApplicationContext(),null,null,1);
         noti_bar = (Notification_bar)getSupportFragmentManager().findFragmentById(R.id.noti);
         noti_bar.setTexts(ParseUser.getCurrentUser().getUsername(), role,institution_name);
+        */
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        //getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle("Dashboard");
 
 
@@ -316,7 +311,13 @@ public class Home extends BaseActivity {
         drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar,role);
         drawerFragment.setDrawerListener(this);
-*/
+
+        taskLt = UserPrefs.taskItems;
+        taskidmap = UserPrefs.taskidmap;
+
+        schedulekeymap = UserPrefs.schedulekeymap;
+        scheduleslt = new ArrayList<>();
+
       
         final GridView gridview = (GridView) findViewById(R.id.gridview);
         gridview.setAdapter(new ImageAdapter(getApplicationContext(), densityX,densityY, "Parent"));

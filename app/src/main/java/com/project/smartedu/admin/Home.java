@@ -6,22 +6,15 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.ContactsContract;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Display;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,26 +22,24 @@ import com.google.firebase.database.ValueEventListener;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.ImageAdapter;
-import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
-import com.project.smartedu.SignUp;
 import com.project.smartedu.UserPrefs;
 import com.project.smartedu.common.Tasks;
 import com.project.smartedu.database.Allotments;
 import com.project.smartedu.database.Class;
 import com.project.smartedu.database.Schedule;
+import com.project.smartedu.navigation.FragmentDrawer;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 
 public class Home extends BaseActivity{
 
+    private Toolbar mToolbar;
+    private FragmentDrawer drawerFragment;
+    //  Notification_bar noti_bar;
 
     DatabaseReference databaseReference;
     Button logout;
@@ -741,8 +732,18 @@ public class Home extends BaseActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+
+
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        //getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setTitle("Dashboard");
+
+
+
+        drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
+        drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar,"admin");
+        drawerFragment.setDrawerListener(this);
 
         userPrefs=new UserPrefs(Home.this);
         adminUserPrefs=new AdminUserPrefs(getApplicationContext());
