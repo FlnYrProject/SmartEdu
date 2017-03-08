@@ -131,9 +131,9 @@ public class Tasks extends BaseActivity {
 
         taskList=(ListView)findViewById(R.id.taskList);
 
-        if(role.equals("admin")) {
+
             taskLt =UserPrefs.taskItems;           //load data afterwards
-        }
+        
         showList();
 
 
