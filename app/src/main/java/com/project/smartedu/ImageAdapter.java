@@ -82,7 +82,7 @@ public class ImageAdapter extends BaseAdapter {
 
 
 
-        if(role.equals("Teacher")) {
+        if(role.equalsIgnoreCase("Teacher")) {
             /*
             imageView.post(new Runnable() {
                 @Override
@@ -104,19 +104,19 @@ public class ImageAdapter extends BaseAdapter {
             } */
         }
 
-        else if(role.equals("Parent"))
+        else if(role.equalsIgnoreCase("Parent"))
 
         {
             imageView.setImageResource(mThumbIdsParent[position]);
         }
 
-        else if(role.equals("Student"))
+        else if(role.equalsIgnoreCase("Student"))
 
         {
             imageView.setImageResource(mThumbIdsStudent[position]);
         }
 
-        else if(role.equals("admin"))
+        else if(role.equalsIgnoreCase("admin"))
 
         {
                            /* Bitmap bitmap = decodeSampledBitmapFromResource(imageView.getResources(), mThumbIdsAdmin[position],
