@@ -23,9 +23,11 @@ import com.project.smartedu.Constants;
 import com.project.smartedu.ImageAdapter;
 import com.project.smartedu.R;
 import com.project.smartedu.UserPrefs;
+import com.project.smartedu.admin.AdminUserPrefs;
 import com.project.smartedu.common.Schedule;
 import com.project.smartedu.common.Tasks;
 import com.project.smartedu.common.view_messages;
+import com.project.smartedu.database.Allotments;
 import com.project.smartedu.navigation.FragmentDrawer;
 
 import java.text.SimpleDateFormat;
@@ -49,6 +51,108 @@ public class Home extends BaseActivity {
     HashMap<com.project.smartedu.database.Schedule,String> schedulekeymap;        //to map schedule to the key
 
     DatabaseReference databaseReference;
+
+
+    private class AllotmentItems extends AsyncTask<Void, Void, Void> {
+
+        private Context async_context;
+        private ProgressDialog pd;
+
+        public AllotmentItems(Context context){
+            this.async_context = context;
+            pd = new ProgressDialog(async_context);
+            databaseReference = Constants.databaseReference.child(Constants.ALLOTMENTS_TABLE).child(institutionName).child(firebaseAuth.getCurrentUser().getUid());
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd.setMessage("Fetching Allotments");
+            pd.setCancelable(false);
+            pd.show();
+          TeacherUserPrefs.allotments.clear();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            final Object lock = new Object();
+
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    synchronized (lock) {
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+
+                            Log.d("ds.key",ds.getKey());             //random key
+                            String classid= (String) ds.getValue();
+                            TeacherUserPrefs.allotments.add(classid);
+
+
+                        }
+
+
+
+                        lock.notifyAll();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+
+            });
+
+
+            synchronized (lock){
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+
+
+
+
+
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //Handles the stuff after the synchronisation with the firebase listener has been achieved
+            //The main UI is already idle by this moment
+            super.onPostExecute(aVoid);
+
+
+            int size=TeacherUserPrefs.allotments.size();
+            Toast.makeText(getApplicationContext(),size + " allotments found",Toast.LENGTH_LONG).show();
+
+
+
+            //Show the log in progress_bar for at least a few milliseconds
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    pd.dismiss();
+                    pd=null;
+                }
+            }, 500);  // 100 milliseconds
+        }
+
+
+        //end firebase_async_class
+    }
+
+
 
 
     private class TaskItems extends AsyncTask<Void, Void, Void> {
@@ -268,7 +372,7 @@ public class Home extends BaseActivity {
                 public void run() {
                     pd.dismiss();
                     pd=null;
-                    //loadClassData();
+                   loadAllotmentData();
                 }
             }, 500);  // 100 milliseconds
         }
@@ -294,6 +398,10 @@ public class Home extends BaseActivity {
             institutionName=home.getStringExtra("institution_name");
             Log.d("user", role);
 
+
+
+            TeacherUserPrefs teacherUserPrefs=new TeacherUserPrefs(Home.this);
+            teacherUserPrefs.setInstituion(institutionName);
          /*
             noti_bar = (Notification_bar)getSupportFragmentManager().findFragmentById(R.id.noti);
             noti_bar.setTexts(ParseUser.getCurrentUser().getUsername(), role,institution_name); */
@@ -428,8 +536,15 @@ public class Home extends BaseActivity {
 
     private void loadScheduleData(){
 
-       ScheduleItems scheduleasync = new ScheduleItems(Home.this);        //get teacher data
+       ScheduleItems scheduleasync = new ScheduleItems(Home.this);        //getschedule data
         scheduleasync.execute();
+
+    }
+
+    private void loadAllotmentData(){
+
+        AllotmentItems allotmentasync = new AllotmentItems(Home.this);        //get teacher data
+        allotmentasync.execute();
 
     }
 
