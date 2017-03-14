@@ -106,7 +106,7 @@ public class Classes extends BaseActivity {
                     String item = ((TextView) view).getText().toString();
                     String classid=classmap.get(item);
                     Toast.makeText(Classes.this, "id of class selected is = " + classid, Toast.LENGTH_LONG).show();
-             /*       if (_for.equals("students")) {
+                    if (_for.equals("students")) {
                         Intent to_student = new Intent(Classes.this, Students.class);
 
                         to_student.putExtra("institution_name", institutionName);
@@ -114,7 +114,7 @@ public class Classes extends BaseActivity {
                         to_student.putExtra("id", id);
                         startActivity(to_student);
                     } else if (_for.equals("exam")) {
-                        Intent to_exams = new Intent(Classes.this, teacher_exams.class);
+                        Intent to_exams = new Intent(Classes.this, Exams.class);
 
                         to_exams.putExtra("institution_name", institutionName);
                         to_exams.putExtra("role", role);
@@ -137,14 +137,14 @@ public class Classes extends BaseActivity {
                         to_message.putExtra("_for", _for);
                         startActivity(to_message);
                     } else if (_for.equals("attendance")) {
-                        Intent to_att = new Intent(Classes.this, AddAttendance_everyday.class);
+                        Intent to_att = new Intent(Classes.this, Attendance.class);
 
                         to_att.putExtra("institution_name", institutionName);
 
                         to_att.putExtra("role", role);
                         to_att.putExtra("id", id);
                         startActivity(to_att);
-                    }*/
+                    }
 
 
 
