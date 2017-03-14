@@ -626,7 +626,6 @@ public class Home extends BaseActivity{
             this.async_context = context;
             pd = new ProgressDialog(async_context);
 
-            databaseReference = Constants.databaseReference.child(Constants.TASK_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child(role);
         }
 
         @Override
@@ -642,19 +641,22 @@ public class Home extends BaseActivity{
         @Override
         protected Void doInBackground(Void... params) {
             final Object lock = new Object();
+            databaseReference = Constants.databaseReference.child(Constants.TASK_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child(role);
 
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     synchronized (lock) {
                         for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                            HashMap<String, HashMap<String,String>> retTaskList = (HashMap<String, HashMap<String,String>>) ds.getValue();
+                            HashMap<String, String> retTaskList = (HashMap<String, String>) ds.getValue();
                             //   Toast.makeText(getApplicationContext(),"here in",Toast.LENGTH_LONG).show();
 
-                            for ( String key : retTaskList.keySet() ) {
+
+                            //String.valueOf(retTaskList.get(key); gives values
+                           // for ( String key : retTaskList.keySet() ) {
                                 //  Toast.makeText(getApplicationContext(),"here",Toast.LENGTH_LONG).show();
-                                Log.d("key",key);
-                                HashMap<String,String> taskmap=( HashMap<String,String>)retTaskList.get(key);
+                               // Log.d("key",String.valueOf(retTaskList.get(key)));
+                                //HashMap<String,String> taskmap=( HashMap<String,String>)retTaskList.get(key);
                                 // Toast.makeText(getApplicationContext(),taskmap.get("name") + " " + taskmap.get("date"),Toast.LENGTH_LONG).show();
                                /// System.out.print(taskmap.get("name") + " " + taskmap.get("date"));
 
@@ -664,14 +666,14 @@ public class Home extends BaseActivity{
 
 
 
-                                String dateString = formatter.format(new Date(Long.parseLong(taskmap.get("date"))));
+                                String dateString = formatter.format(new Date(Long.parseLong(retTaskList.get("date"))));
 
-                                String entry=taskmap.get("name")+ "\n" + taskmap.get("description") + "\n" + dateString;
-                                Log.d("key",key);
-                                taskidmap.put(entry,key);
+                                String entry=retTaskList.get("name")+ "\n" +retTaskList.get("description") + "\n" + dateString;
+                                //Log.d("key",key);
+                                taskidmap.put(entry,ds.getKey());
                                 taskLt.add(entry);
 
-                            }
+                            //}
 
 
 
@@ -740,7 +742,7 @@ public class Home extends BaseActivity{
         getSupportActionBar().setTitle("Dashboard");
 
 
-
+role="admin";
         drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar,"admin");
         drawerFragment.setDrawerListener(this);
@@ -760,16 +762,16 @@ public class Home extends BaseActivity{
         scheduleslt=new ArrayList<>();
         schedulekeymap=UserPrefs.schedulekeymap;
 
-        logout=(Button)findViewById(R.id.lo);
+       // logout=(Button)findViewById(R.id.lo);
 
-        logout.setOnClickListener(new View.OnClickListener() {
+  /*      logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 firebaseAuth.signOut();
                 userPrefs.clearUserDetails();
                // startActivity(new Intent(Home.this, LoginActivity.class));
             }
-        });
+        });*/
 
 
 

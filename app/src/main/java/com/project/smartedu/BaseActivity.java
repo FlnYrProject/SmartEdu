@@ -17,8 +17,11 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.project.smartedu.admin.AdminUserPrefs;
+import com.project.smartedu.admin.Home;
 import com.project.smartedu.navigation.FragmentDrawer;
 
 import java.io.File;
@@ -376,7 +379,7 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
     private void displayView(int position) {
 
-        if(this.role.equals("Teacher")){
+        if(this.role.equalsIgnoreCase("Teacher")){
             if (position == 0) { //dashboard
                 Intent i = new Intent(getApplicationContext(),com.project.smartedu.teacher.Home.class);
                 i.putExtra("role", role);
@@ -442,11 +445,13 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
                 Intent i = new Intent(BaseActivity.this, login.class);
                 startActivity(i); */
+                UserPrefs userPrefs=new UserPrefs(BaseActivity.this);
+                userPrefs.clearUserDetails();
             }
 
         }
 
-        else if(this.role.equals("Student")){
+        else if(this.role.equalsIgnoreCase("Student")){
             if (position == 0) { //dashboard
                 Intent i = new Intent(getApplicationContext(),com.project.smartedu.student.Home.class);
                 i.putExtra("role", role);
@@ -519,11 +524,13 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
                 Intent i = new Intent(BaseActivity.this, login.class);
                 startActivity(i); */
+                UserPrefs userPrefs=new UserPrefs(BaseActivity.this);
+                userPrefs.clearUserDetails();
             }
 
         }
 
-        else if(role.equals("Parent")){
+        else if(role.equalsIgnoreCase("Parent")){
             if (position == 0) { //dashboard
                 /*
                 Intent i = new Intent(getApplicationContext(),com.project.smartedu.parent.Home.class);
@@ -593,16 +600,19 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
                 Intent i = new Intent(BaseActivity.this, login.class);
                 startActivity(i); */
+
+                UserPrefs userPrefs=new UserPrefs(BaseActivity.this);
+                userPrefs.clearUserDetails();
             }
 
-        } else if(role.equals("Admin")){
+        } else if(role.equalsIgnoreCase("Admin")){
             if (position == 0) { //dashboard
-                /*
-                Intent i = new Intent(getApplicationContext(),admin_home.class);
-                i.putExtra("institution_code",institution_code);
-                i.putExtra("institution_name",institution_name);
-                i.putExtra("role", role);
-                startActivity(i); */
+
+                Intent i = new Intent(getApplicationContext(), Home.class);
+
+                i.putExtra("institution_name",institutionName);
+
+                startActivity(i);
             }
 
             if (position == 1) { //tasks
@@ -625,22 +635,23 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
 
             if(position==4) //logout
-            {
-                /*
-                ParseUser.logOut();
-                ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
-                Intent i = new Intent(BaseActivity.this, login.class);
-                startActivity(i); */
+            {        Toast.makeText(getApplicationContext(),"logout pressed",Toast.LENGTH_LONG).show();
+
+                AdminUserPrefs adminUserPrefs=new AdminUserPrefs(BaseActivity.this);
+                adminUserPrefs.clearAdminData();
+                UserPrefs userPrefs=new UserPrefs(BaseActivity.this);
+                userPrefs.clearUserDetails();
             }
 
         } else{
             if(position==0)
             {
-                /*
-                ParseUser.logOut();
-                ParseUser currentUser = ParseUser.getCurrentUser(); // this will now be null
-                Intent i = new Intent(BaseActivity.this, login.class);
-                startActivity(i); */
+                AdminUserPrefs adminUserPrefs=new AdminUserPrefs(BaseActivity.this);
+                adminUserPrefs.clearAdminData();
+
+
+                UserPrefs userPrefs=new UserPrefs(BaseActivity.this);
+                userPrefs.clearUserDetails();
             }
         }
 

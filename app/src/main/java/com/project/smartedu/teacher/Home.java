@@ -135,7 +135,10 @@ public class Home extends BaseActivity {
             int size=TeacherUserPrefs.allotments.size();
             Toast.makeText(getApplicationContext(),size + " allotments found",Toast.LENGTH_LONG).show();
 
+for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
+    Toast.makeText(getApplicationContext(),TeacherUserPrefs.allotments.get(x),Toast.LENGTH_LONG).show();
 
+}
 
             //Show the log in progress_bar for at least a few milliseconds
 
@@ -186,30 +189,32 @@ public class Home extends BaseActivity {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     synchronized (lock) {
                         for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                            HashMap<String, HashMap<String,String>> retTaskList = (HashMap<String, HashMap<String,String>>) ds.getValue();
+                            HashMap<String, String> retTaskList = (HashMap<String, String>) ds.getValue();
                             //   Toast.makeText(getApplicationContext(),"here in",Toast.LENGTH_LONG).show();
 
-                            for ( String key : retTaskList.keySet() ) {
-                                //  Toast.makeText(getApplicationContext(),"here",Toast.LENGTH_LONG).show();
-                                Log.d("key",key);
-                                HashMap<String,String> taskmap=( HashMap<String,String>)retTaskList.get(key);
-                                // Toast.makeText(getApplicationContext(),taskmap.get("name") + " " + taskmap.get("date"),Toast.LENGTH_LONG).show();
-                                /// System.out.print(taskmap.get("name") + " " + taskmap.get("date"));
+
+                            //String.valueOf(retTaskList.get(key); gives values
+                            // for ( String key : retTaskList.keySet() ) {
+                            //  Toast.makeText(getApplicationContext(),"here",Toast.LENGTH_LONG).show();
+                            // Log.d("key",String.valueOf(retTaskList.get(key)));
+                            //HashMap<String,String> taskmap=( HashMap<String,String>)retTaskList.get(key);
+                            // Toast.makeText(getApplicationContext(),taskmap.get("name") + " " + taskmap.get("date"),Toast.LENGTH_LONG).show();
+                            /// System.out.print(taskmap.get("name") + " " + taskmap.get("date"));
 
 
 
-                                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
 
 
-                                String dateString = formatter.format(new Date(Long.parseLong(taskmap.get("date"))));
+                            String dateString = formatter.format(new Date(Long.parseLong(retTaskList.get("date"))));
 
-                                String entry=taskmap.get("name")+ "\n" + taskmap.get("description") + "\n" + dateString;
-                                Log.d("key",key);
-                                taskidmap.put(entry,key);
-                                taskLt.add(entry);
+                            String entry=retTaskList.get("name")+ "\n" +retTaskList.get("description") + "\n" + dateString;
+                            //Log.d("key",key);
+                            taskidmap.put(entry,ds.getKey());
+                            taskLt.add(entry);
 
-                            }
+                            //}
 
 
 
@@ -224,6 +229,7 @@ public class Home extends BaseActivity {
                 }
 
             });
+
 
             synchronized (lock){
                 try {
@@ -384,6 +390,115 @@ public class Home extends BaseActivity {
 
 
 
+    private class AllotedClassesItems extends AsyncTask<Void, Void, Void> {
+
+        private Context async_context;
+        private ProgressDialog pd;
+
+
+
+        public AllotedClassesItems(Context context){
+            this.async_context = context;
+            pd = new ProgressDialog(async_context);
+            TeacherUserPrefs.allotments.clear();
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd.setMessage("Fetching Classes");
+            pd.setCancelable(false);
+            pd.show();
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            final Object lock = new Object();
+            databaseReference = Constants.databaseReference.child(Constants.ALLOTMENTS_TABLE).child(firebaseAuth.getCurrentUser().getUid());
+
+
+
+                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        synchronized (lock) {
+                            for (DataSnapshot ds : dataSnapshot.getChildren()) {
+
+
+                                String classid=(String) ds.getValue();
+                                Log.d("classid",classid);
+                                TeacherUserPrefs.allotments.add(classid);
+
+
+
+
+
+                            }
+
+
+
+                            lock.notifyAll();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+
+                });
+
+
+                synchronized (lock){
+                    try {
+                        lock.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+
+
+
+
+
+
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //Handles the stuff after the synchronisation with the firebase listener has been achieved
+            //The main UI is already idle by this moment
+            super.onPostExecute(aVoid);
+
+
+            // AdminUserPrefs.schedulesmaplt=schedulesmaplt;
+
+
+            //Show the log in progress_bar for at least a few milliseconds
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    pd.dismiss();
+                    pd=null;
+                    loadAllotmentData();
+                }
+            }, 500);  // 100 milliseconds
+        }
+
+
+        //end firebase_async_class
+    }
+
+
+
+
 
 
 
@@ -391,7 +506,7 @@ public class Home extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try {
+
             setContentView(R.layout.activity_home_teacher);
             Intent home=getIntent();
             role=home.getStringExtra("role");
@@ -420,7 +535,6 @@ public class Home extends BaseActivity {
 
             schedulekeymap = UserPrefs.schedulekeymap;
             scheduleslt = new ArrayList<>();
-
 
 
 
@@ -484,10 +598,7 @@ public class Home extends BaseActivity {
                 }
             });
 
-        }catch(Exception create_error){
-            Log.d("user", "error in create main activity: " + create_error.getMessage());
-            Toast.makeText(Home.this, "error " + create_error, Toast.LENGTH_LONG).show();
-        }
+
     }
 
 

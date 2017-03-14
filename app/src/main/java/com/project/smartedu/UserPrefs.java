@@ -3,7 +3,9 @@ package com.project.smartedu;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.project.smartedu.database.Schedule;
 
 import java.util.ArrayList;
@@ -103,6 +105,9 @@ public class UserPrefs {
         editor.commit();
         clearAllSavedData();
 
+        FirebaseAuth firebaseAuth=FirebaseAuth.getInstance();
+        firebaseAuth.signOut();
+        Toast.makeText(_context,"logout",Toast.LENGTH_LONG).show();
         // After logout redirect user to Loing Activity
         Intent i = new Intent(_context, LoginActivity.class);
         // Closing all the Activities
