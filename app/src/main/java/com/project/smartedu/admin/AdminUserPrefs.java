@@ -65,6 +65,18 @@ public class AdminUserPrefs {
         editor = pref.edit();
     }
 
+    public void clearAdminData(){
+        teacherLt.clear();
+        teacheruseridLt.clear();
+        teachersusermap.clear();
+        // schedulesmaplt=new HashMap<>();
+
+
+        classes.clear();
+        allotmments.clear();
+
+    }
+
 
 
 }
