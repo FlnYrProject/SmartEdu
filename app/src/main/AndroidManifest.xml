@@ -71,7 +71,8 @@
         <activity android:name=".parent.Home" />
         <activity android:name=".teacher.Home"
                   android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".teacher.Classes" />
+        <activity android:name=".teacher.Classes"
+                  android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".common.view_messages"></activity>
     </application>
 
