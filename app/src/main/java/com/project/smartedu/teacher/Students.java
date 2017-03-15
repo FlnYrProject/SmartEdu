@@ -24,7 +24,9 @@ import com.parse.SignUpCallback;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
+import com.project.smartedu.UserPrefs;
 import com.project.smartedu.navigation.FragmentDrawer;
+import com.project.smartedu.notification.NotificationBar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +37,11 @@ public class Students extends BaseActivity {
     Button addStudentButton;
     private FragmentDrawer drawerFragment;
 
+    UserPrefs userPrefs;
+
 
     ListView studentList;
-   // Notification_bar noti_bar;
+   NotificationBar noti_bar;
     String classId;
     String name;
     Integer age;
@@ -55,6 +59,8 @@ public class Students extends BaseActivity {
 
         institutionName=from_student.getStringExtra("institution_name");
 
+
+        userPrefs=new UserPrefs(Students.this);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
       /*  getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -72,12 +78,27 @@ public class Students extends BaseActivity {
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar,role);
         drawerFragment.setDrawerListener(this);
 
+        noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
+        noti_bar.setTexts(userPrefs.getUserName(),role,institutionName);
+
         //  myList = dbHandler.getAllTasks();
 
         //Log.i("Anmol", "(Inside MainActivity) dbHandler.getAllTasks().toString() gives " + dbHandler.getAllTasks().toString());
         //ListAdapter adapter = new CustomListAdapter(getApplicationContext(), dbHandler.getAllTasks());
         //taskList.setAdapter(adapter);
         Toast.makeText(Students.this, "id class selected is = " +classId, Toast.LENGTH_LONG).show();
+
+        addStudentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Students.this, NewStudent.class);
+                i.putExtra("institution_name",institutionName);
+                i.putExtra("role",role);
+                i.putExtra("id",classId);
+                startActivity(i);
+            }
+        });
+
         ArrayList<String> studentLt = new ArrayList<String>();
         ArrayAdapter adapter = new ArrayAdapter(Students.this, android.R.layout.simple_list_item_1, studentLt);
 

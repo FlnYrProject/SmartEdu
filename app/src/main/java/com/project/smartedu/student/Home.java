@@ -22,6 +22,7 @@ import com.project.smartedu.ImageAdapter;
 import com.project.smartedu.R;
 import com.project.smartedu.UserPrefs;
 import com.project.smartedu.navigation.FragmentDrawer;
+import com.project.smartedu.notification.NotificationBar;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class Home extends BaseActivity {
 
     private Toolbar mToolbar;
     private FragmentDrawer drawerFragment;
-    //  Notification_bar noti_bar;
+ NotificationBar noti_bar;
 
     ArrayList<String> taskLt;
     HashMap<String, String> taskidmap; //to map task to its  id
@@ -42,6 +43,8 @@ public class Home extends BaseActivity {
     HashMap<com.project.smartedu.database.Schedule, String> schedulekeymap;        //to map schedule to the key
 
     DatabaseReference databaseReference;
+
+    UserPrefs userPrefs;
 
 
     private class TaskItems extends AsyncTask<Void, Void, Void> {
@@ -267,6 +270,7 @@ public class Home extends BaseActivity {
         institutionName = home.getStringExtra("institution_name");
 
         Log.d("user", role);
+        UserPrefs  userPrefs=new UserPrefs(Home.this);
 
          /*   noti_bar = (Notification_bar)getSupportFragmentManager().findFragmentById(R.id.noti);
             noti_bar.setTexts(ParseUser.getCurrentUser().getUsername(),role,institution_name);
@@ -283,6 +287,10 @@ public class Home extends BaseActivity {
             drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
             drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar,role);
             drawerFragment.setDrawerListener(this);
+
+        noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
+        noti_bar.setTexts(userPrefs.getUserName(),role,institutionName);
+
 
             taskLt = UserPrefs.taskItems;
             taskidmap = UserPrefs.taskidmap;

@@ -5,8 +5,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 
 import com.project.smartedu.LoginActivity;
-import com.project.smartedu.database.Allotments;
+import com.project.smartedu.database.*;
 import com.project.smartedu.database.Class;
+import com.project.smartedu.database.Students;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,14 +38,19 @@ public class TeacherUserPrefs {
 
     public static ArrayList<String> allotments;
 
+    public static ArrayList<String> studentsuseridLt;
+    public static HashMap<String,Students> studentsHashMap;
+
 
 
     static {
 
         allotments=new ArrayList<>();
-
-
+        studentsuseridLt=new ArrayList<>();
+        studentsHashMap=new HashMap<>();
     }
+
+
 
     public TeacherUserPrefs(Context context){
         this._context = context;

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#2A2A2A">
+
+    <LinearLayout
+        android:id="@+id/container_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/toolbar" />
+
+        <fragment
+            android:layout_width="match_parent"
+            android:layout_height="26dp"
+            android:id="@+id/noti"
+            android:layout_gravity="center_horizontal"
+            tools:layout="@layout/fragment_notification_bar" />
+    </LinearLayout>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Name:"
+        android:id="@+id/textView37"
+        android:layout_marginTop="49dp"
+        android:textSize="25sp"
+        android:textColor="#ffff"
+        android:layout_below="@+id/container_toolbar"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="30dp"
+        android:id="@+id/studentName"
+        android:background="#FFFFFF"
+        android:layout_below="@+id/textView37"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Email:"
+        android:id="@+id/textView36"
+        android:layout_marginTop="49dp"
+        android:textSize="25sp"
+        android:textColor="#ffff"
+        android:layout_below="@+id/studentName"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="30dp"
+        android:id="@+id/studentEmail"
+        android:background="#FFFFFF"
+        android:layout_below="@+id/textView36"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="add student"
+        android:id="@+id/addStudentButton"
+        android:layout_gravity="center_horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="#20BF9F"
+        android:textSize="15sp"
+        android:textColor="#ffffff" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="53dp"
+
+        android:id="@+id/studentAge"
+        android:layout_gravity="center_horizontal"
+        android:background="#ffffffff"
+
+        android:layout_above="@+id/addStudentButton"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="26dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Age:"
+        android:id="@+id/ageHead"
+        android:textSize="25sp"
+        android:textColor="#ffff"
+        android:layout_above="@+id/studentAge"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="30dp"
+        android:id="@+id/rollno_desc"
+        android:background="#FFFFFF"
+        android:layout_above="@+id/studentAge"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="37dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Roll Number:"
+        android:id="@+id/rollno"
+        android:textSize="25sp"
+        android:textColor="#ffff"
+        android:layout_above="@+id/rollno_desc"
+        android:layout_alignParentStart="true" />
+</RelativeLayout>

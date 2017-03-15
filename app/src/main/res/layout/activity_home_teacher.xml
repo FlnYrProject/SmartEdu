@@ -22,7 +22,14 @@
                 android:id="@+id/toolbar"
                 layout="@layout/toolbar" />
 
-                 </LinearLayout>
+            <fragment
+                android:layout_width="match_parent"
+                android:layout_height="28dp"
+                android:id="@+id/noti"
+                android:layout_gravity="center_horizontal"
+                tools:layout="@layout/fragment_notification_bar" />
+
+        </LinearLayout>
 
 
 

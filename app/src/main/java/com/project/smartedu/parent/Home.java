@@ -22,6 +22,7 @@ import com.project.smartedu.ImageAdapter;
 import com.project.smartedu.R;
 import com.project.smartedu.UserPrefs;
 import com.project.smartedu.navigation.FragmentDrawer;
+import com.project.smartedu.notification.NotificationBar;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -49,9 +50,11 @@ public class Home extends BaseActivity {
     String classGradeId;
     String studentId;
 
-   // Notification_bar noti_bar;
+    NotificationBar noti_bar;
     //String child_code;
     String child_username;
+
+    UserPrefs userPrefs;
 
 
     private class TaskItems extends AsyncTask<Void, Void, Void> {
@@ -287,7 +290,7 @@ public class Home extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_parent);
 
-
+userPrefs=new UserPrefs(Home.this);
 
         Intent home=getIntent();
 
@@ -311,6 +314,10 @@ public class Home extends BaseActivity {
         drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar,role);
         drawerFragment.setDrawerListener(this);
+
+
+        noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
+        noti_bar.setTexts(userPrefs.getUserName(),role,institutionName);
 
         taskLt = UserPrefs.taskItems;
         taskidmap = UserPrefs.taskidmap;
