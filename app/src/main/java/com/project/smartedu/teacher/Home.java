@@ -27,7 +27,8 @@ import com.project.smartedu.admin.AdminUserPrefs;
 import com.project.smartedu.common.Schedule;
 import com.project.smartedu.common.Tasks;
 import com.project.smartedu.common.view_messages;
-import com.project.smartedu.database.Allotments;
+import com.project.smartedu.database.*;
+import com.project.smartedu.database.Students;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
 
@@ -93,60 +94,68 @@ public class Home extends BaseActivity {
 
             for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
 
-                String classid=TeacherUserPrefs.allotments.get(x);
+                final String classid=TeacherUserPrefs.allotments.get(x);
                 String[] classitems=classid.split("_");
 
-                databaseReference=Constants.databaseReference.child(Constants.CLASS_TABLE).child(institutionName).child(classitems[1]).child(classitems[2]);
+                databaseReference=Constants.databaseReference.child(Constants.CLASS_TABLE).child(institutionName).child(classitems[1]).child(classitems[2]).child("student");
 
 
 
-
-
-            }
-
-
-            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-
-                    synchronized (lock) {
+                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        synchronized (lock) {
                         for (DataSnapshot ds : dataSnapshot.getChildren()) {
 
-                            Log.d("ds.key",ds.getKey());             //random key
-                            String classid= (String) ds.getValue();
-                            TeacherUserPrefs.allotments.add(classid);
+
+                            String roll=ds.getValue().toString(); //gives rollnumber
+                            String studentid=ds.getKey();   //gives student id
+
+                            TeacherUserPrefs.studentsuseridLt.add(studentid);
+
+                            com.project.smartedu.database.Students stu=new Students(studentid,classid,roll);
+                            TeacherUserPrefs.studentsHashMap.put(studentid,stu);
+
+                            //  HashMap<String, String> retTeachersList=(HashMap<String, String>)dataSnapshot.getValue();
+
+                            // HashMap<String, HashMap<String,String>> retTeachersList = (HashMap<String, HashMap<String,String>>) ds.getValue();
+                            //   Toast.makeText(getApplicationContext(),"here in",Toast.LENGTH_LONG).show();
+
+
+
 
 
                         }
 
 
+                            lock.notifyAll();
+                        }
+                    }
 
-                        lock.notifyAll();
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+
+
+                synchronized (lock){
+                    try {
+                        lock.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-
-            });
 
 
-            synchronized (lock){
-                try {
-                    lock.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+
+
+
+
+
             }
-
-
-
-
-
-
-
 
 
             return null;
@@ -159,13 +168,8 @@ public class Home extends BaseActivity {
             super.onPostExecute(aVoid);
 
 
-            int size=TeacherUserPrefs.allotments.size();
-            Toast.makeText(getApplicationContext(),size + " allotments found",Toast.LENGTH_LONG).show();
-
-            for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
-                Toast.makeText(getApplicationContext(),TeacherUserPrefs.allotments.get(x),Toast.LENGTH_LONG).show();
-
-            }
+            int size=TeacherUserPrefs.studentsuseridLt.size();
+            Toast.makeText(getApplicationContext(),size + " total students found",Toast.LENGTH_LONG).show();
 
             //Show the log in progress_bar for at least a few milliseconds
 
@@ -290,6 +294,7 @@ for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
                 public void run() {
                     pd.dismiss();
                     pd=null;
+                    loadStudentData();
                 }
             }, 500);  // 100 milliseconds
         }
@@ -673,8 +678,7 @@ for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
             drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
             drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar, role);//pass role
             drawerFragment.setDrawerListener(this);
-        noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
-        noti_bar.setTexts(userPrefs.getUserName(), role,institutionName);
+
 
 
             taskLt = UserPrefs.taskItems;
@@ -804,6 +808,16 @@ for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
 
         AllotmentItems allotmentasync = new AllotmentItems(Home.this);        //get teacher data
         allotmentasync.execute();
+
+    }
+
+
+
+
+    private void loadStudentData(){
+
+        StudentsItems studentasync = new StudentsItems(Home.this);        //get teacher data
+        studentasync.execute();
 
     }
 

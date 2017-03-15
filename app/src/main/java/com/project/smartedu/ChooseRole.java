@@ -25,6 +25,7 @@ import com.project.smartedu.admin.Home;
 import com.project.smartedu.common.parent_choose_child;
 import com.project.smartedu.common.select_institution;
 
+import java.nio.charset.spi.CharsetProvider;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,7 +43,7 @@ public class ChooseRole extends BaseActivity {
     DatabaseReference databaseReference;
 
 
-
+UserPrefs userPrefs;
 
 
 
@@ -168,6 +169,7 @@ public class ChooseRole extends BaseActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        userPrefs=new UserPrefs(ChooseRole.this);
 
         //change to add role button
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -191,6 +193,8 @@ public class ChooseRole extends BaseActivity {
 
         RoleItems roleItemsasync=new RoleItems(ChooseRole.this);
         roleItemsasync.execute();
+
+        Toast.makeText(getApplicationContext(),userPrefs.getUserName(),Toast.LENGTH_LONG).show();
 
         teacher.setOnClickListener(new View.OnClickListener() {
             @Override

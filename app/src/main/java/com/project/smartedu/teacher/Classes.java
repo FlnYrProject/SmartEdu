@@ -75,9 +75,9 @@ public class Classes extends BaseActivity {
             drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
             drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar, "Teacher");
             drawerFragment.setDrawerListener(this);
-        noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
+       /* noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
         noti_bar.setTexts(userPrefs.getUserName(), role,institutionName);
-
+*/
 
 
         final HashMap<String,String> classmap=new HashMap<>();
@@ -118,28 +118,28 @@ public class Classes extends BaseActivity {
 
                         to_student.putExtra("institution_name", institutionName);
                         to_student.putExtra("role", role);
-                        to_student.putExtra("id", id);
+                        to_student.putExtra("id", classid);
                         startActivity(to_student);
                     } else if (_for.equals("exam")) {
                         Intent to_exams = new Intent(Classes.this, Exams.class);
 
                         to_exams.putExtra("institution_name", institutionName);
                         to_exams.putExtra("role", role);
-                        to_exams.putExtra("id", id);
+                        to_exams.putExtra("id", classid);
                         startActivity(to_exams);
                     } else if (_for.equals("upload")) {
                         Intent to_uploads = new Intent(Classes.this, UploadMaterial.class);
 
                         to_uploads.putExtra("institution_name", institutionName);
                         to_uploads.putExtra("role", role);
-                        to_uploads.putExtra("id", id);
+                        to_uploads.putExtra("id", classid);
                         startActivity(to_uploads);
                     } else if (_for.equals("message")) {
                         Intent to_message = new Intent(Classes.this, teacher_message.class);
 
                         to_message.putExtra("institution_name", institutionName);
                         to_message.putExtra("role", role);
-                        to_message.putExtra("id", id);
+                        to_message.putExtra("id", classid);
 
                         to_message.putExtra("_for", _for);
                         startActivity(to_message);
@@ -149,7 +149,7 @@ public class Classes extends BaseActivity {
                         to_att.putExtra("institution_name", institutionName);
 
                         to_att.putExtra("role", role);
-                        to_att.putExtra("id", id);
+                        to_att.putExtra("id", classid);
                         startActivity(to_att);
                     }
 

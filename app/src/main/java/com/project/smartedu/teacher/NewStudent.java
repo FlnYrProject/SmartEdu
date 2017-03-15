@@ -59,6 +59,8 @@ public class NewStudent extends BaseActivity {
     FirebaseUser studentfirebaseUser;
     FirebaseUser parentfirebaseuser;
 
+    String studentuid;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,8 +83,8 @@ public class NewStudent extends BaseActivity {
         studentAge = (EditText) findViewById(R.id.studentAge);
         studentRno= (EditText) findViewById(R.id.rollno_desc);
         Button addStudentButton = (Button) findViewById(R.id.addStudentButton);
-        noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
-        noti_bar.setTexts(userPrefs.getUserName(), "Teacher",institutionName);
+       /* noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
+        noti_bar.setTexts(userPrefs.getUserName(), "Teacher",institutionName);*/
         Log.i("abcd", "studentEmail is......" + studentEmail);
 
         addStudentButton.setOnClickListener(new View.OnClickListener() {
@@ -131,6 +133,7 @@ public class NewStudent extends BaseActivity {
 
                     databaseReference = Constants.databaseReference.child(Constants.USER_DETAILS_TABLE);
                     studentfirebaseUser = firebaseAuth.getCurrentUser();
+                    studentuid=firebaseAuth.getCurrentUser().getUid();
                     databaseReference.child(studentfirebaseUser.getUid()).child("name").setValue(name);
                     DatabaseReference dataReference = databaseReference.child(studentfirebaseUser.getUid()).child("role").child("student").push();
                     dataReference.setValue(institutionName);
@@ -192,7 +195,7 @@ public class NewStudent extends BaseActivity {
 
 
 
-        firebaseAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        firebaseAuth.createUserWithEmailAndPassword("p"+email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
 
@@ -202,7 +205,7 @@ public class NewStudent extends BaseActivity {
                     parentfirebaseuser = firebaseAuth.getCurrentUser();
                     databaseReference.child( parentfirebaseuser.getUid()).child("name").setValue(name);
                     DatabaseReference dataReference = databaseReference.child( parentfirebaseuser.getUid()).child("role").child("parent").push();
-                    dataReference.setValue(studentfirebaseUser.getUid());
+                    dataReference.setValue(studentuid);
 
                     Toast.makeText(getApplicationContext(), "Parent User Registration Successful ", Toast.LENGTH_LONG).show();
                     loginTeacherBack();

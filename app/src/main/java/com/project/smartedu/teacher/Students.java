@@ -78,8 +78,8 @@ public class Students extends BaseActivity {
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar,role);
         drawerFragment.setDrawerListener(this);
 
-        noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
-        noti_bar.setTexts(userPrefs.getUserName(),role,institutionName);
+      /*  noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
+        noti_bar.setTexts(userPrefs.getUserName(),role,institutionName);*/
 
         //  myList = dbHandler.getAllTasks();
 
