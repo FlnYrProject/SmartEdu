@@ -132,6 +132,8 @@ public class UserPrefs {
     public String getUserName(){
         return pref.getString(USER_NAME,null);
     }
+    public String getUserEmail() { return pref.getString(USER_EMAIL,null);}
+    public String getUserPassword() { return  pref.getString(USER_PASSWORD,null);}
 
     public void clearAllSavedData(){
         roleslistmap.clear();

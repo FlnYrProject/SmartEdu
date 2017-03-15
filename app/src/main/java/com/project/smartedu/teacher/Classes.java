@@ -22,8 +22,10 @@ import com.parse.ParseUser;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
+import com.project.smartedu.UserPrefs;
 import com.project.smartedu.database.TeacherTable;
 import com.project.smartedu.navigation.FragmentDrawer;
+import com.project.smartedu.notification.NotificationBar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,6 +43,9 @@ public class Classes extends BaseActivity {
     RelativeLayout layout;
 
    // Notification_bar noti_bar;
+    NotificationBar noti_bar;
+
+    UserPrefs userPrefs;
 
 
     @Override
@@ -55,14 +60,14 @@ public class Classes extends BaseActivity {
             role = from_home.getStringExtra("role");
             institutionName=from_home.getStringExtra("institution_name");
 
+            userPrefs=new UserPrefs(Classes.this);
 
             mToolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(mToolbar);
          //   getSupportActionBar().setDisplayShowHomeEnabled(true);
          //   getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle("Classes");
-            //noti_bar = (Notification_bar) getSupportFragmentManager().findFragmentById(R.id.noti);
-            //noti_bar.setTexts(ParseUser.getCurrentUser().getUsername(), role,super.institution_name);
+
 
 
 
@@ -70,6 +75,8 @@ public class Classes extends BaseActivity {
             drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
             drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar, "Teacher");
             drawerFragment.setDrawerListener(this);
+        noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
+        noti_bar.setTexts(userPrefs.getUserName(), role,institutionName);
 
 
 

@@ -29,6 +29,7 @@ import com.project.smartedu.common.Tasks;
 import com.project.smartedu.common.view_messages;
 import com.project.smartedu.database.Allotments;
 import com.project.smartedu.navigation.FragmentDrawer;
+import com.project.smartedu.notification.NotificationBar;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,7 +41,9 @@ public class Home extends BaseActivity {
 
       private Toolbar mToolbar;
       private FragmentDrawer drawerFragment;
-     //  Notification_bar noti_bar;
+    NotificationBar noti_bar;
+    TeacherUserPrefs teacherUserPrefs;
+            UserPrefs userPrefs;
 
 
     ArrayList<String> taskLt;
@@ -51,6 +54,146 @@ public class Home extends BaseActivity {
     HashMap<com.project.smartedu.database.Schedule,String> schedulekeymap;        //to map schedule to the key
 
     DatabaseReference databaseReference;
+
+
+
+
+
+
+
+
+
+
+
+    private class StudentsItems extends AsyncTask<Void, Void, Void> {
+
+        private Context async_context;
+        private ProgressDialog pd;
+
+        public StudentsItems(Context context){
+            this.async_context = context;
+            pd = new ProgressDialog(async_context);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd.setMessage("Fetching Students of alloted classes");
+            pd.setCancelable(false);
+            pd.show();
+            TeacherUserPrefs.studentsHashMap.clear();
+            TeacherUserPrefs.studentsuseridLt.clear();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            final Object lock = new Object();
+
+
+
+            for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
+
+                String classid=TeacherUserPrefs.allotments.get(x);
+                String[] classitems=classid.split("_");
+
+                databaseReference=Constants.databaseReference.child(Constants.CLASS_TABLE).child(institutionName).child(classitems[1]).child(classitems[2]);
+
+
+
+
+
+            }
+
+
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    synchronized (lock) {
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+
+                            Log.d("ds.key",ds.getKey());             //random key
+                            String classid= (String) ds.getValue();
+                            TeacherUserPrefs.allotments.add(classid);
+
+
+                        }
+
+
+
+                        lock.notifyAll();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+
+            });
+
+
+            synchronized (lock){
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+
+
+
+
+
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //Handles the stuff after the synchronisation with the firebase listener has been achieved
+            //The main UI is already idle by this moment
+            super.onPostExecute(aVoid);
+
+
+            int size=TeacherUserPrefs.allotments.size();
+            Toast.makeText(getApplicationContext(),size + " allotments found",Toast.LENGTH_LONG).show();
+
+            for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
+                Toast.makeText(getApplicationContext(),TeacherUserPrefs.allotments.get(x),Toast.LENGTH_LONG).show();
+
+            }
+
+            //Show the log in progress_bar for at least a few milliseconds
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    pd.dismiss();
+                    pd=null;
+                }
+            }, 500);  // 100 milliseconds
+        }
+
+
+        //end firebase_async_class
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     private class AllotmentItems extends AsyncTask<Void, Void, Void> {
@@ -515,7 +658,8 @@ for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
 
 
 
-            TeacherUserPrefs teacherUserPrefs=new TeacherUserPrefs(Home.this);
+        UserPrefs userPrefs=new UserPrefs(Home.this);
+         teacherUserPrefs=new TeacherUserPrefs(Home.this);
             teacherUserPrefs.setInstituion(institutionName);
          /*
             noti_bar = (Notification_bar)getSupportFragmentManager().findFragmentById(R.id.noti);
@@ -529,6 +673,9 @@ for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
             drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
             drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar, role);//pass role
             drawerFragment.setDrawerListener(this);
+        noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
+        noti_bar.setTexts(userPrefs.getUserName(), role,institutionName);
+
 
             taskLt = UserPrefs.taskItems;
             taskidmap = UserPrefs.taskidmap;
@@ -651,6 +798,7 @@ for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
         scheduleasync.execute();
 
     }
+
 
     private void loadAllotmentData(){
 

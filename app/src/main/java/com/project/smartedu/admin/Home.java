@@ -19,6 +19,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.parse.ParseUser;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.ImageAdapter;
@@ -29,6 +30,7 @@ import com.project.smartedu.database.Allotments;
 import com.project.smartedu.database.Class;
 import com.project.smartedu.database.Schedule;
 import com.project.smartedu.navigation.FragmentDrawer;
+import com.project.smartedu.notification.NotificationBar;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -60,6 +62,9 @@ public class Home extends BaseActivity{
     ArrayList<Schedule> scheduleslt;
     HashMap<String,ArrayList<Schedule>> schedulesmaplt;
     HashMap<Schedule,String> schedulekeymap;        //to map schedule to the key
+
+    NotificationBar noti_bar;
+
 
 
 
@@ -742,13 +747,16 @@ public class Home extends BaseActivity{
         getSupportActionBar().setTitle("Dashboard");
 
 
-role="admin";
+        role="admin";
         drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar,"admin");
         drawerFragment.setDrawerListener(this);
 
         userPrefs=new UserPrefs(Home.this);
         adminUserPrefs=new AdminUserPrefs(getApplicationContext());
+
+        noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
+        noti_bar.setTexts(userPrefs.getUserName(), role,institutionName);
 
 
         taskLt=UserPrefs.taskItems;
