@@ -173,7 +173,7 @@ String institutionName;
                 String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
 
-                 userPrefs.setUserDetails(FirebaseAuth.getInstance().getCurrentUser().getUid(),null,emailInput.getText().toString(),passwordInput.getText().toString());
+                 userPrefs.setUserDetails(FirebaseAuth.getInstance().getCurrentUser().getUid(),"testing name",emailInput.getText().toString(),passwordInput.getText().toString());
 
                 userPrefs.setIfAdmin(ifadmin,institutionName);
                 progressDialog.dismiss();
