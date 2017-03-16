@@ -1,11 +1,9 @@
 package com.project.smartedu.teacher;
 
 import android.content.Intent;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -14,22 +12,15 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
 import com.project.smartedu.UserPrefs;
-import com.project.smartedu.database.TeacherTable;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class Classes extends BaseActivity {
 

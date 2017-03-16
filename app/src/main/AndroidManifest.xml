@@ -82,13 +82,16 @@
         <activity
             android:name=".teacher.Exams"
             android:label="@string/title_activity_exams" />
-        <activity android:name=".teacher.UploadMaterial" />
+        <activity android:name=".teacher.UploadMaterial"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".teacher.teacher_message" />
         <activity android:name=".teacher.Attendance" />
-        <activity android:name=".teacher.NewStudent"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+        <activity
+            android:name=".teacher.NewStudent"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".teacher.UploadImage"
+            android:label="@string/title_activity_upload_image"></activity>
     </application>
 
 </manifest>
