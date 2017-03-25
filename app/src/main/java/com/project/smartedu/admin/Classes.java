@@ -992,5 +992,13 @@ public class Classes extends BaseActivity {
 
 
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent tohome=new Intent(Classes.this,Home.class);
+        tohome.putExtra("institution_name",institutionName);
+        startActivity(tohome);
+    }
+
 
 }

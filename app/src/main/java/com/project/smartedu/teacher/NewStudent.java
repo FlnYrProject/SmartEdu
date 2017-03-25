@@ -61,6 +61,8 @@ public class NewStudent extends BaseActivity {
 
     String studentuid;
 
+    int no_of_stu=0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +77,8 @@ public class NewStudent extends BaseActivity {
         classId = from_students.getStringExtra("id");
        role=from_students.getStringExtra("role");
         institutionName=from_students.getStringExtra("institution_name");
+        no_of_stu=from_students.getIntExtra("no_of_stu",0);
+
         userPrefs=new UserPrefs(NewStudent.this);
         teacherUserPrefs=new TeacherUserPrefs(NewStudent.this);
 
@@ -83,8 +87,11 @@ public class NewStudent extends BaseActivity {
         studentAge = (EditText) findViewById(R.id.studentAge);
         studentRno= (EditText) findViewById(R.id.rollno_desc);
         Button addStudentButton = (Button) findViewById(R.id.addStudentButton);
-       /* noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
-        noti_bar.setTexts(userPrefs.getUserName(), "Teacher",institutionName);*/
+
+
+
+        noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
+        noti_bar.setTexts(userPrefs.getUserName(), "Teacher",institutionName);
         Log.i("abcd", "studentEmail is......" + studentEmail);
 
         addStudentButton.setOnClickListener(new View.OnClickListener() {
@@ -93,9 +100,9 @@ public class NewStudent extends BaseActivity {
                 name=studentName.getText().toString().trim();
                 email = studentEmail.getText().toString().trim();
                 age = Integer.parseInt(studentAge.getText().toString().trim());
-                rollno = Integer.parseInt(studentRno.getText().toString().trim());
+                rollno = no_of_stu+1;
 
-                if ( name.equals(null) || email.equals(null) || (age == 0) || (rollno == -1)) {
+                if ( name.equals(null) || email.equals(null) || (age == 0) ) {
                     Toast.makeText(getApplicationContext(), "Student details cannot be empty!", Toast.LENGTH_LONG).show();
                 } else {
 
@@ -169,7 +176,7 @@ public class NewStudent extends BaseActivity {
 
         //adding to class table
         databaseReference=Constants.databaseReference.child(Constants.CLASS_TABLE).child(institutionName).child(classitems[1]).child(classitems[2]).child("student");
-        databaseReference.child(studentfirebaseUser.getUid()).setValue(String.valueOf(rollno));
+        databaseReference.child(studentuid).setValue(String.valueOf(rollno));
 
 
         //adding to student table
@@ -177,6 +184,11 @@ public class NewStudent extends BaseActivity {
         databaseReference.child("class").setValue(classId);
         databaseReference.child("roll_number").setValue(String.valueOf(rollno));
 
+
+        //local changes
+        com.project.smartedu.database.Students newstudent=new com.project.smartedu.database.Students(studentuid,classId,String.valueOf(rollno),name);
+        TeacherUserPrefs.studentsuseridLt.add(studentuid);
+        TeacherUserPrefs.studentsHashMap.put(studentuid,newstudent);
 
         addParentUser();
 

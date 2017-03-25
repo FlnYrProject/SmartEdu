@@ -1,8 +1,11 @@
 package com.project.smartedu;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
@@ -20,6 +23,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.project.smartedu.admin.Home;
+import com.project.smartedu.notification.NotificationBar;
 
 public class LoginActivity extends BaseActivity {
 
@@ -33,6 +37,18 @@ public class LoginActivity extends BaseActivity {
 boolean ifadmin;
 String institutionName;
     UserPrefs userPrefs;
+
+
+
+
+
+
+
+
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +67,7 @@ String institutionName;
 
         if(firebaseAuth.getCurrentUser()!=null){
 
-        //adminCheck();
+       // adminCheck();
 
             //check shared prefs
             if(userPrefs.isAdmin()){
@@ -173,7 +189,7 @@ String institutionName;
                 String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
 
-                 userPrefs.setUserDetails(FirebaseAuth.getInstance().getCurrentUser().getUid(),"testing name",emailInput.getText().toString(),passwordInput.getText().toString());
+                 userPrefs.setUserDetails(FirebaseAuth.getInstance().getCurrentUser().getUid(),"",emailInput.getText().toString(),passwordInput.getText().toString());
 
                 userPrefs.setIfAdmin(ifadmin,institutionName);
                 progressDialog.dismiss();

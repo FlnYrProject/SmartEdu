@@ -67,7 +67,7 @@ public class SignUp extends AppCompatActivity {
         Log.d("signup", "onCreate: " + firebaseAuth);
 
         if(firebaseAuth.getCurrentUser()!=null){
-           // adminCheck();
+            //adminCheck();
             if(userPrefs.isAdmin()){
 
                 Intent toAdminConsole=new Intent(SignUp.this, Home.class);
