@@ -635,7 +635,7 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
 
             if(position==4) //logout
-            {        Toast.makeText(getApplicationContext(),"logout pressed",Toast.LENGTH_LONG).show();
+            {
 
                 AdminUserPrefs adminUserPrefs=new AdminUserPrefs(BaseActivity.this);
                 adminUserPrefs.clearAdminData();

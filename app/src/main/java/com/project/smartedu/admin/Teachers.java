@@ -23,6 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.project.smartedu.Constants;
 import com.project.smartedu.R;
 import com.project.smartedu.common.Tasks;
+import com.project.smartedu.database.Task;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -97,5 +98,14 @@ public class Teachers extends AppCompatActivity {
 
         adapter = new ArrayAdapter(Teachers.this, android.R.layout.simple_list_item_1, teacherLt);
         teacherList.setAdapter(adapter);
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent tohome=new Intent(Teachers.this,Home.class);
+        tohome.putExtra("institution_name",institutionName);
+        startActivity(tohome);
     }
 }

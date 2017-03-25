@@ -194,4 +194,15 @@ public class NewClass extends BaseActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        Intent to_admin_classes = new Intent(NewClass.this, Classes.class);
+        to_admin_classes.putExtra("institution_name", institutionName);
+        to_admin_classes.putExtra("role", role);
+        startActivity(to_admin_classes);
+    }
+
+
 }

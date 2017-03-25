@@ -90,6 +90,7 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
     int Daycal;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,8 +124,8 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
         // context= this;
         // list = (ListView) findViewById(R.id.uploadList);
 
-        // noti_bar = (Notification_bar)getSupportFragmentManager().findFragmentById(R.id.noti);
-        // noti_bar.setTexts(ParseUser.getCurrentUser().getUsername(), role,super.institution_name);
+        noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
+         noti_bar.setTexts(userPrefs.getUserName(), role,super.institutionName);
 
 
         uploadList = (ListView) findViewById(R.id.uploadList);

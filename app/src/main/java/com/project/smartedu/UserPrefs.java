@@ -107,7 +107,7 @@ public class UserPrefs {
 
         FirebaseAuth firebaseAuth=FirebaseAuth.getInstance();
         firebaseAuth.signOut();
-        Toast.makeText(_context,"logout",Toast.LENGTH_LONG).show();
+        Toast.makeText(_context,"Signed Out",Toast.LENGTH_LONG).show();
         // After logout redirect user to Loing Activity
         Intent i = new Intent(_context, LoginActivity.class);
         // Closing all the Activities
@@ -134,6 +134,12 @@ public class UserPrefs {
     }
     public String getUserEmail() { return pref.getString(USER_EMAIL,null);}
     public String getUserPassword() { return  pref.getString(USER_PASSWORD,null);}
+
+
+    public void setUserName(String name){
+        editor.putString(USER_NAME, name);
+        editor.commit();
+    }
 
     public void clearAllSavedData(){
         roleslistmap.clear();

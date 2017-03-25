@@ -51,6 +51,9 @@ public class Students extends BaseActivity {
 
     HashMap<String ,String> localstumap;
 
+    int no_of_stu=0;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,8 +72,8 @@ public class Students extends BaseActivity {
       /*  getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);*/
         getSupportActionBar().setTitle("Students");
-       /* noti_bar = (Notification_bar)getSupportFragmentManager().findFragmentById(R.id.noti);
-        noti_bar.setTexts(ParseUser.getCurrentUser().getUsername(), role,institution_name);*/
+       noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
+        noti_bar.setTexts(userPrefs.getUserName(), role,institutionName);
 
 
         addStudentButton = (Button)findViewById(R.id.addButton);
@@ -98,6 +101,7 @@ public class Students extends BaseActivity {
                 i.putExtra("institution_name",institutionName);
                 i.putExtra("role",role);
                 i.putExtra("id",classId);
+                i.putExtra("no_of_stu",no_of_stu);
                 startActivity(i);
             }
         });
@@ -126,6 +130,7 @@ public class Students extends BaseActivity {
         }
 
         if(studentLt.size()>0){
+            no_of_stu=studentLt.size();
             ArrayAdapter adapter = new ArrayAdapter(Students.this, android.R.layout.simple_list_item_1, studentLt);
             studentList.setAdapter(adapter);
             createIDs.setVisibility(View.VISIBLE);

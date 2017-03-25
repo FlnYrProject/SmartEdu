@@ -261,4 +261,16 @@ public class NewTeacher extends BaseActivity {
 
    }
 
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        Intent i = new Intent(NewTeacher.this, Teachers.class);
+        i.putExtra("institution_name", institutionName);
+        i.putExtra("role", role);
+        startActivity(i);
+
+    }
+
 }
