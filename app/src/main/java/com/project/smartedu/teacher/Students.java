@@ -29,6 +29,7 @@ import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Students extends BaseActivity {
@@ -47,6 +48,8 @@ public class Students extends BaseActivity {
     Integer age;
     Integer rollno;
     Button createIDs;
+
+    HashMap<String ,String> localstumap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,17 +103,82 @@ public class Students extends BaseActivity {
         });
 
         ArrayList<String> studentLt = new ArrayList<String>();
-        ArrayAdapter adapter = new ArrayAdapter(Students.this, android.R.layout.simple_list_item_1, studentLt);
+        localstumap=new HashMap<>();
+
+        for(int x=0;x<TeacherUserPrefs.studentsuseridLt.size();x++){
+
+            String studentid=TeacherUserPrefs.studentsuseridLt.get(x);
+            com.project.smartedu.database.Students student=TeacherUserPrefs.studentsHashMap.get(studentid);
 
 
-        studentList.setAdapter(adapter);
-        createIDs.setVisibility(View.VISIBLE);
-        createIDs.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                shareCode();
+            if(student.getClass_id().equals(classId)){
+
+
+                studentLt.add(student.getRoll_number() + ". " + student.getName());
+
+                localstumap.put(student.getRoll_number() + ". " + student.getName(),studentid);
+
             }
-        });
+
+
+
+
+        }
+
+        if(studentLt.size()>0){
+            ArrayAdapter adapter = new ArrayAdapter(Students.this, android.R.layout.simple_list_item_1, studentLt);
+            studentList.setAdapter(adapter);
+            createIDs.setVisibility(View.VISIBLE);
+            createIDs.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    shareCode();
+                }
+            });
+
+
+            studentList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    String item = ((TextView) view).getText().toString();
+                    Log.d("user", item);
+
+                    //item  = item.replaceAll("[\n\r\\s]", "");
+                    String[] studentdetails = item.split("\\. ");
+
+                   String rn=studentdetails[0];
+                    String nm=studentdetails[1];
+
+
+
+                    Log.d("user", "rno: " + rn.trim()+" name "+nm);
+
+
+                    String stuid=localstumap.get(item);
+
+                    Intent to_student_info = new Intent(Students.this, StudentInfo.class);
+                    to_student_info.putExtra("id", stuid);
+                    to_student_info.putExtra("classId", classId);
+                    startActivity(to_student_info);
+
+
+
+
+                }
+            });
+
+
+        }else{
+
+            Toast.makeText(Students.this, " no students in this class ", Toast.LENGTH_LONG).show();
+
+
+        }
+
+
+
+
+
 
 
 

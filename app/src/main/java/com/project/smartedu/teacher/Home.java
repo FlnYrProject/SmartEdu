@@ -89,7 +89,7 @@ public class Home extends BaseActivity {
         @Override
         protected Void doInBackground(Void... params) {
             final Object lock = new Object();
-
+            final Object lock2 = new Object();
 
 
             for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
@@ -113,7 +113,7 @@ public class Home extends BaseActivity {
 
                             TeacherUserPrefs.studentsuseridLt.add(studentid);
 
-                            com.project.smartedu.database.Students stu=new Students(studentid,classid,roll);
+                            com.project.smartedu.database.Students stu=new Students(studentid,classid,roll,"");
                             TeacherUserPrefs.studentsHashMap.put(studentid,stu);
 
                             //  HashMap<String, String> retTeachersList=(HashMap<String, String>)dataSnapshot.getValue();
@@ -145,6 +145,48 @@ public class Home extends BaseActivity {
                         lock.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
+                    }
+                }
+
+
+
+                for(int i=0;i<TeacherUserPrefs.studentsuseridLt.size();i++) {
+
+                    final String studentid=TeacherUserPrefs.studentsuseridLt.get(i);
+                    DatabaseReference dataReference = Constants.databaseReference.child(Constants.USER_DETAILS_TABLE).child(studentid);
+
+                    final int finalI = i;
+                    dataReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            synchronized (lock2) {
+                                for (DataSnapshot dsi : dataSnapshot.getChildren()) {
+                                    if (dsi.getKey().equals("name")) {
+
+                                        String stuname=dsi.getValue().toString();
+
+                                        TeacherUserPrefs.studentsHashMap.get(studentid).setName(stuname);
+
+
+                                    }
+                                }
+                                lock2.notifyAll();
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    synchronized (lock2) {
+                        try {
+                            lock2.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
 

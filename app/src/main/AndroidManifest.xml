@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    android:installLocation="preferExternal"
     package="com.project.smartedu">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -82,8 +85,9 @@
         <activity
             android:name=".teacher.Exams"
             android:label="@string/title_activity_exams" />
-        <activity android:name=".teacher.UploadMaterial"
-            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".teacher.UploadMaterial"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".teacher.teacher_message" />
         <activity android:name=".teacher.Attendance" />
         <activity
@@ -91,7 +95,8 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".teacher.UploadImage"
-            android:label="@string/title_activity_upload_image"></activity>
+            android:label="@string/title_activity_upload_image" />
+        <activity android:name=".teacher.StudentInfo"></activity>
     </application>
 
 </manifest>

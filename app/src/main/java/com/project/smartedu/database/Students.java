@@ -9,12 +9,22 @@ public class Students {
     String userid;
     String class_id;
     String roll_number;
+    String name;
 
 
-    public Students(String userid, String class_id, String roll_number) {
+    public Students(String userid, String class_id, String roll_number, String name) {
         this.userid = userid;
         this.class_id = class_id;
         this.roll_number = roll_number;
+        this.name=name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name=name;
     }
 
     public String getUserid() {
