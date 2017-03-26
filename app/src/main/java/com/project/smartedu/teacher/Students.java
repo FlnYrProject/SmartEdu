@@ -542,5 +542,14 @@ public class Students extends BaseActivity {
         }
     }*/
 
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent task_intent = new Intent(Students.this, Classes.class);
+        task_intent.putExtra("institution_name", institutionName);
+        task_intent.putExtra("for","attendance");
+        task_intent.putExtra("role", role);
+        //task_intent.putExtra("id", classId);
+        startActivity(task_intent);
+    }
 }

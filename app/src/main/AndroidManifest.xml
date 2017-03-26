@@ -89,7 +89,8 @@
             android:name=".teacher.UploadMaterial"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".teacher.teacher_message" />
-        <activity android:name=".teacher.Attendance" />
+        <activity android:name=".teacher.Attendance"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".teacher.NewStudent"
             android:theme="@style/AppTheme.NoActionBar" />

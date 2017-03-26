@@ -22,6 +22,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.ImageAdapter;
+import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
 import com.project.smartedu.UserPrefs;
 import com.project.smartedu.admin.AdminUserPrefs;
@@ -60,6 +61,158 @@ public class Home extends BaseActivity {
 
 
     SwipeRefreshLayout swipeRefreshLayout;
+
+    ArrayList<String> subjects;
+
+
+
+    private class SubjectAllotmentItems extends AsyncTask<Void, Void, Void> {
+
+        private Context async_context;
+        private ProgressDialog pd;
+
+        public SubjectAllotmentItems(Context context){
+            this.async_context = context;
+            pd = new ProgressDialog(async_context);
+            subjects=new ArrayList<>();
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd.setMessage("Fetching Subject Allotments");
+            pd.setCancelable(false);
+            pd.show();
+            TeacherUserPrefs.subjectallotmentmap.clear();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            final Object lock = new Object();
+
+
+
+
+            for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
+
+                final String classId=TeacherUserPrefs.allotments.get(x);
+                String[] clsdetails=classId.split("_");
+                String cls=clsdetails[1];
+                String section=clsdetails[2];
+               subjects.clear();
+                databaseReference=Constants.databaseReference.child(Constants.CLASS_TABLE).child(institutionName).child(cls).child(section).child("subject");
+
+
+                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        synchronized (lock) {
+                            for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                                String teacheruid= (String) ds.getValue();
+
+                                if(teacheruid.equals(firebaseAuth.getCurrentUser().getUid())){
+
+                                    String subjectname=ds.getKey();     //subject name
+
+                                    if(TeacherUserPrefs.subjectallotmentmap.containsKey(classId)){
+                                        Log.d("test","here");
+                                        TeacherUserPrefs.subjectallotmentmap.get(classId).add(subjectname);
+
+                                    }else{
+                                        Log.d("test","here again " + subjectname);
+                                       // subjects.clear();
+                                        ArrayList<String> sbjlt=new ArrayList<String>();
+                                        sbjlt.add(subjectname);
+                                        TeacherUserPrefs.subjectallotmentmap.put(classId,sbjlt);
+
+                                    }
+
+
+                                }
+
+
+                            }
+
+                            //TeacherUserPrefs.subjectallotmentmap.put(classId,subjects);
+
+
+                            lock.notifyAll();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+
+                });
+
+
+                synchronized (lock){
+                    try {
+                        lock.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+
+
+
+            }
+
+
+
+
+
+
+
+
+
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //Handles the stuff after the synchronisation with the firebase listener has been achieved
+            //The main UI is already idle by this moment
+            super.onPostExecute(aVoid);
+
+
+            for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
+                String id=TeacherUserPrefs.allotments.get(x);
+                ArrayList<String> sbj=TeacherUserPrefs.subjectallotmentmap.get(id);
+                for(int i=0;i<sbj.size();i++){
+                    Toast.makeText(getApplicationContext(),sbj.get(i)+" in "+id,Toast.LENGTH_LONG).show();
+                }
+            }
+
+          //  Toast.makeText(getApplicationContext(),TeacherUserPrefs.subjectallotmentmap.get("NITJ_10_b").get(0),Toast.LENGTH_LONG).show();
+
+
+            //Show the log in progress_bar for at least a few milliseconds
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    pd.dismiss();
+                    pd=null;
+
+                }
+            }, 500);  // 100 milliseconds
+        }
+
+
+        //end firebase_async_class
+    }
+
+
+
+
+
+
 
 
 
@@ -102,12 +255,13 @@ public class Home extends BaseActivity {
                 databaseReference=Constants.databaseReference.child(Constants.CLASS_TABLE).child(institutionName).child(classitems[1]).child(classitems[2]).child("student");
 
 
-
                 databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         synchronized (lock) {
                         for (DataSnapshot ds : dataSnapshot.getChildren()) {
+
+
 
 
                             String roll=ds.getValue().toString(); //gives rollnumber
@@ -222,6 +376,7 @@ public class Home extends BaseActivity {
                 public void run() {
                     pd.dismiss();
                     pd=null;
+                    loadSubjectAllotmentData();
                 }
             }, 500);  // 100 milliseconds
         }
@@ -326,13 +481,7 @@ public class Home extends BaseActivity {
             int size=TeacherUserPrefs.allotments.size();
             Toast.makeText(getApplicationContext(),size + " allotments found",Toast.LENGTH_LONG).show();
 
-for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
-    Toast.makeText(getApplicationContext(),TeacherUserPrefs.allotments.get(x),Toast.LENGTH_LONG).show();
-
-}
-
             //Show the log in progress_bar for at least a few milliseconds
-
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
@@ -582,111 +731,6 @@ for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
 
 
 
-    private class AllotedClassesItems extends AsyncTask<Void, Void, Void> {
-
-        private Context async_context;
-        private ProgressDialog pd;
-
-
-
-        public AllotedClassesItems(Context context){
-            this.async_context = context;
-            pd = new ProgressDialog(async_context);
-            TeacherUserPrefs.allotments.clear();
-
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            pd.setMessage("Fetching Classes");
-            pd.setCancelable(false);
-            pd.show();
-
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            final Object lock = new Object();
-            databaseReference = Constants.databaseReference.child(Constants.ALLOTMENTS_TABLE).child(firebaseAuth.getCurrentUser().getUid());
-
-
-
-                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        synchronized (lock) {
-                            for (DataSnapshot ds : dataSnapshot.getChildren()) {
-
-
-                                String classid=(String) ds.getValue();
-                                Log.d("classid",classid);
-                                TeacherUserPrefs.allotments.add(classid);
-
-
-
-
-
-                            }
-
-
-
-                            lock.notifyAll();
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-
-                });
-
-
-                synchronized (lock){
-                    try {
-                        lock.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-
-
-
-
-
-
-
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            //Handles the stuff after the synchronisation with the firebase listener has been achieved
-            //The main UI is already idle by this moment
-            super.onPostExecute(aVoid);
-
-
-            // AdminUserPrefs.schedulesmaplt=schedulesmaplt;
-
-
-            //Show the log in progress_bar for at least a few milliseconds
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    pd.dismiss();
-                    pd=null;
-                    loadAllotmentData();
-                }
-            }, 500);  // 100 milliseconds
-        }
-
-
-        //end firebase_async_class
-    }
 
 
 
@@ -843,39 +887,63 @@ for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
                 public void onItemClick(AdapterView<?> parent, View v,
                                         int position, long id) {
                     if (position == 0) {
-                        Intent attendance_intent = new Intent(Home.this, Classes.class);
-                        attendance_intent.putExtra("institution_name",institutionName);
-                        attendance_intent.putExtra("for", "attendance");
-                        attendance_intent.putExtra("role", role);
-                        startActivity(attendance_intent);
+
+                        if(TeacherUserPrefs.allotments.size()==0){
+                            Toast.makeText(getApplicationContext(),"No Classes Allotted",Toast.LENGTH_LONG).show();
+                        }else{
+                            Intent attendance_intent = new Intent(Home.this, Classes.class);
+                            attendance_intent.putExtra("institution_name",institutionName);
+                            attendance_intent.putExtra("for", "attendance");
+                            attendance_intent.putExtra("role", role);
+                            startActivity(attendance_intent);
+                        }
+
                     } else if (position == 1) {
                         Intent task_intent = new Intent(Home.this, Tasks.class);
                         task_intent.putExtra("institution_name",institutionName);
                         task_intent.putExtra("role", role);
                         startActivity(task_intent);
                     } else if (position == 2) {
-                        Intent student_intent = new Intent(Home.this, Classes.class);
-                        student_intent.putExtra("institution_name",institutionName);
-                        student_intent.putExtra("role", role);
-                        student_intent.putExtra("for", "students");
-                        startActivity(student_intent);
+
+                        if(TeacherUserPrefs.allotments.size()==0){
+                            Toast.makeText(getApplicationContext(),"No Classes Allotted",Toast.LENGTH_LONG).show();
+                        }else{
+                            Intent student_intent = new Intent(Home.this, Classes.class);
+                            student_intent.putExtra("institution_name",institutionName);
+                            student_intent.putExtra("role", role);
+                            student_intent.putExtra("for", "students");
+                            startActivity(student_intent);
+                        }
+
                     } else if (position == 3) {
                         Intent schedule_intent = new Intent(Home.this, Schedule.class);
                         schedule_intent.putExtra("institution_name",institutionName);
                         schedule_intent.putExtra("role", role);
                         startActivity(schedule_intent);
                     } else if (position == 4) {
-                        Intent addmarks_intent = new Intent(Home.this, Classes.class);
-                        addmarks_intent.putExtra("institution_name",institutionName);
-                        addmarks_intent.putExtra("role", role);
-                        addmarks_intent.putExtra("for", "exam");
-                        startActivity(addmarks_intent);
+
+                        if(TeacherUserPrefs.allotments.size()==0){
+                            Toast.makeText(getApplicationContext(),"No Classes Allotted",Toast.LENGTH_LONG).show();
+                        }else{
+                            Intent addmarks_intent = new Intent(Home.this, Classes.class);
+                            addmarks_intent.putExtra("institution_name",institutionName);
+                            addmarks_intent.putExtra("role", role);
+                            addmarks_intent.putExtra("for", "exam");
+                            startActivity(addmarks_intent);
+                        }
+
                     } else if (position == 5) {
-                        Intent upload_intent = new Intent(Home.this,Classes.class);
-                        upload_intent.putExtra("institution_name",institutionName);
-                        upload_intent.putExtra("role", role);
-                        upload_intent.putExtra("for", "upload");
-                        startActivity(upload_intent);
+
+                        if(TeacherUserPrefs.allotments.size()==0){
+                            Toast.makeText(getApplicationContext(),"No Classes Allotted",Toast.LENGTH_LONG).show();
+                        }else{
+                            Intent upload_intent = new Intent(Home.this,Classes.class);
+                            upload_intent.putExtra("institution_name",institutionName);
+                            upload_intent.putExtra("role", role);
+                            upload_intent.putExtra("for", "upload");
+                            startActivity(upload_intent);
+                        }
+
 
                     } else if (position == 6) {
 
@@ -969,6 +1037,14 @@ for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
 
         StudentsItems studentasync = new StudentsItems(Home.this);        //get teacher data
         studentasync.execute();
+
+    }
+
+
+    private void loadSubjectAllotmentData(){
+
+       SubjectAllotmentItems subjectAllotmentItems = new SubjectAllotmentItems(Home.this);        //get teacher data
+        subjectAllotmentItems.execute();
 
     }
 

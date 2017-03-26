@@ -28,12 +28,11 @@ public class Classes extends BaseActivity {
     private FragmentDrawer drawerFragment;
     String _for;
 
-    // Students students = new Students();
-    //ArrayList<Task> myList;
+
     ListView classList;
     RelativeLayout layout;
 
-   // Notification_bar noti_bar;
+
     NotificationBar noti_bar;
 
     UserPrefs userPrefs;
@@ -72,6 +71,7 @@ public class Classes extends BaseActivity {
 
 
         final HashMap<String,String> classmap=new HashMap<>();
+
         if(TeacherUserPrefs.allotments.size()==0){
             Toast.makeText(getApplicationContext(),"No classes alloted",Toast.LENGTH_LONG).show();
         }else {
@@ -106,7 +106,6 @@ public class Classes extends BaseActivity {
                     Toast.makeText(Classes.this, "id of class selected is = " + classid, Toast.LENGTH_LONG).show();
                     if (_for.equals("students")) {
                         Intent to_student = new Intent(Classes.this, Students.class);
-
                         to_student.putExtra("institution_name", institutionName);
                         to_student.putExtra("role", role);
                         to_student.putExtra("id", classid);
@@ -345,5 +344,12 @@ public class Classes extends BaseActivity {
         }
     }*/
 
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent toHome=new Intent(Classes.this,Home.class);
+        toHome.putExtra("role",role);
+        toHome.putExtra("institution_name",institutionName);
+        startActivity(toHome);
+    }
 }

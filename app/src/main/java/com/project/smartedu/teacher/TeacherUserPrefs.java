@@ -38,6 +38,8 @@ public class TeacherUserPrefs {
 
     public static ArrayList<String> allotments;
 
+    public static HashMap<String,ArrayList<String>> subjectallotmentmap;
+
     public static ArrayList<String> studentsuseridLt;
     public static HashMap<String,Students> studentsHashMap;
 
@@ -47,6 +49,7 @@ public class TeacherUserPrefs {
     static {
 
         allotments=new ArrayList<>();
+        subjectallotmentmap=new HashMap<>();
         studentsuseridLt=new ArrayList<>();
         studentsHashMap=new HashMap<>();
     }

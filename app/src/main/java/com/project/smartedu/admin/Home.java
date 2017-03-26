@@ -903,11 +903,11 @@ public class Home extends BaseActivity{
 
                 } else if (position == 1) { //tasks
 
-                    Intent task_intent = new Intent(Home.this, Tasks.class);
+                        Intent task_intent = new Intent(Home.this, Tasks.class);
+                        task_intent.putExtra("institution_name",institutionName);
+                        task_intent.putExtra("role", "admin");
+                        startActivity(task_intent);
 
-                    task_intent.putExtra("institution_name",institutionName);
-                    task_intent.putExtra("role", "admin");
-                    startActivity(task_intent);
 
                 } else if (position == 2) { //classes
 
