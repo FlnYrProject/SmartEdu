@@ -1,0 +1,117 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.example.dell.smartedu.NewEvent_Teacher"
+    android:orientation="horizontal"
+    android:background="#323b43">
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Number of Absents"
+        android:id="@+id/absentDays_head"
+        android:textSize="25sp"
+        android:layout_marginTop="57dp"
+        android:layout_below="@+id/dateText1"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Total Days"
+        android:id="@+id/totalDays_head"
+        android:textSize="25sp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/exam" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dateText1"
+        android:layout_marginTop="45dp"
+        android:textSize="25sp"
+        android:layout_marginLeft="10dp"
+        android:text="Date"
+
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/test"
+        android:layout_toEndOf="@+id/test" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/test"
+        android:background="@drawable/ic_calender"
+        android:layout_alignBottom="@+id/dateText1"
+
+        android:backgroundTint="#fff"
+        android:onClick="open"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/exam"
+        android:text="absent days"
+        android:layout_below="@+id/absentDays_head"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:textSize="20sp"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/totalMarks"
+        android:text="total days"
+        android:layout_below="@+id/totalDays_head"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="10dp"
+        android:textSize="20sp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Percentage"
+        android:id="@+id/percentage_head"
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/totalMarks"
+        android:layout_alignParentLeft="true"
+        android:textSize="25sp" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="percentage"
+        android:id="@+id/percentage"
+        android:layout_below="@+id/percentage_head"
+        android:layout_marginTop="10dp"
+        android:textSize="20sp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/dateText1"
+        android:text="Attendance upto the date"
+        android:layout_marginTop="50dp"
+        android:textSize="15sp"
+        android:id="@+id/textView13"
+        android:layout_alignTop="@+id/dateText1"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:textColor="#ffff" />
+
+
+</RelativeLayout>
+
