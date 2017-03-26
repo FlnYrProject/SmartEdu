@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.GridView;
@@ -56,6 +57,7 @@ public class Home extends BaseActivity {
 
     UserPrefs userPrefs;
 
+    SwipeRefreshLayout swipeRefreshLayout;
 
     private class TaskItems extends AsyncTask<Void, Void, Void> {
 
@@ -398,7 +400,17 @@ userPrefs=new UserPrefs(Home.this);
 
         noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
        // noti_bar.setTexts(userPrefs.getUserName(),role,institutionName);
-setupNotiBar();
+
+        swipeRefreshLayout=(SwipeRefreshLayout)findViewById(R.id.swipe_layout);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefresh();
+            }
+        });
+
+
         taskLt = UserPrefs.taskItems;
         taskidmap = UserPrefs.taskidmap;
 
@@ -409,8 +421,15 @@ setupNotiBar();
         final GridView gridview = (GridView) findViewById(R.id.gridview);
         gridview.setAdapter(new ImageAdapter(getApplicationContext(), densityX,densityY, "Parent"));
         
-        loadData();
 
+        if(userPrefs.isFirstLoading()) {
+            userPrefs.setFirstLoading(false);
+            setupNotiBar();
+            loadData();
+        }else{
+            noti_bar.setTexts(userPrefs.getUserName(), role,institutionName);
+
+        }
 /*
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
@@ -493,6 +512,16 @@ ScheduleItems scheduleasync = new ScheduleItems(Home.this);        //get teacher
         scheduleasync.execute();
 
     }
+
+    public void swipeRefresh(){
+        userPrefs.setFirstLoading(true);
+        Intent tohome=new Intent(Home.this, Home.class);
+        tohome.putExtra("institution_name",institutionName);
+        tohome.putExtra("child_username",child_username);
+        tohome.putExtra("role",role);
+        startActivity(tohome);
+    }
+
 
 
 }

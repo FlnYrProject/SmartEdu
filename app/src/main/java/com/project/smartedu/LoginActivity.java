@@ -192,6 +192,7 @@ String institutionName;
                  userPrefs.setUserDetails(FirebaseAuth.getInstance().getCurrentUser().getUid(),"",emailInput.getText().toString(),passwordInput.getText().toString());
 
                 userPrefs.setIfAdmin(ifadmin,institutionName);
+                userPrefs.setFirstLoading(true);
                 progressDialog.dismiss();
 
                 if (ifadmin) {
@@ -218,6 +219,14 @@ String institutionName;
         });
 
 
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent tohome=new Intent(LoginActivity.this,LoginActivity.class);
+        startActivity(tohome);
     }
 
 

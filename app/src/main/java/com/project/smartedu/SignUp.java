@@ -241,4 +241,11 @@ public class SignUp extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent tohome=new Intent(SignUp.this,SignUp.class);
+        startActivity(tohome);
+    }
+
 }
