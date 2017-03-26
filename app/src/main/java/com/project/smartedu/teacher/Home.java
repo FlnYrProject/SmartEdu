@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -58,6 +59,7 @@ public class Home extends BaseActivity {
 
 
 
+    SwipeRefreshLayout swipeRefreshLayout;
 
 
 
@@ -795,7 +797,7 @@ for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
             teacherUserPrefs.setInstituion(institutionName);
 
             noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
-            setupNotiBar();
+           // setupNotiBar();
             mToolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(mToolbar);
             //getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -807,6 +809,15 @@ for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
             drawerFragment.setDrawerListener(this);
 
 
+        swipeRefreshLayout=(SwipeRefreshLayout)findViewById(R.id.swipe_layout);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefresh();
+            }
+        });
+
 
             taskLt = UserPrefs.taskItems;
             taskidmap = UserPrefs.taskidmap;
@@ -814,10 +825,17 @@ for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
             schedulekeymap = UserPrefs.schedulekeymap;
             scheduleslt = new ArrayList<>();
 
-
-
-
+        if(userPrefs.isFirstLoading()) {
+            userPrefs.setFirstLoading(false);
+            setupNotiBar();
             loadData();
+        }else{
+            noti_bar.setTexts(userPrefs.getUserName(), role,institutionName);
+
+        }
+
+
+
 
             GridView gridview = (GridView) findViewById(R.id.gridview);
             gridview.setAdapter(new ImageAdapter(this, densityX, densityY, role));
@@ -952,6 +970,14 @@ for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
         StudentsItems studentasync = new StudentsItems(Home.this);        //get teacher data
         studentasync.execute();
 
+    }
+
+    public void swipeRefresh(){
+        userPrefs.setFirstLoading(true);
+        Intent tohome=new Intent(Home.this, Home.class);
+        tohome.putExtra("institution_name",institutionName);
+        tohome.putExtra("role","teacher");
+        startActivity(tohome);
     }
 
 

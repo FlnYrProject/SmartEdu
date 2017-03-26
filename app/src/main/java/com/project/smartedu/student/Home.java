@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.GridView;
@@ -45,6 +46,8 @@ public class Home extends BaseActivity {
     DatabaseReference databaseReference;
 
     UserPrefs userPrefs;
+    SwipeRefreshLayout swipeRefreshLayout;
+
 
 
     private class TaskItems extends AsyncTask<Void, Void, Void> {
@@ -369,7 +372,7 @@ public class Home extends BaseActivity {
 
         noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
        // noti_bar.setTexts(userPrefs.getUserName(),role,institutionName);
-setupNotiBar();
+
 
             taskLt = UserPrefs.taskItems;
             taskidmap = UserPrefs.taskidmap;
@@ -377,8 +380,24 @@ setupNotiBar();
             schedulekeymap = UserPrefs.schedulekeymap;
             scheduleslt = new ArrayList<>();
 
+        swipeRefreshLayout=(SwipeRefreshLayout)findViewById(R.id.swipe_layout);
 
-        loadData();
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefresh();
+            }
+        });
+
+        if(userPrefs.isFirstLoading()) {
+            userPrefs.setFirstLoading(false);
+            setupNotiBar();
+            loadData();
+        }else{
+            noti_bar.setTexts(userPrefs.getUserName(), role,institutionName);
+
+        }
+
         final GridView gridview = (GridView) findViewById(R.id.gridview);
         gridview.setAdapter(new ImageAdapter(getApplicationContext(), densityX, densityY, role));
 
@@ -482,6 +501,14 @@ setupNotiBar();
        ScheduleItems scheduleasync = new ScheduleItems(Home.this);        //get teacher data
         scheduleasync.execute();
 
+    }
+
+    public void swipeRefresh(){
+        userPrefs.setFirstLoading(true);
+        Intent tohome=new Intent(Home.this, Home.class);
+        tohome.putExtra("institution_name",institutionName);
+        tohome.putExtra("role","student");
+        startActivity(tohome);
     }
 
 

@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -43,6 +44,8 @@ public class Home extends BaseActivity{
     private FragmentDrawer drawerFragment;
     //  Notification_bar noti_bar;
 
+    SwipeRefreshLayout swipeRefreshLayout;
+
     DatabaseReference databaseReference;
     Button logout;
     UserPrefs userPrefs;
@@ -64,12 +67,6 @@ public class Home extends BaseActivity{
     HashMap<Schedule,String> schedulekeymap;        //to map schedule to the key
 
     NotificationBar noti_bar;
-
-
-
-
-
-
 
 
 
@@ -552,7 +549,7 @@ public class Home extends BaseActivity{
                             for (DataSnapshot dsi : dataSnapshot.getChildren()) {
                                 if (dsi.getKey().equals("name")) {
                                     String entry = tempteacherlt.get(finalI).toString() + ". " + dsi.getValue().toString();
-                                    Toast.makeText(getApplicationContext(),entry,Toast.LENGTH_LONG).show();
+                                 //   Toast.makeText(getApplicationContext(),entry,Toast.LENGTH_LONG).show();
                                     teacherLt.add(entry);
                                     teachersusermap.put(entry, teacheruseridLt.get(finalI));
                                     teachersuserreversemap.put(teacheruseridLt.get(finalI),entry);
@@ -591,9 +588,7 @@ public class Home extends BaseActivity{
 
             //Show the log in progress_bar for at least a few milliseconds
            Toast.makeText(getApplicationContext(),teacherLt.size() + " teachers found",Toast.LENGTH_LONG).show();
-            for(int i=0;i<teacherLt.size();i++){
-                Toast.makeText(getApplicationContext(),teacherLt.get(i),Toast.LENGTH_LONG).show();
-            }
+
 
             AdminUserPrefs.teacherLt=teacherLt;
             AdminUserPrefs.teachersusermap=teachersusermap;
@@ -844,9 +839,16 @@ public class Home extends BaseActivity{
         adminUserPrefs=new AdminUserPrefs(getApplicationContext());
         noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
 
-        setupNotiBar();
 
 
+        swipeRefreshLayout=(SwipeRefreshLayout)findViewById(R.id.swipe_layout);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefresh();
+            }
+        });
 
         taskLt=UserPrefs.taskItems;
         taskidmap=UserPrefs.taskidmap;
@@ -860,31 +862,31 @@ public class Home extends BaseActivity{
         schedulekeymap=UserPrefs.schedulekeymap;
 
 
-
-        // logout=(Button)findViewById(R.id.lo);
-
-  /*      logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                firebaseAuth.signOut();
-                userPrefs.clearUserDetails();
-               // startActivity(new Intent(Home.this, LoginActivity.class));
-            }
-        });*/
-
-
-
         Intent from_login = getIntent();
         institutionName=from_login.getStringExtra("institution_name");
+        if(userPrefs.isFirstLoading()) {
+            userPrefs.setFirstLoading(false);
+            setupNotiBar();
+            loadData();
+        }else{
+            noti_bar.setTexts(userPrefs.getUserName(), role,institutionName);
 
-       // Toast.makeText(getApplicationContext(),institutionName,Toast.LENGTH_LONG).show();
+        }
+
+
+
+
+
+
+
 
 
         GridView gridview = (GridView) findViewById(R.id.gridview);
         gridview.setAdapter(new ImageAdapter(this, densityX,densityY, "admin"));
 
 
-        loadData();
+
+
 
 
 
@@ -991,9 +993,20 @@ public class Home extends BaseActivity{
 
     }
 
+    public void swipeRefresh(){
+        userPrefs.setFirstLoading(true);
+        Intent tohome=new Intent(Home.this,Home.class);
+        tohome.putExtra("institution_name",institutionName);
+        startActivity(tohome);
+    }
+
+
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        Intent tohome=new Intent(Home.this,Home.class);
+        tohome.putExtra("institution_name",institutionName);
+        startActivity(tohome);
     }
 }

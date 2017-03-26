@@ -43,6 +43,7 @@ public class UserPrefs {
 
     public static final String INSTITUION= "adminInst";
 
+    public static final String FIRST_LOADING= "isfirstloading";
 
 
     public static HashMap<String,ArrayList<String>> roleslistmap;
@@ -93,6 +94,22 @@ public class UserPrefs {
         // Storing flag for admin in pref
         editor.putBoolean(IS_ADMIN, isadmin);
         editor.putString(INSTITUION,institutionName);
+        // commit changes
+        editor.commit();
+    }
+
+    public Boolean isFirstLoading(){
+        // Storing flag for admin in pref
+       return pref.getBoolean(FIRST_LOADING,true);
+
+
+    }
+
+
+    public void setFirstLoading(Boolean isfirstloading){
+        // Storing flag for admin in pref
+        editor.putBoolean(FIRST_LOADING, isfirstloading);
+
         // commit changes
         editor.commit();
     }
