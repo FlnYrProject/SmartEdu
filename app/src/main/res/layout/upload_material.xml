@@ -129,7 +129,7 @@
         android:textSize="20sp"
         android:textColor="#ffffff" />
 
-    <EditText
+    <TextView
         android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:id="@+id/subject"

@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.project.smartedu.database.Schedule;
+import com.project.smartedu.database.Uploads;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,6 +52,11 @@ public class UserPrefs {
 
     public static ArrayList<String> taskItems;
     public static HashMap<String,String> taskidmap; //to map task to its id
+
+    //public static ArrayList<String> uploadItems;
+    //public static HashMap<String,String> uploadidmap; //to map task to its id
+    public static HashMap<Uploads,String> uploadkeymap;        ///to map schedule to key
+
     // public static HashMap<String,ArrayList<Schedule>> schedulesmaplt; // a map from day to its schedules
     public static HashMap<Schedule,String> schedulekeymap;        ///to map schedule to key
 
@@ -60,6 +66,7 @@ public class UserPrefs {
         taskItems=new ArrayList<>();
         taskidmap=new HashMap<>();
         schedulekeymap=new HashMap<>();
+        uploadkeymap=new HashMap<>();
     }
 
     public UserPrefs(Context context){

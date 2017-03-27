@@ -19,19 +19,23 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.R;
 import com.project.smartedu.UserPrefs;
+import com.project.smartedu.database.Uploads;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 
 public class UploadMaterial extends BaseActivity implements FragmentDrawer.FragmentDrawerListener {
@@ -42,7 +46,7 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
     TeacherUserPrefs teacherUserPrefs;
     UserPrefs userPrefs;
     ListView list;
-    ListView uploadList;
+
     String _for;
     String classId;
     DatabaseReference databaseReference;
@@ -67,8 +71,10 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
     TextView mySubject;
     TextView myTopic;
     TextView detailHead;
+    TextView subjectAssigned;
 
-    EditText subject;
+    //EditText subject;
+    String subject;
     EditText topic;
     Date date1;
     CalendarView calendarView;
@@ -89,12 +95,27 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
     int Monthcal;
     int Daycal;
 
+    String[] items;
+
+    //HashMap<String,String> uploadidmap;
+    ListView uploadList;
+    ArrayAdapter adapter=null;
+    ArrayList<String> uploadLtString;
+    ArrayList<com.project.smartedu.database.Uploads> uploadLt;
+
+    Spinner subjectSpinner;
+    ArrayAdapter subjectadapter;
+
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_material);
+
+        userPrefs=new UserPrefs(UploadMaterial.this);
+        teacherUserPrefs=new TeacherUserPrefs(UploadMaterial.this);
 
         Intent from_upload = getIntent();
         classId = from_upload.getStringExtra("id");
@@ -103,6 +124,11 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
         institutionName = from_upload.getStringExtra("institution_name");
 
         userPrefs = new UserPrefs(UploadMaterial.this);
+        /*uploadidmap= UserPrefs.uploadidmap;
+
+        for ( String key : uploadidmap.keySet() ){
+            Log.d("keyi",key);
+        }*/
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
@@ -115,20 +141,52 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
         drawerFragment.setDrawerListener(this);
 
 
-
-        //ListView list;
-        //ListView uploadList;
-
-        //Notification_bar noti_bar;
-
-        // context= this;
-        // list = (ListView) findViewById(R.id.uploadList);
-
         noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
-         noti_bar.setTexts(userPrefs.getUserName(), role,super.institutionName);
+        noti_bar.setTexts(userPrefs.getUserName(), role,super.institutionName);
+
+        subjectSpinner=(Spinner)findViewById(R.id.subjectListspinner);
+        subjectadapter = new ArrayAdapter(UploadMaterial.this, android.R.layout.simple_list_item_1, TeacherUserPrefs.subjectallotmentmap.get(classId));
+        subjectSpinner.setAdapter(subjectadapter);
 
 
         uploadList = (ListView) findViewById(R.id.uploadList);
+        firebaseAuth = FirebaseAuth.getInstance();
+        uploadLt=new ArrayList<>();
+        uploadLtString=new ArrayList<>();
+
+        for(Uploads upl:UserPrefs.uploadkeymap.keySet()){
+                uploadLt.add(upl);
+        }
+
+        if (uploadLt.size() == 0) {
+            uploadList.setVisibility(View.INVISIBLE);
+
+        } else {
+            items = new String[uploadLt.size()];
+
+
+            for (int i = 0; i < uploadLt.size(); i++) {
+                Uploads uploadobject = uploadLt.get(i);
+                long date = TimeUnit.MILLISECONDS.toMinutes(uploadobject.getDate());
+                String upload_type = uploadobject.getUploadType();
+                String subject = uploadobject.getSubject();
+                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                String dateString = formatter.format(new Date(date));
+                String uploaditem = upload_type + "\n" + subject + "\n" + dateString;
+                items[i] = uploaditem;
+
+            }
+            uploadLtString = new ArrayList<>(Arrays.asList(items));
+            adapter = new ArrayAdapter(UploadMaterial.this, android.R.layout.simple_list_item_1, uploadLtString);
+            uploadList.setAdapter(adapter);
+
+
+        }
+
+
+
+
+
         addUploadButton = (Button) findViewById(R.id.uploadButton);
 
         Toast.makeText(UploadMaterial.this, "id class selected is = " + classId, Toast.LENGTH_LONG).show();
@@ -136,19 +194,16 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
         addUploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                subject = subjectSpinner.getSelectedItem().toString().trim();
              uploadNew();
             }
         });
 
-        ArrayList<String> studentLt = new ArrayList<String>();
-        ArrayAdapter adapter = new ArrayAdapter(UploadMaterial.this, android.R.layout.simple_list_item_1, studentLt);
-
-
-        uploadList.setAdapter(adapter);
 
 
 
     }
+
 
 
     public void uploadNew(){
@@ -164,10 +219,15 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
 
         myDate = (TextView) dialog_upload.findViewById(R.id.date);
         myDueDate= (TextView) dialog_upload.findViewById(R.id.deadline);
-        subject=(EditText) dialog_upload.findViewById(R.id.subject);
+        subjectAssigned=(TextView) dialog_upload.findViewById(R.id.subject);
         cal=(ImageButton) dialog_upload.findViewById(R.id.calButton);
         removeDueDate=(Button) dialog_upload.findViewById(R.id.removeDueDate);
         topic=(EditText) dialog_upload.findViewById(R.id.topic);
+
+
+        subjectAssigned.setText(subject);
+
+
 
         final String[] values=new String[2];
         values[0]="Assignment";
@@ -186,6 +246,8 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+
+
 
 
 
@@ -252,10 +314,11 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
         uploadButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 typeSelected=type.getSelectedItem().toString().trim();
-                subjectDesc=subject.getText().toString().trim();
+
+                //subjectDesc=subject.getText().toString().trim();
                 topicDesc=topic.getText().toString().trim();
 
-                if (typeSelected.equals("") || subjectDesc.equals("") ||topicDesc.equals("")) {
+                if (typeSelected.equals("") || subject.equals("") ||topicDesc.equals("")) {
                     Toast.makeText(getApplicationContext(), "Type or Subject details cannot be empty!", Toast.LENGTH_LONG).show();
                 } else {
 
@@ -268,7 +331,7 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
                     databaseReference.child("class").setValue(classId);
                     databaseReference.child("upload_type").setValue(typeSelected);
                     databaseReference.child("topic").setValue(topicDesc);
-                    databaseReference.child("subject").setValue(subjectDesc);
+                    databaseReference.child("subject").setValue(subject);
                     databaseReference.child("date").setValue(String.valueOf(upload_date_milliseconds));
                     databaseReference.child("teacher").setValue(firebaseAuth.getCurrentUser().getUid());//adding to server
 
@@ -343,7 +406,7 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
         super.onBackPressed();
         Intent task_intent = new Intent(UploadMaterial.this, Classes.class);
         task_intent.putExtra("institution_name", institutionName);
-        task_intent.putExtra("for","attendance");
+        task_intent.putExtra("for","upload");
         task_intent.putExtra("role", role);
         //task_intent.putExtra("id", classId);
         startActivity(task_intent);
