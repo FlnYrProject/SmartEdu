@@ -199,7 +199,7 @@ public class NewTask extends BaseActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Intent totask=new Intent();
+        Intent totask=new Intent(NewTask.this,Tasks.class);
         totask.putExtra("role",role);
         totask.putExtra("institution_name",institutionName);
         startActivity(totask);
