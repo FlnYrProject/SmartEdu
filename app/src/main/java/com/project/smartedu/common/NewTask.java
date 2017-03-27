@@ -84,6 +84,7 @@ public class NewTask extends BaseActivity {
 
         Bundle fromrole = getIntent().getExtras();
         role = fromrole.getString("role");
+        institutionName=fromrole.getString("institution_name");
 
 
         addTaskButton.setOnClickListener(new View.OnClickListener() {
@@ -130,8 +131,9 @@ public class NewTask extends BaseActivity {
 
                     String entry=myTitle+"\n"+myDesc+"\n"+dateString;
 
-                    if(role.equals("admin"))
+
                     UserPrefs.taskItems.add(entry);
+                    UserPrefs.taskidmap.put(entry,databaseReference.getKey());
 
 
 
@@ -194,5 +196,13 @@ public class NewTask extends BaseActivity {
     }
 
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent totask=new Intent();
+        totask.putExtra("role",role);
+        totask.putExtra("institution_name",institutionName);
+        startActivity(totask);
 
+    }
 }

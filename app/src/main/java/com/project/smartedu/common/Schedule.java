@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
+import com.project.smartedu.admin.Home;
 
 public class Schedule extends AppCompatActivity implements ActionBar.TabListener{
 
@@ -38,9 +39,9 @@ public class Schedule extends AppCompatActivity implements ActionBar.TabListener
         try {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_schedule);
-            mToolbar = (Toolbar) findViewById(R.id.toolbar);
+         /*   mToolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(mToolbar);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);*/
             //getSupportActionBar().setTitle("Schedule");
        /* drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
@@ -49,7 +50,7 @@ public class Schedule extends AppCompatActivity implements ActionBar.TabListener
             role = fromrole.getString("role");
 
             institutionName=fromrole.getString("institution_name");
-            Log.d("institution",institutionName);
+          //  Log.d("institution",institutionName);
 
 
             Tab = (ViewPager) findViewById(R.id.pager);
@@ -206,4 +207,31 @@ public class Schedule extends AppCompatActivity implements ActionBar.TabListener
 
     }
 
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent tohome;
+        if(role.equalsIgnoreCase("admin")){
+            tohome=new Intent(Schedule.this, Home.class);
+            tohome.putExtra("role",role);
+            tohome.putExtra("institution_name",institutionName);
+            startActivity(tohome);
+        }else if(role.equalsIgnoreCase("teacher")){
+            tohome=new Intent(Schedule.this, com.project.smartedu.teacher.Home.class);
+            tohome.putExtra("role",role);
+            tohome.putExtra("institution_name",institutionName);
+            startActivity(tohome);
+        }else if(role.equalsIgnoreCase("student")){
+            tohome=new Intent(Schedule.this, com.project.smartedu.student.Home.class);
+            tohome.putExtra("role",role);
+            tohome.putExtra("institution_name",institutionName);
+            startActivity(tohome);
+        }else if(role.equalsIgnoreCase("parent")){
+            tohome=new Intent(Schedule.this, com.project.smartedu.parent.Home.class);
+            tohome.putExtra("role",role);
+            tohome.putExtra("institution_name",institutionName);
+            startActivity(tohome);
+        }
+    }
 }

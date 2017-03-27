@@ -437,7 +437,7 @@ public class Schedule_days extends Fragment {
             Toast.makeText(getActivity(), "schedule added ", Toast.LENGTH_LONG).show();
             dialog.dismiss();
             Intent reload=new Intent(getActivity(), com.project.smartedu.common.Schedule.class);
-            reload.putExtra("institutionName",institutionName);
+            reload.putExtra("institution_name",institutionName);
             reload.putExtra("day", day);
             reload.putExtra("role", role);
             startActivity(reload);
