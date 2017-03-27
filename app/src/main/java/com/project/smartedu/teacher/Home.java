@@ -182,13 +182,13 @@ public class Home extends BaseActivity {
             super.onPostExecute(aVoid);
 
 
-            for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
+          /*  for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
                 String id=TeacherUserPrefs.allotments.get(x);
                 ArrayList<String> sbj=TeacherUserPrefs.subjectallotmentmap.get(id);
                 for(int i=0;i<sbj.size();i++){
                     Toast.makeText(getApplicationContext(),sbj.get(i)+" in "+id,Toast.LENGTH_LONG).show();
                 }
-            }
+            }*/
 
           //  Toast.makeText(getApplicationContext(),TeacherUserPrefs.subjectallotmentmap.get("NITJ_10_b").get(0),Toast.LENGTH_LONG).show();
 

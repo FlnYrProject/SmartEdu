@@ -33,6 +33,7 @@ import com.project.smartedu.Constants;
 import com.project.smartedu.R;
 import com.project.smartedu.UserPrefs;
 import com.project.smartedu.admin.AdminUserPrefs;
+import com.project.smartedu.admin.Home;
 import com.project.smartedu.database.Task;
 
 import java.text.DateFormat;
@@ -113,6 +114,7 @@ public class Tasks extends BaseActivity {
 
         Bundle fromhome= getIntent().getExtras();
         role = fromhome.getString("role");
+        institutionName=fromhome.getString("institution_name");
 
 
         //change to add task
@@ -121,6 +123,7 @@ public class Tasks extends BaseActivity {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(Tasks.this, NewTask.class);
+                i.putExtra("institution_name",institutionName);
                 i.putExtra("role", role);
                 startActivity(i);
             }
@@ -335,6 +338,7 @@ public class Tasks extends BaseActivity {
 
                                     dialog_in.dismiss();
                                     Intent reload=new Intent(Tasks.this,Tasks.class);
+                                    reload.putExtra("insitution_name",institutionName);
                                     reload.putExtra("role",role);
                                     startActivity(reload);
 
@@ -406,5 +410,33 @@ public class Tasks extends BaseActivity {
 
 
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent tohome;
+        if(role.equalsIgnoreCase("admin")){
+            tohome=new Intent(Tasks.this, Home.class);
+            tohome.putExtra("role",role);
+            tohome.putExtra("institution_name",institutionName);
+            startActivity(tohome);
+        }else if(role.equalsIgnoreCase("teacher")){
+            tohome=new Intent(Tasks.this, com.project.smartedu.teacher.Home.class);
+            tohome.putExtra("role",role);
+            tohome.putExtra("institution_name",institutionName);
+            startActivity(tohome);
+        }else if(role.equalsIgnoreCase("student")){
+            tohome=new Intent(Tasks.this, com.project.smartedu.student.Home.class);
+            tohome.putExtra("role",role);
+            tohome.putExtra("institution_name",institutionName);
+            startActivity(tohome);
+        }else if(role.equalsIgnoreCase("parent")){
+            tohome=new Intent(Tasks.this, com.project.smartedu.parent.Home.class);
+            tohome.putExtra("role",role);
+            tohome.putExtra("institution_name",institutionName);
+            startActivity(tohome);
+        }
+    }
+
 
 }
