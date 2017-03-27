@@ -22,14 +22,11 @@ import com.google.firebase.database.ValueEventListener;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.ImageAdapter;
-import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
 import com.project.smartedu.UserPrefs;
-import com.project.smartedu.admin.AdminUserPrefs;
 import com.project.smartedu.common.Schedule;
 import com.project.smartedu.common.Tasks;
 import com.project.smartedu.common.view_messages;
-import com.project.smartedu.database.*;
 import com.project.smartedu.database.Students;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
@@ -51,6 +48,10 @@ public class Home extends BaseActivity {
 
     ArrayList<String> taskLt;
     HashMap<String,String> taskidmap; //to map task to its  id
+
+    ArrayList<String> uploadLt;
+    HashMap<String,String> uploadidmap; //to map upload to its  id
+    HashMap<com.project.smartedu.database.Uploads,String> uploadkeymap;
 
     ArrayList<com.project.smartedu.database.Schedule> scheduleslt;
     HashMap<String,ArrayList<com.project.smartedu.database.Schedule>> schedulesmaplt;
@@ -199,6 +200,7 @@ public class Home extends BaseActivity {
                 public void run() {
                     pd.dismiss();
                     pd=null;
+                    //loadUploadData();
 
                 }
             }, 500);  // 100 milliseconds
@@ -817,6 +819,111 @@ public class Home extends BaseActivity {
         //end firebase_async_class
     }
 
+    private class UploadItems extends AsyncTask<Void, Void, Void> {
+
+        private Context async_context;
+        private ProgressDialog pd;
+
+        public UploadItems(Context context){
+            this.async_context = context;
+            pd = new ProgressDialog(async_context);
+            uploadLt=new ArrayList<>();
+
+            databaseReference = Constants.databaseReference.child(Constants.UPLOADS_TABLE).child(institutionName);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd.setMessage("Fetching Upload List");
+            pd.setCancelable(false);
+            pd.show();
+            //uploadLt.clear();
+            //uploadidmap.clear();
+            uploadkeymap.clear();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            final Object lock = new Object();
+
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    synchronized (lock) {
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                            HashMap<String, String> retUploadList = (HashMap<String, String>) ds.getValue();
+
+                            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+
+                            String upload_type = retUploadList.get("upload_type");
+                            String subject = retUploadList.get("subject");
+                            String topic = retUploadList.get("topic");
+                            String imageUrl = retUploadList.get("imageUrl");
+                            String teacher = retUploadList.get("teacher");
+                            Long date = Long.parseLong(retUploadList.get("date"));
+
+
+                            //String dateString = formatter.format(new Date(Long.parseLong(retUploadList.get("date"))));
+                            com.project.smartedu.database.Uploads upload = new com.project.smartedu.database.Uploads(upload_type, subject, topic, imageUrl, teacher, date);
+
+                            //String entry=retUploadList.get("upload_type")+ "\n" +retUploadList.get("subject") +"\n" +retUploadList.get("topic")+"\n" +retUploadList.get("imageUrl")+"\n" +retUploadList.get("teacher") + "\n" + dateString;
+                            //Log.d("key",key);
+                            uploadkeymap.put(upload, ds.getKey());
+                            //uploadidmap.put(entry,ds.getKey());
+                            //uploadLt.add(entry);
+
+                            //}
+
+
+
+                        }
+                        lock.notifyAll();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+
+            });
+
+
+            synchronized (lock){
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //Handles the stuff after the synchronisation with the firebase listener has been achieved
+            //The main UI is already idle by this moment
+            super.onPostExecute(aVoid);
+
+            //Show the log in progress_bar for at least a few milliseconds
+            Toast.makeText(getApplicationContext(),uploadLt.size() + " uploads found",Toast.LENGTH_LONG).show();
+
+            UserPrefs.uploadkeymap=uploadkeymap;
+           // UserPrefs.uploadidmap=uploadidmap;
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    pd.dismiss();
+                    pd=null;
+
+                }
+            }, 500);  // 100 milliseconds
+        }
+        //end firebase_async_class
+    }
+
 
 
 
@@ -836,7 +943,7 @@ public class Home extends BaseActivity {
 
 
 
- userPrefs=new UserPrefs(Home.this);
+        userPrefs=new UserPrefs(Home.this);
          teacherUserPrefs=new TeacherUserPrefs(Home.this);
             teacherUserPrefs.setInstituion(institutionName);
 
@@ -868,6 +975,10 @@ public class Home extends BaseActivity {
 
             schedulekeymap = UserPrefs.schedulekeymap;
             scheduleslt = new ArrayList<>();
+
+            //uploadLt = UserPrefs.uploadItems;
+            //uploadidmap = UserPrefs.uploadidmap;
+            uploadkeymap = UserPrefs.uploadkeymap;
 
         if(userPrefs.isFirstLoading()) {
             userPrefs.setFirstLoading(false);
@@ -1019,6 +1130,13 @@ public class Home extends BaseActivity {
 
        ScheduleItems scheduleasync = new ScheduleItems(Home.this);        //getschedule data
         scheduleasync.execute();
+
+    }
+
+    private void loadUploadData(){
+
+        UploadItems uploadasync = new UploadItems(Home.this);     //get upload data
+        uploadasync.execute();
 
     }
 

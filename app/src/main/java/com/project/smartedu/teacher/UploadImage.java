@@ -147,7 +147,7 @@ public class UploadImage extends ListActivity {
 
                     Intent to_upload_image = new Intent(UploadImage.this, UploadMaterial.class);
                     to_upload_image.putExtra("uploadId", uploadId);
-                    to_upload_image.putExtra("classId", classId);
+                    to_upload_image.putExtra("id", classId);
                     to_upload_image.putExtra("role", role);
                     to_upload_image.putExtra("institution_name", institutionName);
                     startActivity(to_upload_image);
@@ -535,7 +535,7 @@ public class UploadImage extends ListActivity {
         Intent i=new Intent(UploadImage.this,UploadMaterial.class);
         i.putExtra("institution_name",institutionName);
         i.putExtra("role", role);
-        i.putExtra("classId", classId);
+        i.putExtra("id", classId);
         startActivity(i);
     }
 
