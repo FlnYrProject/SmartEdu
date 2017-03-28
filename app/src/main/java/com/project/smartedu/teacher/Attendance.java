@@ -1,5 +1,6 @@
 package com.project.smartedu.teacher;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -69,7 +70,11 @@ public class Attendance extends BaseActivity {
     ListView lv;
     Model[] modelItems;
     Model[] modelItemsRetrieved;
+
     Button saveButton;
+    Button presentall;
+    Button absentall;
+
     CustomAdapter adapter;
 
     private FragmentDrawer drawerFragment;
@@ -90,6 +95,15 @@ public class Attendance extends BaseActivity {
 
     Spinner subjectSpinner;
     ArrayAdapter subjectadapter;
+
+
+    TextView confirm_message;
+    Button cancel;
+    Button proceed;
+
+    TextView total_count;
+    TextView present_count;
+    TextView present_percentage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,8 +137,10 @@ public class Attendance extends BaseActivity {
         drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar, role);
         drawerFragment.setDrawerListener(this);
-
-
+        presentall=(Button)findViewById(R.id.allpresent);
+        absentall=(Button)findViewById(R.id.allabsent);
+        presentall.setVisibility(View.INVISIBLE);
+        absentall.setVisibility(View.INVISIBLE);
 
         subjectadapter = new ArrayAdapter(Attendance.this, android.R.layout.simple_list_item_1, TeacherUserPrefs.subjectallotmentmap.get(classId));
         subjectSpinner.setAdapter(subjectadapter);
@@ -177,18 +193,298 @@ public class Attendance extends BaseActivity {
                         adapter = new CustomAdapter(Attendance.this, modelItems, classId);
                         studentList.setAdapter(adapter);
                         saveButton.setVisibility(View.VISIBLE);
+                        presentall.setVisibility(View.VISIBLE);
+                        absentall.setVisibility(View.VISIBLE);
 
 
                         saveButton.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                save();
+                                final Dialog attendance_details = new Dialog(Attendance.this);
+                                attendance_details.setContentView(R.layout.attendance_info);
+                                total_count = (TextView)  attendance_details.findViewById(R.id.total_students);
+                                present_count = (TextView)  attendance_details.findViewById(R.id.present_count);
+                                present_percentage = (TextView)  attendance_details.findViewById(R.id.present_percentage);
+                                cancel = (Button)  attendance_details.findViewById(R.id.cancelButton);
+                                proceed = (Button)  attendance_details.findViewById(R.id.proceedButton);
+                                total_count.setText(String.valueOf(studentLt.size()));
+
+                                int c=0;
+
+
+                                for (int i = 0; i < adapter.getCount(); i++) {
+                                    Model item = adapter.getItem(i);
+
+                                    if(!item.isChecked()) {
+
+                                       c++;
+                                    }
+
+                                }
+
+                                present_count.setText(String.valueOf(c));
+
+                                double percentage=(double) c/(double)studentLt.size();
+                                present_percentage.setText(String.valueOf(percentage));
+
+                               // confirm_message.setText("All Student in class would be marked PRESENT !! Click Proceed to continue !");
+                                attendance_details.show();
+                                proceed.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                       save();
+                                        attendance_details.dismiss();
+                                    }
+                                });
+
+                                cancel.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        attendance_details.dismiss();
+                                    }
+                                });
+
+
+
+
+
                             }
                         });
 
+                        presentall.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                                final Dialog confirm_allpresent = new Dialog(Attendance.this);
+                                confirm_allpresent.setContentView(R.layout.confirm_message);
+                                confirm_message = (TextView) confirm_allpresent.findViewById(R.id.confirm_message);
+                                cancel = (Button) confirm_allpresent.findViewById(R.id.cancelButton);
+                                proceed = (Button) confirm_allpresent.findViewById(R.id.proceedButton);
+                                confirm_message.setText("All Student in class would be marked PRESENT !! Click Proceed to continue !");
+                                confirm_allpresent.show();
+                                proceed.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        makeAllPresent();
+                                        confirm_allpresent.dismiss();
+                                    }
+                                });
+
+                                cancel.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        confirm_allpresent.dismiss();
+                                    }
+                                });
+
+
+                            }
+                        });
+
+
+                        absentall.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                final Dialog confirm_allabsent = new Dialog(Attendance.this);
+                                confirm_allabsent.setContentView(R.layout.confirm_message);
+                                confirm_message = (TextView) confirm_allabsent.findViewById(R.id.confirm_message);
+                                cancel = (Button) confirm_allabsent.findViewById(R.id.cancelButton);
+                                proceed = (Button) confirm_allabsent.findViewById(R.id.proceedButton);
+                                confirm_message.setText("All Student in class would be marked ABSENT !! Click Proceed to continue !");
+                                confirm_allabsent.show();
+                                proceed.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        makeAllAbsent();
+                                        confirm_allabsent.dismiss();
+                                    }
+                                });
+
+                                cancel.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        confirm_allabsent.dismiss();
+                                    }
+                                });
+                            }
+                        });
         }
 
     }
+
+
+    public void makeAllPresent(){
+
+
+        calendar = java.util.Calendar.getInstance();
+        //System.out.println("Current time =&gt; " + calendar.getTime());
+
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        final String string_current_date = df.format(calendar.getTime());
+
+        String[] date = string_current_date.trim().split("/");
+        final String[] datedetails = new String[3];
+        int j = 0;
+
+        for (String x : date) {
+            datedetails[j++] = x;
+        }
+
+        Day = Integer.parseInt(datedetails[0]);
+        Month = Integer.parseInt(datedetails[1]);
+        Year = Integer.parseInt(datedetails[2]);
+
+
+        final String string_date = String.valueOf(Day) + "-" + String.valueOf(Month) + "-" + String.valueOf(Year);
+        Toast.makeText(Attendance.this, "current date = " + Day + "/" + Month + "/" + Year, Toast.LENGTH_LONG).show();
+
+        SimpleDateFormat f = new SimpleDateFormat("dd-MM-yyyy");
+        Date d = null;
+        try {
+            d = f.parse(string_date);
+        } catch (java.text.ParseException e) {
+            e.printStackTrace();
+        }
+        final long newmilliseconds = d.getTime();
+
+        try {
+            //int checked=0;
+            String subject=subjectSpinner.getSelectedItem().toString();
+            for (int i = 0; i < adapter.getCount(); i++) {
+                Model item = adapter.getItem(i);
+                String stuentry=item.getName();
+                String studentid=localstumap.get(stuentry);
+
+
+                databasereference= Constants.databaseReference.child(Constants.STUDENTS_TABLE).child(institutionName).child(studentid).child("attendance").child(subject);
+
+                databasereference=databasereference.child(String.valueOf(newmilliseconds));
+//setting attendance bool to date
+
+                    databasereference.setValue("p");
+
+
+
+
+
+            }
+
+       /* if (checked==0)
+            Toast.makeText(getApplicationContext(), "None Selected", Toast.LENGTH_LONG).show();
+
+        else{ */
+
+
+
+
+
+            Intent task_intent = new Intent(Attendance.this, Classes.class);
+            task_intent.putExtra("institution_name", institutionName);
+            task_intent.putExtra("for","attendance");
+            task_intent.putExtra("role", role);
+            //task_intent.putExtra("id", classId);
+            startActivity(task_intent);
+
+        }
+
+        catch(
+                Exception ex
+                )
+
+        {
+            Toast.makeText(getApplicationContext(), "error: " + ex.getMessage(), Toast.LENGTH_LONG).show();
+            Log.d("user", "Error catch: " + ex.getMessage());
+        }
+
+
+    }
+
+
+
+    public void makeAllAbsent(){
+        calendar = java.util.Calendar.getInstance();
+        //System.out.println("Current time =&gt; " + calendar.getTime());
+
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        final String string_current_date = df.format(calendar.getTime());
+
+        String[] date = string_current_date.trim().split("/");
+        final String[] datedetails = new String[3];
+        int j = 0;
+
+        for (String x : date) {
+            datedetails[j++] = x;
+        }
+
+        Day = Integer.parseInt(datedetails[0]);
+        Month = Integer.parseInt(datedetails[1]);
+        Year = Integer.parseInt(datedetails[2]);
+
+
+        final String string_date = String.valueOf(Day) + "-" + String.valueOf(Month) + "-" + String.valueOf(Year);
+        Toast.makeText(Attendance.this, "current date = " + Day + "/" + Month + "/" + Year, Toast.LENGTH_LONG).show();
+
+        SimpleDateFormat f = new SimpleDateFormat("dd-MM-yyyy");
+        Date d = null;
+        try {
+            d = f.parse(string_date);
+        } catch (java.text.ParseException e) {
+            e.printStackTrace();
+        }
+        final long newmilliseconds = d.getTime();
+
+        try {
+            //int checked=0;
+            String subject=subjectSpinner.getSelectedItem().toString();
+            for (int i = 0; i < adapter.getCount(); i++) {
+                Model item = adapter.getItem(i);
+                String stuentry=item.getName();
+                String studentid=localstumap.get(stuentry);
+
+
+                databasereference= Constants.databaseReference.child(Constants.STUDENTS_TABLE).child(institutionName).child(studentid).child("attendance").child(subject);
+
+                databasereference=databasereference.child(String.valueOf(newmilliseconds));
+//setting attendance bool to date
+
+                databasereference.setValue("a");
+
+
+
+
+
+            }
+
+       /* if (checked==0)
+            Toast.makeText(getApplicationContext(), "None Selected", Toast.LENGTH_LONG).show();
+
+        else{ */
+
+
+
+
+
+            Intent task_intent = new Intent(Attendance.this, Classes.class);
+            task_intent.putExtra("institution_name", institutionName);
+            task_intent.putExtra("for","attendance");
+            task_intent.putExtra("role", role);
+            //task_intent.putExtra("id", classId);
+            startActivity(task_intent);
+
+        }
+
+        catch(
+                Exception ex
+                )
+
+        {
+            Toast.makeText(getApplicationContext(), "error: " + ex.getMessage(), Toast.LENGTH_LONG).show();
+            Log.d("user", "Error catch: " + ex.getMessage());
+        }
+    }
+
+
+
 
     public void save() {
 
