@@ -164,6 +164,7 @@ public class Students extends BaseActivity {
                     Intent to_student_info = new Intent(Students.this, StudentInfo.class);
                     to_student_info.putExtra("id", stuid);
                     to_student_info.putExtra("classId", classId);
+                    to_student_info.putExtra("institution_name",institutionName);
                     startActivity(to_student_info);
 
 

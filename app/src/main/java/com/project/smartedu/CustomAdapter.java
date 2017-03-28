@@ -31,6 +31,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import static android.graphics.Color.RED;
+import static android.graphics.Color.WHITE;
+
 public class CustomAdapter extends ArrayAdapter<Model> implements View.OnClickListener {
     Model[] modelItems = null;
     Context context;
@@ -58,6 +61,7 @@ public class CustomAdapter extends ArrayAdapter<Model> implements View.OnClickLi
     int Day;
     String role;
 
+    View mainView;
     public CustomAdapter(Context context, Model[] resource, String classId) {
         super(context, R.layout.list_row, resource);
         // TODO Auto-generated constructor stub
@@ -83,6 +87,7 @@ public class CustomAdapter extends ArrayAdapter<Model> implements View.OnClickLi
         if (convertView == null) {
 
             convertView = inflater.inflate(R.layout.list_row, parent, false);
+
             name = (TextView) convertView.findViewById(R.id.textView1);
             name.setOnClickListener(this);
             cb = (CheckBox) convertView.findViewById(R.id.checkBox1);
@@ -103,6 +108,9 @@ public class CustomAdapter extends ArrayAdapter<Model> implements View.OnClickLi
             cb.setChecked(true);
         else
             cb.setChecked(false);
+
+
+
 
         cb.setTag(item);
         return convertView;
@@ -186,6 +194,13 @@ public class CustomAdapter extends ArrayAdapter<Model> implements View.OnClickLi
                 Model model = (Model) cb.getTag();
                 model.setChecked(cb.isChecked());
 
+                if(cb.isChecked()) {
+                   v.setBackgroundColor(RED);
+
+
+                }else {
+                    v.setBackgroundColor(WHITE);
+                }
 
                 break;
 
