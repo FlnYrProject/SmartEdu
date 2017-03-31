@@ -27,6 +27,7 @@ import com.project.smartedu.UserPrefs;
 import com.project.smartedu.common.Schedule;
 import com.project.smartedu.common.Tasks;
 import com.project.smartedu.common.view_messages;
+import com.project.smartedu.database.Class;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
 
@@ -132,16 +133,15 @@ public class Home extends BaseActivity {
             super.onPostExecute(aVoid);
 
             //Show the log in progress_bar for at least a few milliseconds
-            Toast.makeText(getApplicationContext(), taskLt.size() + " tasks found", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), studentUserPrefs.getClassId() + " " + studentUserPrefs.getRollNumber(), Toast.LENGTH_LONG).show();
 
-            UserPrefs.taskItems = taskLt;
-            UserPrefs.taskidmap = taskidmap;
+
 
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
                     pd.dismiss();
-                    loadScheduleData();
+
                 }
             }, 500);  // 100 milliseconds
         }
@@ -445,6 +445,7 @@ public class Home extends BaseActivity {
 
                     noti_bar.setTexts(userPrefs.getUserName(), role,institutionName);
                     pd.dismiss();
+                    loadClassData();
 
                 }
             }, 500);  // 100 milliseconds
@@ -608,6 +609,14 @@ public class Home extends BaseActivity {
 
        ScheduleItems scheduleasync = new ScheduleItems(Home.this);        //get teacher data
         scheduleasync.execute();
+
+    }
+
+
+    private void loadClassData(){
+
+        ClassItem classasync = new ClassItem(Home.this);        //get teacher data
+        classasync.execute();
 
     }
 

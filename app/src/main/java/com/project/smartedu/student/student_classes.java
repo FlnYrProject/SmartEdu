@@ -78,11 +78,6 @@ public class student_classes extends BaseActivity {
             Toast.makeText(student_classes.this,"error " + create_error, Toast.LENGTH_LONG).show();
         }
 
-        //  myList = dbHandler.getAllTasks();
-
-        //Log.i("Anmol", "(Inside MainActivity) dbHandler.getAllTasks().toString() gives " + dbHandler.getAllTasks().toString());
-        //ListAdapter adapter = new CustomListAdapter(getApplicationContext(), dbHandler.getAllTasks());
-        //taskList.setAdapter(adapter);
 
 
 
@@ -91,7 +86,7 @@ public class student_classes extends BaseActivity {
 
 
 
-//        Log.d("classGradeid ", classGradeId);
+
 
         final HashMap<String,String> classMap=new HashMap<String,String>();
 
