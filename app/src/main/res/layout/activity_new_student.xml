@@ -106,23 +106,5 @@
         android:layout_above="@+id/studentAge"
         android:layout_alignParentStart="true" />
 
-    <EditText
-        android:layout_width="fill_parent"
-        android:layout_height="30dp"
-        android:id="@+id/rollno_desc"
-        android:background="#FFFFFF"
-        android:layout_above="@+id/studentAge"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="37dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Roll Number:"
-        android:id="@+id/rollno"
-        android:textSize="25sp"
-        android:textColor="#ffff"
-        android:layout_above="@+id/rollno_desc"
-        android:layout_alignParentStart="true" />
 </RelativeLayout>

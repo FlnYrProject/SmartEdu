@@ -31,7 +31,7 @@ public class TeacherUserPrefs {
 
     private static final String PREF_NAME = "TeacherUserDetails";
 
-    public static final String INSTITUION= "adminInst";
+    public static final String INSTITUION= "Inst";
 
 
 
@@ -79,16 +79,11 @@ public class TeacherUserPrefs {
         editor.commit();
       //  clearAllSavedData();
 
-        // After logout redirect user to Loing Activity
-        Intent i = new Intent(_context, LoginActivity.class);
-        // Closing all the Activities
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        allotments.clear();
+        subjectallotmentmap.clear();
+        studentsuseridLt.clear();
+        studentsHashMap.clear();
 
-        // Add new Flag to start new Activity
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        // Staring Login Activity
-        _context.startActivity(i);
     }
 
 
