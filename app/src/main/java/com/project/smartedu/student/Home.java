@@ -10,6 +10,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -22,6 +24,9 @@ import com.project.smartedu.Constants;
 import com.project.smartedu.ImageAdapter;
 import com.project.smartedu.R;
 import com.project.smartedu.UserPrefs;
+import com.project.smartedu.common.Schedule;
+import com.project.smartedu.common.Tasks;
+import com.project.smartedu.common.view_messages;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
 
@@ -46,7 +51,109 @@ public class Home extends BaseActivity {
     DatabaseReference databaseReference;
 
     UserPrefs userPrefs;
+    StudentUserPrefs studentUserPrefs;
     SwipeRefreshLayout swipeRefreshLayout;
+
+    String classId;
+
+
+
+
+
+
+
+
+    private class ClassItem extends AsyncTask<Void, Void, Void> {
+
+        private Context async_context;
+        private ProgressDialog pd;
+
+        public ClassItem(Context context) {
+            this.async_context = context;
+            pd = new ProgressDialog(async_context);
+
+            databaseReference = Constants.databaseReference.child(Constants.STUDENTS_TABLE).child(firebaseAuth.getCurrentUser().getUid());
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd.setMessage("Fetching Class");
+            pd.setCancelable(false);
+            pd.show();
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            final Object lock = new Object();
+
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    synchronized (lock) {
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+
+
+                            if(ds.getKey().equals("class")){
+                                    studentUserPrefs.setClassId(ds.getValue().toString());
+                            }
+
+                            if(ds.getKey().equals("roll_number")){
+                                studentUserPrefs.setRollNumber(Integer.parseInt(ds.getValue().toString()));
+                            }
+
+                        }
+                        lock.notifyAll();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+
+            });
+
+            synchronized (lock) {
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //Handles the stuff after the synchronisation with the firebase listener has been achieved
+            //The main UI is already idle by this moment
+            super.onPostExecute(aVoid);
+
+            //Show the log in progress_bar for at least a few milliseconds
+            Toast.makeText(getApplicationContext(), taskLt.size() + " tasks found", Toast.LENGTH_LONG).show();
+
+            UserPrefs.taskItems = taskLt;
+            UserPrefs.taskidmap = taskidmap;
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    pd.dismiss();
+                    loadScheduleData();
+                }
+            }, 500);  // 100 milliseconds
+        }
+        //end firebase_async_class
+    }
+
+
+
+
+
+
+
 
 
 
@@ -149,6 +256,9 @@ public class Home extends BaseActivity {
         }
         //end firebase_async_class
     }
+
+
+
 
 
     private class ScheduleItems extends AsyncTask<Void, Void, Void> {
@@ -262,6 +372,8 @@ public class Home extends BaseActivity {
     }
 
 
+
+
     private class NameItem extends AsyncTask<Void, Void, Void> {
 
         private Context async_context;
@@ -354,7 +466,8 @@ public class Home extends BaseActivity {
         institutionName = home.getStringExtra("institution_name");
 
         Log.d("user", role);
-        UserPrefs  userPrefs=new UserPrefs(Home.this);
+        userPrefs=new UserPrefs(Home.this);
+        studentUserPrefs=new StudentUserPrefs(Home.this);
 
            noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
         setupNotiBar();
@@ -401,7 +514,6 @@ public class Home extends BaseActivity {
         final GridView gridview = (GridView) findViewById(R.id.gridview);
         gridview.setAdapter(new ImageAdapter(getApplicationContext(), densityX, densityY, role));
 
-/*
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
@@ -410,24 +522,22 @@ public class Home extends BaseActivity {
                     Intent atten_intent = new Intent(Home.this, student_classes.class);
 
                     atten_intent.putExtra("role", role);
-                    atten_intent.putExtra("studentId", studentId);
-                    atten_intent.putExtra("classGradeId", classGradeId);
-                  
+                    atten_intent.putExtra("studentId",firebaseAuth.getCurrentUser().getUid());
+                    atten_intent.putExtra("classId", studentUserPrefs.getClassId());
                     atten_intent.putExtra("institution_name", institutionName);
                     atten_intent.putExtra("for", "attendance");
                     startActivity(atten_intent);
 
                 } else if (position == 1) {
                     Intent task_intent = new Intent(Home.this, Tasks.class);
-                  
                     task_intent.putExtra("institution_name", institutionName);
                     task_intent.putExtra("role", role);
                     startActivity(task_intent);
                 } else if (position == 2) {
                     Intent message_intent = new Intent(Home.this, view_messages.class);
                     message_intent.putExtra("role", role);
-                    message_intent.putExtra("classGradeId", classGradeId);
-                    message_intent.putExtra("studentId", studentId);
+                    message_intent.putExtra("classId", studentUserPrefs.getClassId());
+                    message_intent.putExtra("studentId",  studentUserPrefs.getClassId());
                     message_intent.putExtra("institution_name", institutionName);
                    
                     message_intent.putExtra("_for", "received");
@@ -443,10 +553,9 @@ public class Home extends BaseActivity {
                 } else if (position == 4) {
                     Intent exam_intent = new Intent(Home.this, student_exams.class);
                     exam_intent.putExtra("institution_name", institutionName);
-                   
                     exam_intent.putExtra("role", role);
-                    exam_intent.putExtra("classGradeId", classGradeId);
-                    exam_intent.putExtra("studentId", studentId);
+                    exam_intent.putExtra("classId", studentUserPrefs.getClassId());
+                    exam_intent.putExtra("studentId", studentUserPrefs.getClassId());
                     startActivity(exam_intent);
 
                 } else if (position == 5) {
@@ -454,7 +563,7 @@ public class Home extends BaseActivity {
                     upload_intent.putExtra("institution_name", institutionName);
                  
                     upload_intent.putExtra("role", role);
-                    upload_intent.putExtra("classGradeId", classGradeId);
+                    upload_intent.putExtra("classId",   studentUserPrefs.getClassId());
                     upload_intent.putExtra("for", "upload");
                     startActivity(upload_intent);
                 } else if (position == 6) {
@@ -465,7 +574,6 @@ public class Home extends BaseActivity {
                 }
             }
         });
-*/
 
     }
 

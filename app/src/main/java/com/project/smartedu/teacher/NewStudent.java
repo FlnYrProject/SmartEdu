@@ -1,5 +1,6 @@
 package com.project.smartedu.teacher;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -46,7 +47,7 @@ public class NewStudent extends BaseActivity {
     EditText studentName;
     EditText studentEmail;
     EditText studentAge;
-    EditText studentRno;
+
     NotificationBar noti_bar;
     String classId;
     String parentId;
@@ -63,6 +64,8 @@ public class NewStudent extends BaseActivity {
 
     int no_of_stu=0;
 
+    ProgressDialog pd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,16 +81,16 @@ public class NewStudent extends BaseActivity {
        role=from_students.getStringExtra("role");
         institutionName=from_students.getStringExtra("institution_name");
         no_of_stu=from_students.getIntExtra("no_of_stu",0);
-
+        pd=new ProgressDialog(NewStudent.this);
+        pd.setMessage("Adding Student");
         userPrefs=new UserPrefs(NewStudent.this);
         teacherUserPrefs=new TeacherUserPrefs(NewStudent.this);
 
         studentName=(EditText)findViewById(R.id.studentName);
         studentEmail = (EditText) findViewById(R.id.studentEmail);
         studentAge = (EditText) findViewById(R.id.studentAge);
-        studentRno= (EditText) findViewById(R.id.rollno_desc);
-        Button addStudentButton = (Button) findViewById(R.id.addStudentButton);
 
+        Button addStudentButton = (Button) findViewById(R.id.addStudentButton);
 
 
         noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
@@ -106,7 +109,7 @@ public class NewStudent extends BaseActivity {
                     Toast.makeText(getApplicationContext(), "Student details cannot be empty!", Toast.LENGTH_LONG).show();
                 } else {
 
-
+                    pd.show();
                     addStudentUser();
 
 
@@ -129,7 +132,7 @@ public class NewStudent extends BaseActivity {
 
     protected void addStudentUser()
     {
-        String password=name;
+        String password="qwerty";
 
 
         firebaseAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -154,6 +157,7 @@ public class NewStudent extends BaseActivity {
                     addStudent();
                 }else{
 
+                    pd.dismiss();
                     Toast.makeText(getApplicationContext(), "Student User Registration Unsuccessful ", Toast.LENGTH_LONG).show();
 
                 }
@@ -203,7 +207,7 @@ public class NewStudent extends BaseActivity {
 
     protected void addParentUser()
     {
-        String password=name;
+        String password="qwerty";
 
 
 
@@ -244,7 +248,7 @@ public class NewStudent extends BaseActivity {
 
 
                     Toast.makeText(getApplicationContext(), "Parent User Registration Unsuccessful ", Toast.LENGTH_LONG).show();
-
+                    pd.dismiss();
                 }
 
 
@@ -265,12 +269,14 @@ public class NewStudent extends BaseActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
+                    pd.dismiss();
                     Intent i = new Intent(NewStudent.this, Students.class);
                     i.putExtra("role",role);
                     i.putExtra("institution_name",institutionName);
                     i.putExtra("id", classId);
                     startActivity(i);
                 }else{
+                    pd.dismiss();
                     Toast.makeText(getApplicationContext(), "signed out due to some error,please sign in again", Toast.LENGTH_LONG).show();
                    teacherUserPrefs.clearTeacherDetails();
                     userPrefs.clearUserDetails();
