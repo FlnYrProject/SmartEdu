@@ -1,10 +1,13 @@
 package com.project.smartedu.teacher;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,11 +17,18 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.project.smartedu.Constants;
 import com.project.smartedu.R;
 
 import java.util.List;
@@ -28,7 +38,12 @@ import java.util.List;
 public class student_info extends Fragment{
 
     TextView studentName;
-    TextView studentAge;
+    TextView studentEmail;
+    TextView studentParentEmail;
+    TextView studentDob;
+    TextView studentContact;
+    TextView studentAddress;
+
     Button deleteStudent;
     String studentId;
     String classId;
@@ -39,6 +54,121 @@ public class student_info extends Fragment{
     Button cancel;
     Button proceed;
 
+    DatabaseReference databaseReference;
+
+
+
+
+
+
+
+
+    private class StudentDetailsItem extends AsyncTask<Void, Void, Void> {
+
+        private Context async_context;
+        private ProgressDialog pd;
+
+        public StudentDetailsItem(Context context){
+            this.async_context = context;
+            pd.setMessage("Loading Data...");
+            pd = new ProgressDialog(async_context);
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd.setMessage("Fetching Data");
+            pd.setCancelable(false);
+            pd.show();
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            final Object lock = new Object();
+            databaseReference = Constants.databaseReference.child(Constants.USER_DETAILS_TABLE).child(studentId);
+
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    synchronized (lock) {
+                        for(DataSnapshot ds:dataSnapshot.getChildren()) {
+                            if(ds.getKey().equals("name")) {
+                                studentName.setText(ds.getValue().toString());
+                            }
+
+                            if(ds.getKey().equals("dob")) {
+                                studentDob.setText(ds.getValue().toString());
+                            }
+
+
+
+                            if(ds.getKey().equals("address")) {
+                                studentAddress.setText(ds.getValue().toString());
+                            }
+
+                            if(ds.getKey().equals("contact")) {
+                                studentContact.setText(ds.getValue().toString());
+                            }
+
+
+
+                            if(ds.getKey().equals("parent_email")) {
+                                studentParentEmail.setText(ds.getValue().toString());
+                            }
+                        }
+                        lock.notifyAll();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+
+            });
+
+            synchronized (lock){
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //Handles the stuff after the synchronisation with the firebase listener has been achieved
+            //The main UI is already idle by this moment
+            super.onPostExecute(aVoid);
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    //  Toast.makeText(async_context,userPrefs.getUserName(),Toast.LENGTH_LONG).show();
+
+
+                    pd.dismiss();
+
+                }
+            }, 500);  // 100 milliseconds
+
+
+        }
+        //end firebase_async_class
+    }
+
+
+
+
+
+
+
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -48,13 +178,22 @@ public class student_info extends Fragment{
         classId= getArguments().getString("classId");
         institutionName=getArguments().getString("institution_node");
         studentName=(TextView)android.findViewById(R.id.student_name);
-        studentAge=(TextView)android.findViewById(R.id.student_age);
+   //     studentEmail=(TextView)android.findViewById(R.id.student_email);
+        studentParentEmail=(TextView)android.findViewById(R.id.student_parentemail);
+        studentDob=(TextView)android.findViewById(R.id.student_dob);
+        studentContact=(TextView)android.findViewById(R.id.student_contact);
+        studentAddress=(TextView)android.findViewById(R.id.student_address);
+
         deleteStudent=(Button)android.findViewById(R.id.delete_student);
 
 
         com.project.smartedu.database.Students student=TeacherUserPrefs.studentsHashMap.get(studentId);
-        studentName.setText(student.getName());
-      //  studentAge.setText(u.getNumber(StudentTable.STUDENT_AGE).toString());
+
+
+
+
+        StudentDetailsItem studentDetailsItem = new StudentDetailsItem(getContext());     //get upload data
+       studentDetailsItem.execute();
 
 
 

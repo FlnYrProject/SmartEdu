@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -125,6 +126,8 @@ String institutionName;
         ifadmin = false;
         institutionName=null;
 
+
+
         if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
 
             Toast.makeText(getApplicationContext(), "Fields left blank", Toast.LENGTH_LONG).show();
@@ -132,19 +135,19 @@ String institutionName;
 
         } else {
 
-
+            Log.d("inds","ohoo");
             firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
 
                     if (task.isSuccessful()) {
-
+                        Log.d("inds","ohoo2");
 
                         Toast.makeText(getApplicationContext(), "User Login Successful", Toast.LENGTH_LONG).show();
                         adminCheck();
 
                     } else {
-
+                        Log.d("inds","ohoo3");
                         Toast.makeText(getApplicationContext(), "User Login Failed", Toast.LENGTH_LONG).show();
                         progressDialog.dismiss();
 
@@ -179,7 +182,7 @@ String institutionName;
                         if (ds.getKey().equals(firebaseAuth.getCurrentUser().getUid())) {
                             ifadmin = true;
                             institutionName = ds.getValue().toString();
-                        //    Log.d("inds",ifadmin + institutionName);
+                         Log.d("inds",ifadmin + institutionName);
                             break;
                         }
 

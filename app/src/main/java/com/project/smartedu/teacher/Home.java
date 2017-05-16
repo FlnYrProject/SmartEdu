@@ -770,10 +770,23 @@ public class Home extends BaseActivity {
                     synchronized (lock) {
                         for(DataSnapshot ds:dataSnapshot.getChildren()) {
                             if(ds.getKey().equals("name")) {
-  //                              Toast.makeText(async_context,"done",Toast.LENGTH_LONG).show();
-
                                 userPrefs.setUserName(ds.getValue().toString());
+                            }
 
+                            if(ds.getKey().equals("dob")) {
+                                userPrefs.setUserDob(ds.getValue().toString());
+                            }
+
+                            if(ds.getKey().equals("address")) {
+                                userPrefs.setUserAddress(ds.getValue().toString());
+                            }
+
+                            if(ds.getKey().equals("contact")) {
+                                userPrefs.setUserContact(ds.getValue().toString());
+                            }
+
+                            if(ds.getKey().equals("parent_name")) {
+                                userPrefs.setUserParentName(ds.getValue().toString());
                             }
                         }
                         lock.notifyAll();
@@ -806,7 +819,7 @@ public class Home extends BaseActivity {
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
-//                   Toast.makeText(async_context,userPrefs.getUserName(),Toast.LENGTH_LONG).show();
+                    //  Toast.makeText(async_context,userPrefs.getUserName(),Toast.LENGTH_LONG).show();
 
                     noti_bar.setTexts(userPrefs.getUserName(), role,institutionName);
                     pd.dismiss();
@@ -818,6 +831,9 @@ public class Home extends BaseActivity {
         }
         //end firebase_async_class
     }
+
+
+
 
     private class UploadItems extends AsyncTask<Void, Void, Void> {
 

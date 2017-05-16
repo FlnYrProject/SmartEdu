@@ -761,10 +761,23 @@ public class Home extends BaseActivity{
                     synchronized (lock) {
                         for(DataSnapshot ds:dataSnapshot.getChildren()) {
                             if(ds.getKey().equals("name")) {
-                    //            Toast.makeText(async_context,"done",Toast.LENGTH_LONG).show();
-
                                 userPrefs.setUserName(ds.getValue().toString());
+                            }
 
+                            if(ds.getKey().equals("dob")) {
+                                userPrefs.setUserDob(ds.getValue().toString());
+                            }
+
+                            if(ds.getKey().equals("address")) {
+                                userPrefs.setUserAddress(ds.getValue().toString());
+                            }
+
+                            if(ds.getKey().equals("contact")) {
+                                userPrefs.setUserContact(ds.getValue().toString());
+                            }
+
+                            if(ds.getKey().equals("parent_name")) {
+                                userPrefs.setUserParentName(ds.getValue().toString());
                             }
                         }
                         lock.notifyAll();

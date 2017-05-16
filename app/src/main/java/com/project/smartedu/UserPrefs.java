@@ -34,6 +34,14 @@ public class UserPrefs {
 
     public static final String USER_NAME = "name";
 
+    public static final String USER_DOB="dateofbirth";
+
+    public static final String USER_ADDRESS="address";
+
+    public static final String USER_CONTACT="contact";
+
+    public static final String USER_PARENT_NAME="parentname";
+
     public static final String USER_EMAIL = "email";
 
     public static final String USER_PASSWORD = "password";
@@ -76,12 +84,13 @@ public class UserPrefs {
     }
 
 
-    public void setUserDetails(String userid, String name, String email, String password){
+    public void setUserDetails(String userid, String name,String email, String password){
         // Storing login value as TRUE
         editor.putBoolean(IS_LOGIN, true);
 
         // Storing name in pref
         editor.putString(USER_NAME, name);
+
 
         // Storing email in pref
         editor.putString(USER_EMAIL, email);
@@ -156,12 +165,36 @@ public class UserPrefs {
     public String getUserName(){
         return pref.getString(USER_NAME,null);
     }
+    public String getUserDob(){ return pref.getString(USER_DOB,null);}
+    public String getUserAddress(){ return pref.getString(USER_ADDRESS,null);}
+    public String getUserContact(){ return pref.getString(USER_CONTACT,null);}
+    public String getUserParentName(){ return pref.getString(USER_PARENT_NAME,null);}
     public String getUserEmail() { return pref.getString(USER_EMAIL,null);}
     public String getUserPassword() { return  pref.getString(USER_PASSWORD,null);}
 
 
     public void setUserName(String name){
         editor.putString(USER_NAME, name);
+        editor.commit();
+    }
+
+    public void setUserDob(String dob){
+        editor.putString(USER_DOB, dob);
+        editor.commit();
+    }
+
+    public void setUserAddress(String address){
+        editor.putString(USER_ADDRESS, address);
+        editor.commit();
+    }
+
+    public void setUserContact(String contact){
+        editor.putString(USER_CONTACT, contact);
+        editor.commit();
+    }
+
+    public void setUserParentName(String parentName){
+        editor.putString(USER_PARENT_NAME, parentName);
         editor.commit();
     }
 

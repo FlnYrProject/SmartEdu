@@ -29,6 +29,7 @@ import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
+import com.project.smartedu.UserPrefs;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,23 +38,25 @@ import java.util.Objects;
 public class NewTeacher extends BaseActivity {
 
     String name;
-
-    int age=0;
-    int serial;
     String email;
+    String dob;
+    String address;
+    String contact;
+    String parentname;
+
+    int serial;
+
 
     Button addTeacherButton;
     EditText teacherName;
-    EditText teacherAge;
     EditText teacheremail;
+    EditText teacherdob;
+    EditText teacheraddress;
+    EditText teachercontact;
+    EditText teacherparent;
 
 
-    String classId;
-    String parentId;
-    String studentId;
-
-    EditText admin_pass;
-    Button ok;
+    String admin_pass;
 
     DatabaseReference databaseReference;
 
@@ -61,7 +64,9 @@ public class NewTeacher extends BaseActivity {
     FirebaseUser teacherfirebaseUser;
 
 
-    String pass,admin_email;
+    String admin_email;
+
+    UserPrefs userPrefs;
 
 
     @Override
@@ -79,10 +84,16 @@ public class NewTeacher extends BaseActivity {
         firebaseUser=firebaseAuth.getCurrentUser();
 
 
+        userPrefs=new UserPrefs(NewTeacher.this);
 
         teacherName = (EditText) findViewById(R.id.teacherName);
-        teacherAge = (EditText) findViewById(R.id.teacherAge);
         teacheremail=(EditText) findViewById(R.id.teacheremail);
+        teacherdob = (EditText) findViewById(R.id.teacherdob);
+        teachercontact = (EditText) findViewById(R.id.teachercontact);
+        teacheraddress=(EditText) findViewById(R.id.teacheraddress);
+        teacherparent=(EditText) findViewById(R.id.teacherparentname);;
+
+
         addTeacherButton = (Button) findViewById(R.id.addTeacherButton);
 
 
@@ -90,13 +101,17 @@ public class NewTeacher extends BaseActivity {
             @Override
             public void onClick(View v) {
                 name = teacherName.getText().toString().trim();
-                age = Integer.parseInt(teacherAge.getText().toString().trim());
                 email =teacheremail.getText().toString();
+                dob=teacherdob.getText().toString();
+                contact=teachercontact.getText().toString();
+                address=teacheraddress.getText().toString();
+                parentname=teacherparent.getText().toString();
 
 
-                if (name.equals(null) || (age == 0) ) {
+                if (name.equals(null) || email.equals(null) || dob.equals(null) || contact.equals(null) || address.equals(null) || parentname.equals(null) ) {
                     Toast.makeText(getApplicationContext(), "Teacher details cannot be empty!", Toast.LENGTH_LONG).show();
                 } else {
+/*
 
                     final Dialog enter_password_dialog = new Dialog(NewTeacher.this);
                     enter_password_dialog.setContentView(R.layout.enter_password);
@@ -107,8 +122,30 @@ public class NewTeacher extends BaseActivity {
 
                     ok = (Button) enter_password_dialog.findViewById(R.id.done);
                     enter_password_dialog.show();
+*/
 
-                    ok.setOnClickListener(new View.OnClickListener() {
+                    admin_pass = userPrefs.getUserPassword();
+                    admin_email=firebaseUser.getEmail();
+
+                    firebaseAuth.signInWithEmailAndPassword(admin_email,admin_pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+
+                            if(task.isSuccessful()){
+
+                                addTeacherUser(name,dob,contact,address,parentname,email, firebaseUser);
+                                sleep(3000);
+
+                            }else{
+
+                                Toast.makeText(getApplicationContext(),"Incorrect Authentication",Toast.LENGTH_LONG).show();
+
+                            }
+
+                        }
+                    });
+
+                   /* ok.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
 
@@ -135,7 +172,7 @@ public class NewTeacher extends BaseActivity {
 
 
                         }
-                    });
+                    });*/
 
 
 
@@ -158,10 +195,10 @@ public class NewTeacher extends BaseActivity {
     }
 
 
-    protected void addTeacherUser(final String Name,int Age,String email, final FirebaseUser prefirebaseuser)
+    protected void addTeacherUser(final String Name,final String DOB,final String contact,final String address, final String parentname, String email, final FirebaseUser prefirebaseuser)
     {
 
-        String password=institutionName + Name + institutionName;
+        String password="qwerty";
 
 
         firebaseAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -173,6 +210,11 @@ public class NewTeacher extends BaseActivity {
                     databaseReference = Constants.databaseReference.child(Constants.USER_DETAILS_TABLE);
                     teacherfirebaseUser = firebaseAuth.getCurrentUser();
                     databaseReference.child(teacherfirebaseUser.getUid()).child("name").setValue(Name);
+                    databaseReference.child(teacherfirebaseUser.getUid()).child("address").setValue(address);
+                    databaseReference.child(teacherfirebaseUser.getUid()).child("dob").setValue(DOB);
+                    databaseReference.child(teacherfirebaseUser.getUid()).child("contact").setValue(contact);
+                    databaseReference.child(teacherfirebaseUser.getUid()).child("parent_name").setValue(parentname);
+
                     DatabaseReference dataReference = databaseReference.child(teacherfirebaseUser.getUid()).child("role").child("teacher").push();
                     dataReference.setValue(institutionName);
 
@@ -205,23 +247,7 @@ public class NewTeacher extends BaseActivity {
     protected void addTeacher(FirebaseUser firebaseUser){
 
         databaseReference = Constants.databaseReference.child(Constants.TEACHER_TABLE).child(institutionName);
-/*
 
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                HashMap<String, Object> teachermap=(HashMap<String, Object>)dataSnapshot.getValue();
-
-                    serial=teachermap.size()  ;
-                Toast.makeText(getApplicationContext(), " serial = " + serial, Toast.LENGTH_LONG).show();
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });*/
 
         serial=AdminUserPrefs.teacherLt.size()+1;
 
@@ -242,7 +268,7 @@ public class NewTeacher extends BaseActivity {
 
    protected void loginAdminBack(){
 
-       firebaseAuth.signInWithEmailAndPassword(admin_email,pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+       firebaseAuth.signInWithEmailAndPassword(admin_email,admin_pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
            @Override
            public void onComplete(@NonNull Task<AuthResult> task) {
                if(task.isSuccessful()){

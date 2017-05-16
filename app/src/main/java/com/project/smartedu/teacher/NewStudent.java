@@ -41,12 +41,20 @@ public class NewStudent extends BaseActivity {
     private Toolbar mToolbar;
     String name;
     String email;
-    int age;
+    String dob;
+    String address;
+    String contact;
+    String parentname;
+    String parentemail;
     int rollno= -1;
 
     EditText studentName;
     EditText studentEmail;
-    EditText studentAge;
+    EditText studentdob;
+    EditText studentaddress;
+    EditText studentcontact;
+    EditText studentparent;
+    EditText studentparentemail;
 
     NotificationBar noti_bar;
     String classId;
@@ -87,10 +95,15 @@ public class NewStudent extends BaseActivity {
         teacherUserPrefs=new TeacherUserPrefs(NewStudent.this);
 
         studentName=(EditText)findViewById(R.id.studentName);
-        studentEmail = (EditText) findViewById(R.id.studentEmail);
-        studentAge = (EditText) findViewById(R.id.studentAge);
+        studentEmail = (EditText) findViewById(R.id.studentemail);
+        studentdob = (EditText) findViewById(R.id.studentdob);
+        studentcontact=(EditText)findViewById(R.id.studentcontact);
+        studentaddress = (EditText) findViewById(R.id.studentaddress);
+        studentparent = (EditText) findViewById(R.id.studentparentname);
+        studentparentemail=(EditText)findViewById(R.id.studentparentemail);
 
-        Button addStudentButton = (Button) findViewById(R.id.addStudentButton);
+
+        Button addStudentButton = (Button) findViewById(R.id.addstudentButton);
 
 
         noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
@@ -102,10 +115,16 @@ public class NewStudent extends BaseActivity {
             public void onClick(View v) {
                 name=studentName.getText().toString().trim();
                 email = studentEmail.getText().toString().trim();
-                age = Integer.parseInt(studentAge.getText().toString().trim());
+                dob=studentName.getText().toString().trim();
+                address = studentEmail.getText().toString().trim();
+                contact=studentName.getText().toString().trim();
+                parentemail = studentEmail.getText().toString().trim();
+                parentname=studentName.getText().toString().trim();
+
+
                 rollno = no_of_stu+1;
 
-                if ( name.equals(null) || email.equals(null) || (age == 0) ) {
+                if ( name.equals(null) || email.equals(null) || dob.equals(null) || address.equals(null) || contact.equals(null) || parentname.equals(null) || parentemail.equals(null) || email.equals(null)  ) {
                     Toast.makeText(getApplicationContext(), "Student details cannot be empty!", Toast.LENGTH_LONG).show();
                 } else {
 
@@ -145,6 +164,12 @@ public class NewStudent extends BaseActivity {
                     studentfirebaseUser = firebaseAuth.getCurrentUser();
                     studentuid=firebaseAuth.getCurrentUser().getUid();
                     databaseReference.child(studentfirebaseUser.getUid()).child("name").setValue(name);
+                    databaseReference.child(studentfirebaseUser.getUid()).child("address").setValue(address);
+                    databaseReference.child(studentfirebaseUser.getUid()).child("dob").setValue(dob);
+                    databaseReference.child(studentfirebaseUser.getUid()).child("contact").setValue(contact);
+                    databaseReference.child(studentfirebaseUser.getUid()).child("parent_name").setValue(parentname);
+                    databaseReference.child(studentfirebaseUser.getUid()).child("parent_email").setValue(parentemail);
+
                     DatabaseReference dataReference = databaseReference.child(studentfirebaseUser.getUid()).child("role").child("student").push();
                     dataReference.setValue(institutionName);
 
@@ -211,7 +236,7 @@ public class NewStudent extends BaseActivity {
 
 
 
-        firebaseAuth.createUserWithEmailAndPassword("p"+email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        firebaseAuth.createUserWithEmailAndPassword(parentemail,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
 
@@ -219,7 +244,9 @@ public class NewStudent extends BaseActivity {
 
                     databaseReference = Constants.databaseReference.child(Constants.USER_DETAILS_TABLE);
                     parentfirebaseuser = firebaseAuth.getCurrentUser();
-                    databaseReference.child( parentfirebaseuser.getUid()).child("name").setValue(name);
+                    databaseReference.child( parentfirebaseuser.getUid()).child("name").setValue(parentname);
+                    databaseReference.child( parentfirebaseuser.getUid()).child("address").setValue(address);
+                    databaseReference.child( parentfirebaseuser.getUid()).child("contact").setValue(contact);
                     DatabaseReference dataReference = databaseReference.child( parentfirebaseuser.getUid()).child("role").child("parent").push();
                     dataReference.setValue(studentuid);
 
