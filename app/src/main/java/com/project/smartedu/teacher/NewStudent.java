@@ -115,11 +115,11 @@ public class NewStudent extends BaseActivity {
             public void onClick(View v) {
                 name=studentName.getText().toString().trim();
                 email = studentEmail.getText().toString().trim();
-                dob=studentName.getText().toString().trim();
-                address = studentEmail.getText().toString().trim();
-                contact=studentName.getText().toString().trim();
-                parentemail = studentEmail.getText().toString().trim();
-                parentname=studentName.getText().toString().trim();
+                dob=studentdob.getText().toString().trim();
+                address = studentaddress.getText().toString().trim();
+                contact=studentcontact.getText().toString().trim();
+                parentemail = studentparentemail.getText().toString().trim();
+                parentname=studentparentemail.getText().toString().trim();
 
 
                 rollno = no_of_stu+1;

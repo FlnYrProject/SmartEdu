@@ -70,9 +70,9 @@ public class student_info extends Fragment{
 
         public StudentDetailsItem(Context context){
             this.async_context = context;
-            pd.setMessage("Loading Data...");
-            pd = new ProgressDialog(async_context);
 
+            pd = new ProgressDialog(async_context);
+            pd.setMessage("Loading Data...");
         }
 
         @Override
