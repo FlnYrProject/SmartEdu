@@ -1,7 +1,11 @@
 package com.project.smartedu.teacher;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,7 +19,10 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -66,6 +73,229 @@ public class teacher_message extends BaseActivity {
     UserPrefs userPrefs;
     TeacherUserPrefs teacherUserPrefs;
 
+
+    ArrayList<String> recipientLt;
+
+
+    ArrayList<String> sturecipients;
+
+    ProgressDialog progressDialog;
+
+
+
+
+
+
+
+
+    private class BroadcastParentItems extends AsyncTask<Void, Void, Void> {
+
+        private Context async_context;
+
+
+        public BroadcastParentItems(Context context){
+            this.async_context = context;
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            recipientLt.clear();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            final Object lock = new Object();
+
+
+
+            for(int x=0;x<TeacherUserPrefs.studentsuseridLt.size();x++){
+
+                String studentid=TeacherUserPrefs.studentsuseridLt.get(x);
+                com.project.smartedu.database.Students student=TeacherUserPrefs.studentsHashMap.get(studentid);
+
+
+                if(student.getClass_id().equals(classId)){
+
+
+
+
+                    databaseReference=Constants.databaseReference.child(Constants.PARENT_RELATION_TABLE).child(studentid);
+
+                    databaseReference.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+                            synchronized (lock) {
+                                recipientLt.add(dataSnapshot.getValue().toString());
+
+
+
+                                lock.notifyAll();
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    synchronized (lock){
+                        try {
+                            lock.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+
+            }
+
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //Handles the stuff after the synchronisation with the firebase listener has been achieved
+            //The main UI is already idle by this moment
+            super.onPostExecute(aVoid);
+
+           sendMessage();
+
+            Toast.makeText(teacher_message.this, "Message Successfully Broadcasted to Parents", Toast.LENGTH_LONG).show();
+progressDialog.dismiss();
+        }
+        //end firebase_async_class
+    }
+
+
+
+
+
+
+
+
+
+
+
+    private class ParentItems extends AsyncTask<Void, Void, Void> {
+
+        private Context async_context;
+
+
+        public ParentItems(Context context){
+            this.async_context = context;
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            recipientLt.clear();
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            final Object lock = new Object();
+
+
+for(int x=0;x<sturecipients.size();x++){
+    String studentid=sturecipients.get(x);
+    databaseReference=Constants.databaseReference.child(Constants.PARENT_RELATION_TABLE).child(studentid);
+
+    databaseReference.addValueEventListener(new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+            synchronized (lock) {
+                Log.d("pid",dataSnapshot.toString());
+                recipientLt.add(dataSnapshot.getValue().toString());
+                lock.notifyAll();
+            }
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    });
+
+    synchronized (lock){
+        try {
+            lock.wait();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+
+
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //Handles the stuff after the synchronisation with the firebase listener has been achieved
+            //The main UI is already idle by this moment
+            super.onPostExecute(aVoid);
+
+            sendMessage();
+            progressDialog.dismiss();
+
+            Toast.makeText(teacher_message.this, "Message Successfully Sent to Parents", Toast.LENGTH_LONG).show();
+
+        }
+        //end firebase_async_class
+    }
+
+
+
+
+
+
+
+
+
+
+    public void  sendMessage(){
+
+        java.util.Calendar calendar = Calendar.getInstance();
+        long millis=calendar.getTimeInMillis();
+
+        for(int x=0;x<recipientLt.size();x++){
+
+            String client_userid=recipientLt.get(x);
+            databaseReference= Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child("sent").child(client_userid).push();
+            databaseReference.child("content").setValue(message.getText().toString());
+            databaseReference.child("time").setValue(String.valueOf(millis));
+
+        }
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,7 +338,11 @@ public class teacher_message extends BaseActivity {
 
 
 
-
+recipientLt=new ArrayList<>();
+        sturecipients=new ArrayList<>();
+        progressDialog=new ProgressDialog(teacher_message.this);
+        progressDialog.setCancelable(false);
+        progressDialog.setMessage("Sending...");
 
         studentLt = new ArrayList<String>();
         localstumap=new HashMap<>();
@@ -206,6 +440,7 @@ public class teacher_message extends BaseActivity {
         message = (EditText)marks_add.findViewById(R.id.message);
         sendmessage=(Button)marks_add.findViewById(R.id.send_message);
 
+        marks_add.show();
         sendmessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -217,6 +452,7 @@ public class teacher_message extends BaseActivity {
                 {
 
 
+                    progressDialog.show();
 
 
                     if(role.getSelectedItem().equals("Student"))
@@ -224,6 +460,8 @@ public class teacher_message extends BaseActivity {
 
                         ArrayList<String> studentLt = new ArrayList<String>();
                         localstumap=new HashMap<>();
+
+
 
                         for(int x=0;x<TeacherUserPrefs.studentsuseridLt.size();x++){
 
@@ -247,8 +485,7 @@ public class teacher_message extends BaseActivity {
 
                                 databaseReference.child("time").setValue(String.valueOf(calendar.getTimeInMillis()));
 
-                                marks_add.dismiss();
-                                Toast.makeText(teacher_message.this, "Message Successfully Broadcasted to Students", Toast.LENGTH_LONG).show();
+
 
 
 
@@ -258,63 +495,19 @@ public class teacher_message extends BaseActivity {
 
 
                         }
+                        Toast.makeText(teacher_message.this, "Message Successfully Broadcasted to Students", Toast.LENGTH_LONG).show();
+marks_add.dismiss();
 
 
-
-
+progressDialog.dismiss();
 
 
                     }else       //if parent selected
                     {
 
-
-
-                        localstumap=new HashMap<>();
-
-                        for(int x=0;x<TeacherUserPrefs.studentsuseridLt.size();x++){
-
-                            String studentid=TeacherUserPrefs.studentsuseridLt.get(x);
-                            com.project.smartedu.database.Students student=TeacherUserPrefs.studentsHashMap.get(studentid);
-
-
-                            if(student.getClass_id().equals(classId)){
-
-
-
-
-                                String client_userid = studentid;
-
-                                databaseReference= Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child("sent").child(client_userid).push();
-
-
-
-                                databaseReference.child("content").setValue(message.getText().toString());
-
-                                java.util.Calendar calendar = Calendar.getInstance();
-
-
-                                databaseReference.child("time").setValue(String.valueOf(calendar.getTimeInMillis()));
-
-                                marks_add.dismiss();
-                                Toast.makeText(teacher_message.this, "Message Successfully Broadcasted to Students", Toast.LENGTH_LONG).show();
-
-
-
-                            }
-
-
-
-
-                        }
-
-
-
-
-
-
-
-
-
+                        BroadcastParentItems broadcastParentItems=new BroadcastParentItems(teacher_message.this);
+                        broadcastParentItems.execute();
+                        marks_add.dismiss();
 
                     }
                 }
@@ -360,9 +553,14 @@ public class teacher_message extends BaseActivity {
             message = (EditText) marks_add.findViewById(R.id.message);
             sendmessage = (Button) marks_add.findViewById(R.id.send_message);
 
+
+            marks_add.show();
+
             sendmessage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
+                    sturecipients.clear();
 
                     if (message.getText().equals("") || role.getSelectedItem().toString().equals("")) {
                         Toast.makeText(getApplicationContext(), "no message", Toast.LENGTH_LONG).show();
@@ -377,13 +575,16 @@ public class teacher_message extends BaseActivity {
 
                                 String stuentry=item.getName();
                                 String studentid=localstumap.get(stuentry);
-                                giveMessage(studentid, role.getSelectedItem().toString());
-                                marks_add.dismiss();
+                                sturecipients.add(studentid);
+
 
 
                             }
 
                         }
+
+                        giveMessage(role.getSelectedItem().toString());
+                        marks_add.dismiss();
 
                     }
                 }
@@ -395,39 +596,31 @@ public class teacher_message extends BaseActivity {
 
 
 
-    protected void giveMessage(String studentid,String to_role)
+    protected void giveMessage(String to_role)
     {
+        progressDialog.show();
         if(to_role.equals("Student")) {
 
 
+            for(int x=0;x<sturecipients.size();x++){
+                String client_userid = sturecipients.get(x);
+                databaseReference= Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child("sent").child(client_userid).push();
+                databaseReference.child("content").setValue(message.getText().toString());
+                java.util.Calendar calendar = Calendar.getInstance();
+                databaseReference.child("time").setValue(String.valueOf(calendar.getTimeInMillis()));
+
+            }
 
 
-            String client_userid = studentid;
-
-            databaseReference= Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child("sent").child(client_userid).push();
-
-
-
-            databaseReference.child("content").setValue(message.getText().toString());
-            java.util.Calendar calendar = Calendar.getInstance();
-            databaseReference.child("time").setValue(String.valueOf(calendar.getTimeInMillis()));
+progressDialog.dismiss();
 
             Toast.makeText(teacher_message.this, "Message Successfully Sent to Student", Toast.LENGTH_LONG).show();
 
         }else       //if parent selected
         {
 
-            String client_userid = studentid;
-
-            databaseReference= Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child("sent").child(client_userid).push();
-
-
-
-            databaseReference.child("content").setValue(message.getText().toString());
-            java.util.Calendar calendar = Calendar.getInstance();
-            databaseReference.child("time").setValue(String.valueOf(calendar.getTimeInMillis()));
-
-            Toast.makeText(teacher_message.this, "Message Successfully Sent to Parent", Toast.LENGTH_LONG).show();
+           ParentItems parentItems=new ParentItems(teacher_message.this);
+            parentItems.execute();
         }
     }
 

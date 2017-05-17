@@ -119,12 +119,12 @@ public class NewStudent extends BaseActivity {
                 address = studentaddress.getText().toString().trim();
                 contact=studentcontact.getText().toString().trim();
                 parentemail = studentparentemail.getText().toString().trim();
-                parentname=studentparentemail.getText().toString().trim();
+                parentname=studentparent.getText().toString().trim();
 
 
                 rollno = no_of_stu+1;
 
-                if ( name.equals(null) || email.equals(null) || dob.equals(null) || address.equals(null) || contact.equals(null) || parentname.equals(null) || parentemail.equals(null) || email.equals(null)  ) {
+                if ( name.equals("") || email.equals("") || dob.equals("") || address.equals("") || contact.equals("") || parentname.equals("") || parentemail.equals("") || email.equals("")  ) {
                     Toast.makeText(getApplicationContext(), "Student details cannot be empty!", Toast.LENGTH_LONG).show();
                 } else {
 
@@ -253,7 +253,7 @@ public class NewStudent extends BaseActivity {
 
 
                     databaseReference=Constants.databaseReference.child(Constants.PARENT_RELATION_TABLE).child(institutionName).child(studentuid);
-                    dataReference.setValue(parentfirebaseuser.getUid());
+                    databaseReference.setValue(parentfirebaseuser.getUid());
 
 
 

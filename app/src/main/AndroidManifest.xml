@@ -78,7 +78,8 @@
         <activity
             android:name=".teacher.Classes"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".common.view_messages" />
+        <activity android:name=".common.view_messages"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".teacher.Students"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -88,7 +89,8 @@
         <activity
             android:name=".teacher.UploadMaterial"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".teacher.teacher_message" />
+        <activity android:name=".teacher.teacher_message"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".teacher.Attendance"
             android:theme="@style/AppTheme.NoActionBar" />

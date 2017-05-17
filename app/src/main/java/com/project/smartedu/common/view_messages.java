@@ -26,6 +26,7 @@ import com.parse.ParseUser;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
+import com.project.smartedu.UserPrefs;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
 import com.project.smartedu.teacher.Classes;
@@ -37,7 +38,7 @@ import java.util.Date;
 import java.util.List;
 
 public class view_messages extends BaseActivity {
-    /*private Toolbar mToolbar;
+    private Toolbar mToolbar;
     private FragmentDrawer drawerFragment;
 
 
@@ -60,6 +61,8 @@ public class view_messages extends BaseActivity {
     EditText reply_message;
     Button reply_button;
 
+    UserPrefs userPrefs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,12 +76,14 @@ public class view_messages extends BaseActivity {
         final Intent from_student = getIntent();
         role = from_student.getStringExtra("role");
         _for = from_student.getStringExtra("_for");
-        classGradeId= from_student.getStringExtra("classGradeId");
-        studentId= from_student.getStringExtra("studentId");
+        //classGradeId= from_student.getStringExtra("classGradeId");
+        //studentId= from_student.getStringExtra("studentId");
         institutionName= from_student.getStringExtra("institution_name");
 
+
+        userPrefs=new UserPrefs(view_messages.this);
         noti_bar = (NotificationBar) getSupportFragmentManager().findFragmentById(R.id.noti);
-        noti_bar.setTexts(ParseUser.getCurrentUser().getUsername(), role,institutionName);
+        noti_bar.setTexts(userPrefs.getUserName(), role,institutionName);
 
 
         drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
@@ -126,7 +131,7 @@ public class view_messages extends BaseActivity {
         }
 
 
-        if(_for.equals("received")){
+       /* if(_for.equals("received")){
             getSupportActionBar().setTitle("Received Messages");
             change_mode.setText("SEE INBOX");
 
@@ -716,7 +721,7 @@ public class view_messages extends BaseActivity {
         {
             Intent nouser=new Intent(view_messages.this,LoginActivity.class);
             startActivity(nouser);
-        }
+        }*/
     }
-*/
+
 }
