@@ -20,7 +20,9 @@ public class Constants {
   public static final String ALLOTMENTS_TABLE= "allotments";
   public static final String SCHEDULES_TABLE= "schedules";
   public static final String STUDENTS_TABLE= "students";
+  public static final String PARENT_RELATION_TABLE= "parents";
   public static final String UPLOADS_TABLE= "uploads";
+  public static final String MESSAGES_TABLE= "uploads";
 
 
 

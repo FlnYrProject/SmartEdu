@@ -250,6 +250,13 @@ public class NewStudent extends BaseActivity {
                     DatabaseReference dataReference = databaseReference.child( parentfirebaseuser.getUid()).child("role").child("parent").push();
                     dataReference.setValue(studentuid);
 
+
+
+                    databaseReference=Constants.databaseReference.child(Constants.PARENT_RELATION_TABLE).child(institutionName).child(studentuid);
+                    dataReference.setValue(parentfirebaseuser.getUid());
+
+
+
                     Toast.makeText(getApplicationContext(), "Parent User Registration Successful ", Toast.LENGTH_LONG).show();
                     loginTeacherBack();
 
