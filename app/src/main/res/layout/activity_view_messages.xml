@@ -60,12 +60,19 @@
                     android:id="@+id/change_mode"
                     android:textColor="#20BF9F" />
             </RelativeLayout>
-
+            <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/swipe_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#323b43">
             <ListView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/messageList"
                 android:layout_gravity="center_horizontal" />
+            </android.support.v4.widget.SwipeRefreshLayout>
 
         </LinearLayout>
 

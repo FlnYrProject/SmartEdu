@@ -41,7 +41,7 @@ public class TeacherUserPrefs {
     public static HashMap<String,ArrayList<String>> subjectallotmentmap;
 
     public static ArrayList<String> studentsuseridLt;
-    public static HashMap<String,Students> studentsHashMap;
+    public static HashMap<String,Students> studentsHashMap;                 //user id to student details
 
 
 

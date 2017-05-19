@@ -1,9 +1,14 @@
 package com.project.smartedu.common;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -18,18 +23,26 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.project.smartedu.BaseActivity;
+import com.project.smartedu.Constants;
 import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
 import com.project.smartedu.UserPrefs;
+import com.project.smartedu.database.Messages;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
 import com.project.smartedu.teacher.Classes;
+import com.project.smartedu.teacher.Home;
+import com.project.smartedu.teacher.TeacherUserPrefs;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -63,6 +76,264 @@ public class view_messages extends BaseActivity {
 
     UserPrefs userPrefs;
 
+
+    DatabaseReference databaseReference;
+
+
+SwipeRefreshLayout swipeRefreshLayout;
+
+
+
+
+    private class ReceivedMessageItems extends AsyncTask<Void, Void, Void> {
+
+        private Context async_context;
+        private ProgressDialog pd;
+
+        public ReceivedMessageItems(Context context){
+            this.async_context = context;
+            pd = new ProgressDialog(async_context);
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd.setMessage("Fetching Received Messages...");
+            pd.setCancelable(false);
+            pd.show();
+            UserPrefs.receivedmessagemap.clear();
+            databaseReference = Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child("received");
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            final Object lock = new Object();
+
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    synchronized (lock) {
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+
+                            Log.d("ds.key",ds.getKey());             //user id
+
+
+                            String id=ds.getKey();
+                            String msg_id="";
+                            String name="";
+                            String content="";
+                            String time="";
+                            for(DataSnapshot dataSnapshot1:ds.getChildren()){           //traversing each message related to a user
+                                Log.d("dsc",dataSnapshot1.getKey());        //message id
+
+msg_id=dataSnapshot1.getKey();
+
+                                for(DataSnapshot dataSnapshot2:dataSnapshot1.getChildren()) {
+                                    Log.d("dscc",dataSnapshot2.getKey());
+                                    if (dataSnapshot2.getKey().equalsIgnoreCase("name")) {
+
+                                        name = dataSnapshot2.getValue().toString();
+                                    }
+
+                                    if (dataSnapshot2.getKey().equalsIgnoreCase("content")) {
+                                        content = dataSnapshot2.getValue().toString();
+                                    }
+
+                                    if (dataSnapshot2.getKey().equalsIgnoreCase("time")) {
+                                        time = dataSnapshot2.getValue().toString();
+                                    }
+                                }
+
+                            }
+
+                            Messages messages=new Messages(name,content,time,id,msg_id);
+
+                            UserPrefs.receivedmessagemap.put(name+". "+time,messages);
+
+
+
+                        }
+
+
+
+                        lock.notifyAll();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+
+            });
+
+
+            synchronized (lock){
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //Handles the stuff after the synchronisation with the firebase listener has been achieved
+            //The main UI is already idle by this moment
+            super.onPostExecute(aVoid);
+
+            if(UserPrefs.receivedmessagemap.size()!=0) {
+                setReceived();
+            }
+            //Show the log in progress_bar for at least a few milliseconds
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    pd.dismiss();
+                    pd=null;
+                }
+            }, 500);  // 100 milliseconds
+        }
+        //end firebase_async_class
+    }
+
+
+
+
+
+
+    private class SentMessageItems extends AsyncTask<Void, Void, Void> {
+
+        private Context async_context;
+        private ProgressDialog pd;
+
+        public SentMessageItems(Context context){
+            this.async_context = context;
+            pd = new ProgressDialog(async_context);
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd.setMessage("Fetching Sent Messages...");
+            pd.setCancelable(false);
+            pd.show();
+            UserPrefs.sentmessagemap.clear();
+            databaseReference = Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child("sent");
+            Log.d("check","1");
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            final Object lock = new Object();
+            Log.d("check","2");
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    synchronized (lock) {
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+
+                            Log.d("ds.key",ds.getKey());             //user id
+
+
+                            String id=ds.getKey();
+                            String msg_id="";
+                            String name="";
+                            String content="";
+                            String time="";
+                            for(DataSnapshot dataSnapshot1:ds.getChildren()){           //traversing each message related to a user
+                                Log.d("dsc",dataSnapshot1.getKey());        //message id
+
+                                msg_id=dataSnapshot1.getKey();
+
+                                for(DataSnapshot dataSnapshot2:dataSnapshot1.getChildren()) {
+                                    Log.d("dscc",dataSnapshot2.getKey());
+                                    if (dataSnapshot2.getKey().equalsIgnoreCase("name")) {
+
+                                        name = dataSnapshot2.getValue().toString();
+                                    }
+
+                                    if (dataSnapshot2.getKey().equalsIgnoreCase("content")) {
+                                        content = dataSnapshot2.getValue().toString();
+                                    }
+
+                                    if (dataSnapshot2.getKey().equalsIgnoreCase("time")) {
+                                        time = dataSnapshot2.getValue().toString();
+                                    }
+                                }
+
+                            }
+
+                            Messages messages=new Messages(name,content,time,id,msg_id);
+
+                            UserPrefs.sentmessagemap.put(name+". "+time,messages);
+
+
+
+                        }
+
+
+
+                        lock.notifyAll();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+
+            });
+
+
+            synchronized (lock){
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //Handles the stuff after the synchronisation with the firebase listener has been achieved
+            //The main UI is already idle by this moment
+            super.onPostExecute(aVoid);
+
+
+            //Show the log in progress_bar for at least a few milliseconds
+            if(UserPrefs.sentmessagemap.size()!=0) {
+                setSent();
+            }
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    pd.dismiss();
+                    pd=null;
+                }
+            }, 500);  // 100 milliseconds
+        }
+        //end firebase_async_class
+    }
+
+
+
+
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,6 +361,16 @@ public class view_messages extends BaseActivity {
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar, role);
         drawerFragment.setDrawerListener(this);
 
+
+        swipeRefreshLayout=(SwipeRefreshLayout)findViewById(R.id.swipe_layout);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefresh();
+            }
+        });
+
         change_mode=(TextView)findViewById(R.id.change_mode);
         new_message=(TextView)findViewById(R.id.new_message);
         messageList = (ListView) findViewById(R.id.messageList);
@@ -110,7 +391,7 @@ public class view_messages extends BaseActivity {
 
 
 
-        if(role.equals("Student") || role.equals("Parent"))
+        if(role.equalsIgnoreCase("Student") || role.equalsIgnoreCase("Parent"))
         {
             new_message.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -131,280 +412,132 @@ public class view_messages extends BaseActivity {
         }
 
 
-       /* if(_for.equals("received")){
-            getSupportActionBar().setTitle("Received Messages");
-            change_mode.setText("SEE INBOX");
+        if(_for.equals("received")) {
+            getSupportActionBar().setTitle("INBOX");
+            change_mode.setText("SEE OUTBOX");
 
             change_mode.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent read_message_intent = new Intent(view_messages.this, view_messages.class);
                     read_message_intent.putExtra("role", role);
+
                     if (role.equals("Parent") || role.equals("Student")) {
-                        classId = from_student.getStringExtra("classId");
+                        //see later classId = from_student.getStringExtra("classId");
                         studentId = from_student.getStringExtra("studentId");
-                        read_message_intent.putExtra("classId", classId);
+                        //sl read_message_intent.putExtra("classId", classId);
                         read_message_intent.putExtra("studentId", studentId);
-                        read_message_intent.putExtra("institution_name", institutionName);
                     }
+                    read_message_intent.putExtra("institution_name", institutionName);
+
                     read_message_intent.putExtra("_for", "sent");
                     startActivity(read_message_intent);
                 }
             });
 
-            ParseQuery<ParseObject> messageQuery = ParseQuery.getQuery(MessageTable.TABLE_NAME);
-            messageQuery.whereEqualTo(MessageTable.TO_USER_REF, ParseUser.getCurrentUser());
-            messageQuery.whereEqualTo(MessageTable.DELETED_BY_RECEIVER, false);
-            messageQuery.findInBackground(new FindCallback<ParseObject>() {
-                public void done(List<ParseObject> messageListRet, ParseException e) {
-                    if (e == null) {
-                        if (messageListRet.size() != 0) {
 
-                            ArrayList<String> messageLt = new ArrayList<String>();
-
-                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                                    getApplicationContext(), android.R.layout.simple_list_item_1, messageLt) {
-
-                                @Override
-                                public View getView(int position, View convertView,
-                                                    ViewGroup parent) {
-                                    View view = super.getView(position, convertView, parent);
-
-                                    TextView textView = (TextView) view.findViewById(android.R.id.text1);
-
-            *//*YOUR CHOICE OF COLOR*//*
-                                    textView.setTextColor(Color.WHITE);
-
-                                    return view;
-                                }
-                            };
+            if (userPrefs.isFirstMessageLoading()) {
+                userPrefs.setFirstLoading(false);
+                ReceivedMessageItems receivedMessageItems = new ReceivedMessageItems(view_messages.this);
+                receivedMessageItems.execute();
+            }
 
 
-                            Log.d("user", "Retrieved " + messageListRet.size() + " messages");
-                            //Toast.makeText(getApplicationContext(), studentListRet.toString(), Toast.LENGTH_LONG).show();
-                            for (int i = 0; i < messageListRet.size(); i++) {
-                                ParseObject u = messageListRet.get(i);
-                                //  if(u.getString("class").equals(id)) {
-                                ParseUser senderuser = (ParseUser) u.get(MessageTable.FROM_USER_REF);
-
-                                String from = null;
-                                try {
-                                    from = senderuser.fetchIfNeeded().getUsername();
-                                } catch (ParseException e1) {
-                                    e1.printStackTrace();
-                                }
-                                //name += "\n";
-                                // name += u.getInt("age");
-                                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss aa");
-
-                                final String dateString = formatter.format(new Date(u.getLong(MessageTable.SENT_AT)));
-                                Log.d("user", dateString);
-
-                                ParseObject institute = (ParseObject) u.get(MessageTable.INSTITUTION);
-                                String insti= null;
-                                if (institute != null) {
-                                    try {
-                                        insti = institute.fetchIfNeeded().get(InstitutionTable.INSTITUTION_NAME).toString();
-                                        Log.d("institute: ", insti);
-                                    } catch (ParseException e1) {
-                                        e1.printStackTrace();
-                                    }
-                                }
-                                String name = from + "\nat " + dateString + "\n" + insti;
-                                adapter.add(name);
-                                // }
-
-                            }
 
 
-                            messageList.setAdapter(adapter);
+            messageList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    String item = ((TextView) view).getText().toString();
+                    String values[] = item.split(" at ");
+                    final String name = values[0];
+                    String dateString = values[1];
 
+                    SimpleDateFormat f = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss aa");
 
-                            messageList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                @Override
-                                public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-                                    String item = ((TextView) view).getText().toString();
-                                    String[] itemVal= item.split("\n");
-                                    Log.d("user", "1 " + itemVal[0].trim() + " 2 " + itemVal[1]);
-
-                                    final String[] details = new String[2];
-                                    details[0]= itemVal[0];
-
-                                    String[] itemValues = itemVal[1].split("at ");
-                                    details[1]=itemValues[1];
-
-                            *//*
-                            int j = 0;
-
-                            for (String x : itemValues) {
-                                details[j++] = x;
-                            } *//*
-
-                                    Log.d("user", "from " + details[0].trim() + " at " + details[1]);  //extracts Chit as Chi and query fails???
-                                    final Dialog dialog = new Dialog(view_messages.this);
-                                    dialog.setContentView(R.layout.messsage_info);
-                                    dialog.setTitle("Message");
-
-                                    setDialogSize(dialog);
-
-
-                                    title = (TextView) dialog.findViewById(R.id.title);
-                                    message = (TextView) dialog.findViewById(R.id.message);
-                                    messageFrom = (TextView) dialog.findViewById(R.id.message_from);
-                                    messagedate = (TextView) dialog.findViewById(R.id.date);
-                                    delete = (Button) dialog.findViewById(R.id.delButton);
-                                    ok = (Button) dialog.findViewById(R.id.doneButton);
-                                    reply = (Button) dialog.findViewById(R.id.replyButton);
-
-
-                                    title.setText("From:");
-                                    messageFrom.setText(details[0]);
-                                    messagedate.setText(details[1]);
-
-
-                                    reply.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            sendReply(details[0]);
-                                            dialog.dismiss();
-                                        }
-                                    });
-
-
-                                    ok.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            dialog.dismiss();
-                                        }
-                                    });
-
-                                    SimpleDateFormat f = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss aa");
-                                    Log.d("user", details[1]);
-                                    Date d = null;
-                                    try {
-                                        d = f.parse(details[1].trim());
-                                    } catch (java.text.ParseException x) {
-                                        x.printStackTrace();
-                                    }
-                                    final java.util.Calendar calendar = Calendar.getInstance();
-                                    Log.d("user", String.valueOf(d));
-                                    calendar.setTime(d);
-
-                                    delete.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-
-                                            ParseQuery<ParseUser> user = ParseUser.getQuery();
-                                            user.whereEqualTo("username", details[0]);
-                                            user.findInBackground(new FindCallback<ParseUser>() {
-                                                @Override
-                                                public void done(List<ParseUser> objects, ParseException e) {
-                                                    if (e == null) {
-                                                        if (objects.size() != 0) {
-                                                            ParseQuery<ParseObject> getMessageQuery = ParseQuery.getQuery(MessageTable.TABLE_NAME);
-                                                            getMessageQuery.whereEqualTo(MessageTable.FROM_USER_REF, objects.get(0));
-                                                            getMessageQuery.whereEqualTo(MessageTable.TO_USER_REF, ParseUser.getCurrentUser());
-                                                            getMessageQuery.whereEqualTo(MessageTable.INSTITUTION, ParseObject.createWithoutData(InstitutionTable.TABLE_NAME, institution_code));
-
-                                                            final long milliseconds = calendar.getTimeInMillis();
-                                                            Log.d("user", String.valueOf(milliseconds));
-                                                            getMessageQuery.whereEqualTo(MessageTable.SENT_AT, milliseconds);
-                                                            getMessageQuery.findInBackground(new FindCallback<ParseObject>() {
-                                                                @Override
-                                                                public void done(List<ParseObject> objects, ParseException e) {
-                                                                    if (e == null) {
-                                                                        if (objects.size() != 0) {
-                                                                            objects.get(0).put(MessageTable.DELETED_BY_RECEIVER, true);
-                                                                            objects.get(0).saveInBackground();
-                                                                            sleep(1000);
-                                                                            if (objects.get(0).getBoolean(MessageTable.DELETED_BY_SENDER)) {
-                                                                                objects.get(0).deleteEventually();
-                                                                            }
-                                                                            dialog.dismiss();
-                                                                            onRestart();
-                                                                        } else {
-                                                                            Log.d("user", "query logic in deleting messages");
-                                                                        }
-                                                                    } else {
-                                                                        Log.d("user", "no message retrived");
-                                                                    }
-                                                                }
-                                                            });
-                                                        } else {
-                                                            Log.d("user", "query logic error");
-                                                        }
-                                                    } else {
-                                                        Log.d("user", "error in getting user");
-                                                    }
-                                                }
-                                            });
-
-
-                                        }
-                                    });
-
-
-                                    ParseQuery<ParseUser> user = ParseUser.getQuery();
-                                    user.whereEqualTo("username", details[0]);
-                                    user.findInBackground(new FindCallback<ParseUser>() {
-                                        @Override
-                                        public void done(List<ParseUser> objects, ParseException e) {
-                                            if (e == null) {
-                                                if (objects.size() != 0) {
-                                                    ParseQuery<ParseObject> getMessageQuery = ParseQuery.getQuery(MessageTable.TABLE_NAME);
-                                                    getMessageQuery.whereEqualTo(MessageTable.FROM_USER_REF, objects.get(0));
-                                                    getMessageQuery.whereEqualTo(MessageTable.TO_USER_REF, ParseUser.getCurrentUser());
-                                                    getMessageQuery.whereEqualTo(MessageTable.INSTITUTION, ParseObject.createWithoutData(InstitutionTable.TABLE_NAME, institution_code));
-                                                    final long milliseconds = calendar.getTimeInMillis();
-                                                    Log.d("user", String.valueOf(milliseconds));
-                                                    getMessageQuery.whereEqualTo(MessageTable.SENT_AT, milliseconds);
-                                                    getMessageQuery.findInBackground(new FindCallback<ParseObject>() {
-                                                        @Override
-                                                        public void done(List<ParseObject> objects, ParseException e) {
-                                                            if (e == null) {
-                                                                if (objects.size() != 0) {
-
-                                                                    message.setText(objects.get(0).getString(MessageTable.MESSAGE_CONTENT));
-                                                                } else {
-                                                                    Log.d("user", "query logic in getting messages");
-                                                                }
-                                                            } else {
-                                                                Log.d("user", "no message retrived");
-                                                            }
-                                                        }
-                                                    });
-                                                } else {
-                                                    Log.d("user", "query logic error");
-                                                }
-                                            } else {
-                                                Log.d("user", "error in getting user");
-                                            }
-                                        }
-                                    });
-
-                                    dialog.show();
-
-
-                                }
-                            });
-
-                        } else {
-                            Toast.makeText(view_messages.this, "No messsages", Toast.LENGTH_LONG).show();
-                        }
-
-                    } else {
-                        Toast.makeText(view_messages.this, "error", Toast.LENGTH_LONG).show();
-                        Log.d("user", "Error: " + e.getMessage());
+                    Date d = null;
+                    try {
+                        d = f.parse(dateString.trim());
+                    } catch (java.text.ParseException x) {
+                        x.printStackTrace();
                     }
+                    java.util.Calendar calendar = Calendar.getInstance();
+                    Log.d("user", String.valueOf(d));
+                    calendar.setTime(d);
+                    final String time = String.valueOf(d.getTime());
+
+
+                    final Dialog dialog = new Dialog(view_messages.this);
+                    dialog.setContentView(R.layout.messsage_info);
+                    dialog.setTitle("Message");
+
+                    setDialogSize(dialog);
+
+                    Log.d("mcheck",name+" "+time);
+
+                    title = (TextView) dialog.findViewById(R.id.title);
+                    message = (TextView) dialog.findViewById(R.id.message);
+                    messageFrom = (TextView) dialog.findViewById(R.id.message_from);
+                    messagedate = (TextView) dialog.findViewById(R.id.date);
+                    delete = (Button) dialog.findViewById(R.id.delButton);
+                    ok = (Button) dialog.findViewById(R.id.doneButton);
+                    reply = (Button) dialog.findViewById(R.id.replyButton);
+
+
+                    title.setText("From:");
+                    messageFrom.setText(name);
+                    messagedate.setText(dateString);
+
+
+                    reply.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            //sendReply(name + ". " + time);
+                            dialog.dismiss();
+                        }
+                    });
+
+
+                    ok.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+                        }
+                    });
+
+
+                    delete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Messages messages = UserPrefs.receivedmessagemap.get(name + ". " + time);
+                            String key = messages.getMessage_id();
+                            databaseReference = Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child("received").child(messages.getName_id()).child(key);
+                            databaseReference.removeValue();
+
+                            UserPrefs.receivedmessagemap.remove(name + ". " + time);
+                            setReceived();
+                            dialog.dismiss();
+
+                        }
+                    });
+
+
+                    Messages messages = UserPrefs.receivedmessagemap.get(name + ". " + time);
+                    message.setText(messages.getContent());
+
+
+                    dialog.show();
+
+
                 }
             });
+
+
         }
 
-
-
         if(_for.equals("sent")){
-            getSupportActionBar().setTitle("Sent Messages");
-            change_mode.setText("SEE OUTBOX");
+            getSupportActionBar().setTitle("OUTBOX");
+            change_mode.setText("SEE INBOX");
 
             change_mode.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -417,229 +550,110 @@ public class view_messages extends BaseActivity {
                 }
             });
 
-            ParseQuery<ParseObject> messageQuery = ParseQuery.getQuery(MessageTable.TABLE_NAME);
-            messageQuery.whereEqualTo(MessageTable.FROM_USER_REF, ParseUser.getCurrentUser());
-            messageQuery.whereEqualTo(MessageTable.INSTITUTION, ParseObject.createWithoutData(InstitutionTable.TABLE_NAME, institution_code));
-            messageQuery.whereEqualTo(MessageTable.DELETED_BY_SENDER, false);
-            messageQuery.findInBackground(new FindCallback<ParseObject>() {
-                public void done(List<ParseObject> messageListRet, ParseException e) {
-                    if (e == null) {
-                        if (messageListRet.size() != 0) {
 
-                            ArrayList<String> messageLt = new ArrayList<String>();
+            SentMessageItems sentMessageItems = new SentMessageItems(view_messages.this);
+            sentMessageItems.execute();
+            //see sent
+            if(userPrefs.isFirstLoading()) {
+                userPrefs.setFirstLoading(false);
 
-                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                                    getApplicationContext(), android.R.layout.simple_list_item_1, messageLt) {
-
-                                @Override
-                                public View getView(int position, View convertView,
-                                                    ViewGroup parent) {
-                                    View view = super.getView(position, convertView, parent);
-
-                                    TextView textView = (TextView) view.findViewById(android.R.id.text1);
-
-            *//*YOUR CHOICE OF COLOR*//*
-                                    textView.setTextColor(Color.WHITE);
-
-                                    return view;
-                                }
-                            };
+            }
 
 
-                            Log.d("user", "Retrieved " + messageListRet.size() + " messages");
-                            //Toast.makeText(getApplicationContext(), studentListRet.toString(), Toast.LENGTH_LONG).show();
-                            for (int i = 0; i < messageListRet.size(); i++) {
-                                ParseObject u = messageListRet.get(i);
-                                //  if(u.getString("class").equals(id)) {
-                                ParseUser receiveruser = (ParseUser) u.get(MessageTable.TO_USER_REF);
-
-                                String to = null;
-                                try {
-                                    to = receiveruser.fetchIfNeeded().getUsername();
-                                } catch (ParseException e1) {
-                                    e1.printStackTrace();
-                                }
-                                //name += "\n";
-                                // name += u.getInt("age");
-                                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss aa");
-
-                                final String dateString = formatter.format(new Date(u.getLong(MessageTable.SENT_AT)));
-                                Log.d("user", dateString);
-                                String name = to + "\nat " + dateString;
-                                adapter.add(name);
-                                // }
-
-                            }
 
 
-                            messageList.setAdapter(adapter);
 
+            messageList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    String item = ((TextView) view).getText().toString();
+                    String values[] = item.split(" at ");
+                    final String name = values[0];
+                    String dateString = values[1];
 
-                            messageList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                @Override
-                                public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-                                    String item = ((TextView) view).getText().toString();
+                    SimpleDateFormat f = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss aa");
 
-                                    String[] itemValues = item.split("\nat ");
-
-                                    final String[] details = new String[2];
-                                    int j = 0;
-
-                                    for (String x : itemValues) {
-                                        details[j++] = x;
-                                    }
-
-                                    Log.d("user", "from " + details[0].trim() + " at " + details[1]);  //extracts Chit as Chi and query fails???
-                                    final Dialog dialog = new Dialog(view_messages.this);
-                                    dialog.setContentView(R.layout.messsage_info);
-                                    dialog.setTitle("Message");
-
-                                    setDialogSize(dialog);
-
-                                    title = (TextView) dialog.findViewById(R.id.title);
-                                    message = (TextView) dialog.findViewById(R.id.message);
-                                    messageFrom = (TextView) dialog.findViewById(R.id.message_from);
-                                    messagedate = (TextView) dialog.findViewById(R.id.date);
-                                    delete = (Button) dialog.findViewById(R.id.doneButton);
-                                    ok = (Button) dialog.findViewById(R.id.doneButton);
-                                    reply=(Button)dialog.findViewById(R.id.replyButton);
-                                    reply.setVisibility(View.INVISIBLE);
-                                    title.setText("To:");
-                                    messageFrom.setText(details[0]);
-                                    messagedate.setText(details[1]);
-
-                                    ok.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            dialog.dismiss();
-                                        }
-                                    });
-
-                                    SimpleDateFormat f = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss aa");
-                                    Log.d("user", details[1]);
-                                    Date d = null;
-                                    try {
-                                        d = f.parse(details[1].trim());
-                                    } catch (java.text.ParseException x) {
-                                        x.printStackTrace();
-                                    }
-                                    final java.util.Calendar calendar = Calendar.getInstance();
-                                    Log.d("user", String.valueOf(d));
-                                    calendar.setTime(d);
-
-                                    delete.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-
-                                            ParseQuery<ParseUser> user = ParseUser.getQuery();
-                                            user.whereEqualTo("username", details[0]);
-                                            user.findInBackground(new FindCallback<ParseUser>() {
-                                                @Override
-                                                public void done(List<ParseUser> objects, ParseException e) {
-                                                    if (e == null) {
-                                                        if (objects.size() != 0) {
-                                                            ParseQuery<ParseObject> getMessageQuery = ParseQuery.getQuery(MessageTable.TABLE_NAME);
-                                                            getMessageQuery.whereEqualTo(MessageTable.FROM_USER_REF, ParseUser.getCurrentUser());
-                                                            getMessageQuery.whereEqualTo(MessageTable.TO_USER_REF, objects.get(0));
-                                                            getMessageQuery.whereEqualTo(MessageTable.INSTITUTION, ParseObject.createWithoutData(InstitutionTable.TABLE_NAME, institution_code));
-
-                                                            final long milliseconds = calendar.getTimeInMillis();
-                                                            Log.d("user", String.valueOf(milliseconds));
-                                                            getMessageQuery.whereEqualTo(MessageTable.SENT_AT, milliseconds);
-                                                            getMessageQuery.findInBackground(new FindCallback<ParseObject>() {
-                                                                @Override
-                                                                public void done(List<ParseObject> objects, ParseException e) {
-                                                                    if (e == null) {
-                                                                        if (objects.size() != 0) {
-                                                                            objects.get(0).put(MessageTable.DELETED_BY_SENDER, true);
-                                                                            objects.get(0).saveInBackground();
-                                                                            sleep(1000);
-                                                                            if (objects.get(0).getBoolean(MessageTable.DELETED_BY_RECEIVER)) {
-                                                                                objects.get(0).deleteEventually();
-                                                                            }
-                                                                            dialog.dismiss();
-                                                                            onRestart();
-                                                                        } else {
-                                                                            Log.d("user", "query logic in deleting messages");
-                                                                        }
-                                                                    } else {
-                                                                        Log.d("user", "no message retrived");
-                                                                    }
-                                                                }
-                                                            });
-                                                        } else {
-                                                            Log.d("user", "query logic error");
-                                                        }
-                                                    } else {
-                                                        Log.d("user", "error in getting user");
-                                                    }
-                                                }
-                                            });
-
-
-                                        }
-                                    });
-
-
-                                    ParseQuery<ParseUser> user = ParseUser.getQuery();
-                                    user.whereEqualTo("username", details[0]);
-                                    user.findInBackground(new FindCallback<ParseUser>() {
-                                        @Override
-                                        public void done(List<ParseUser> objects, ParseException e) {
-                                            if (e == null) {
-                                                if (objects.size() != 0) {
-                                                    ParseQuery<ParseObject> getMessageQuery = ParseQuery.getQuery(MessageTable.TABLE_NAME);
-                                                    getMessageQuery.whereEqualTo(MessageTable.FROM_USER_REF, ParseUser.getCurrentUser());
-                                                    getMessageQuery.whereEqualTo(MessageTable.TO_USER_REF, objects.get(0));
-                                                    getMessageQuery.whereEqualTo(MessageTable.INSTITUTION, ParseObject.createWithoutData(InstitutionTable.TABLE_NAME, institution_code));
-                                                    final long milliseconds = calendar.getTimeInMillis();
-                                                    Log.d("user", String.valueOf(milliseconds));
-                                                    getMessageQuery.whereEqualTo(MessageTable.SENT_AT, milliseconds);
-                                                    getMessageQuery.findInBackground(new FindCallback<ParseObject>() {
-                                                        @Override
-                                                        public void done(List<ParseObject> objects, ParseException e) {
-                                                            if (e == null) {
-                                                                if (objects.size() != 0) {
-
-                                                                    message.setText(objects.get(0).getString(MessageTable.MESSAGE_CONTENT));
-                                                                } else {
-                                                                    Log.d("user", "query logic in getting messages");
-                                                                }
-                                                            } else {
-                                                                Log.d("user", "no message retrived");
-                                                            }
-                                                        }
-                                                    });
-                                                } else {
-                                                    Log.d("user", "query logic error");
-                                                }
-                                            } else {
-                                                Log.d("user", "error in getting user");
-                                            }
-                                        }
-                                    });
-
-                                    dialog.show();
-
-
-                                }
-                            });
-
-                        } else {
-                            Toast.makeText(view_messages.this, "No messsages", Toast.LENGTH_LONG).show();
-                        }
-
-                    } else {
-                        Toast.makeText(view_messages.this, "error", Toast.LENGTH_LONG).show();
-                        Log.d("user", "Error: " + e.getMessage());
+                    Date d = null;
+                    try {
+                        d = f.parse(dateString.trim());
+                    } catch (java.text.ParseException x) {
+                        x.printStackTrace();
                     }
+                    java.util.Calendar calendar = Calendar.getInstance();
+                    Log.d("user", String.valueOf(d));
+                    calendar.setTime(d);
+                    final String time = String.valueOf(d.getTime());
+
+
+                    final Dialog dialog = new Dialog(view_messages.this);
+                    dialog.setContentView(R.layout.messsage_info);
+                    dialog.setTitle("Message");
+
+                    setDialogSize(dialog);
+
+
+                    title = (TextView) dialog.findViewById(R.id.title);
+                    message = (TextView) dialog.findViewById(R.id.message);
+                    messageFrom = (TextView) dialog.findViewById(R.id.message_from);
+                    messagedate = (TextView) dialog.findViewById(R.id.date);
+                    delete = (Button) dialog.findViewById(R.id.delButton);
+                    ok = (Button) dialog.findViewById(R.id.doneButton);
+                    reply = (Button) dialog.findViewById(R.id.replyButton);
+                    reply.setVisibility(View.INVISIBLE);
+
+
+                    title.setText("To:");
+                    messageFrom.setText(name);
+                    messagedate.setText(dateString);
+
+
+                    reply.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                           // sendReply(name + ". " + time);
+                            dialog.dismiss();
+                        }
+                    });
+
+
+                    ok.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+                        }
+                    });
+
+
+                    delete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Messages messages = UserPrefs.sentmessagemap.get(name + ". " + time);
+                            String key = messages.getMessage_id();
+                            databaseReference = Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child("sent").child(messages.getName_id()).child(key);
+                            databaseReference.removeValue();
+
+                            UserPrefs.sentmessagemap.remove(name + ". " + time);
+                            setSent();
+                            dialog.dismiss();
+
+                        }
+                    });
+
+
+                    Messages messages = UserPrefs.sentmessagemap.get(name + ". " + time);
+                    message.setText(messages.getContent());
+
+
+                    dialog.show();
+
+
                 }
             });
         }
     }
 
 
-    protected void sendReply(final String sender)
+  /*  protected void sendReply(String key)            //key is name+". "+time
     {
         final Dialog send_reply=new Dialog(view_messages.this);
         send_reply.setContentView(R.layout.sending_message_to_teacher);
@@ -694,7 +708,7 @@ public class view_messages extends BaseActivity {
                 }
             }
         });
-    }
+    }*/
 
 
     protected void sleep(int time)
@@ -714,6 +728,68 @@ public class view_messages extends BaseActivity {
         finish();
     }
 
+
+    public void setReceived(){
+
+        ArrayList<String> messageLt = new ArrayList<String>();
+
+        for (String key : UserPrefs.receivedmessagemap.keySet()) {      //key is name+". "+time
+
+            String values[] = key.split("\\. ");
+            String name = values[0];
+            String time = values[1];
+
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss aa");
+            String dateString = formatter.format(new Date(Long.parseLong(time)));
+
+            messageLt.add(name + " at " + dateString);
+
+        }
+
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                getApplicationContext(), android.R.layout.simple_list_item_1, messageLt);
+
+        messageList.setAdapter(adapter);
+
+    }
+
+
+    public void setSent(){
+
+        ArrayList<String> messageLt = new ArrayList<String>();
+
+        for (String key : UserPrefs.sentmessagemap.keySet()) {      //key is name+". "+time
+
+            String values[] = key.split("\\. ");
+            String name = values[0];
+            String time = values[1];
+
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss aa");
+            String dateString = formatter.format(new Date(Long.parseLong(time)));
+
+            messageLt.add(name + " at " + dateString);
+
+        }
+
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                getApplicationContext(), android.R.layout.simple_list_item_1, messageLt);
+
+        messageList.setAdapter(adapter);
+    }
+
+    public void swipeRefresh(){
+        userPrefs.setFirstMessageLoading(true);
+        Intent to_view_messages = new Intent(view_messages.this, view_messages.class);
+        to_view_messages.putExtra("institution_name",institutionName);
+        to_view_messages.putExtra("role", role);
+        to_view_messages.putExtra("_for",_for);
+        startActivity(to_view_messages);
+
+    }
+
+
     @Override
     protected void onPostResume() {
         super.onPostResume();
@@ -721,7 +797,7 @@ public class view_messages extends BaseActivity {
         {
             Intent nouser=new Intent(view_messages.this,LoginActivity.class);
             startActivity(nouser);
-        }*/
+        }
     }
 
 }

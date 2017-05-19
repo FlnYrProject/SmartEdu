@@ -35,6 +35,8 @@ import com.project.smartedu.LoginActivity;
 import com.project.smartedu.Model;
 import com.project.smartedu.R;
 import com.project.smartedu.UserPrefs;
+import com.project.smartedu.database.*;
+import com.project.smartedu.database.Students;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
 
@@ -113,7 +115,7 @@ public class teacher_message extends BaseActivity {
             for(int x=0;x<TeacherUserPrefs.studentsuseridLt.size();x++){
 
                 String studentid=TeacherUserPrefs.studentsuseridLt.get(x);
-                com.project.smartedu.database.Students student=TeacherUserPrefs.studentsHashMap.get(studentid);
+                final com.project.smartedu.database.Students student=TeacherUserPrefs.studentsHashMap.get(studentid);
 
 
                 if(student.getClass_id().equals(classId)){
@@ -129,9 +131,7 @@ public class teacher_message extends BaseActivity {
 
 
                             synchronized (lock) {
-                                recipientLt.add(dataSnapshot.getValue().toString());
-
-
+                                recipientLt.add(dataSnapshot.getValue().toString() + ". " + student.getName());
 
                                 lock.notifyAll();
                             }
@@ -207,6 +207,7 @@ progressDialog.dismiss();
 
 for(int x=0;x<sturecipients.size();x++){
     String studentid=sturecipients.get(x);
+    final Students students=TeacherUserPrefs.studentsHashMap.get(studentid);
     databaseReference=Constants.databaseReference.child(Constants.PARENT_RELATION_TABLE).child(studentid);
 
     databaseReference.addValueEventListener(new ValueEventListener() {
@@ -215,8 +216,8 @@ for(int x=0;x<sturecipients.size();x++){
 
 
             synchronized (lock) {
-                Log.d("pid",dataSnapshot.toString());
-                recipientLt.add(dataSnapshot.getValue().toString());
+
+                recipientLt.add(dataSnapshot.getValue().toString()+". "+ students.getName());
                 lock.notifyAll();
             }
 
@@ -273,13 +274,25 @@ for(int x=0;x<sturecipients.size();x++){
 
         java.util.Calendar calendar = Calendar.getInstance();
         long millis=calendar.getTimeInMillis();
+        millis=(millis/1000)*1000;
 
         for(int x=0;x<recipientLt.size();x++){
 
-            String client_userid=recipientLt.get(x);
+            String values[]=recipientLt.get(x).split("\\. ");
+
+            String client_userid=values[0];
+            String name=values[1];
+
             databaseReference= Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child("sent").child(client_userid).push();
             databaseReference.child("content").setValue(message.getText().toString());
             databaseReference.child("time").setValue(String.valueOf(millis));
+            databaseReference.child("name").setValue(name);
+
+
+            databaseReference= Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(client_userid).child("received").child(firebaseAuth.getCurrentUser().getUid()).push();
+            databaseReference.child("content").setValue(message.getText().toString());
+            databaseReference.child("time").setValue(String.valueOf(millis));
+            databaseReference.child("name").setValue(userPrefs.getUserName());
 
         }
 
@@ -471,23 +484,22 @@ recipientLt=new ArrayList<>();
 
                             if(student.getClass_id().equals(classId)){
 
-
                                 String client_userid = studentid;
 
+
                                 databaseReference= Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child("sent").child(client_userid).push();
-
-
-
                               databaseReference.child("content").setValue(message.getText().toString());
-
                                 java.util.Calendar calendar = Calendar.getInstance();
+                                databaseReference.child("time").setValue(String.valueOf((calendar.getTimeInMillis()/1000)*1000));
+                                databaseReference.child("name").setValue(student.getName());
 
 
-                                databaseReference.child("time").setValue(String.valueOf(calendar.getTimeInMillis()));
 
 
-
-
+                                databaseReference= Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(client_userid).child("received").child(firebaseAuth.getCurrentUser().getUid()).push();
+                                databaseReference.child("content").setValue(message.getText().toString());
+                                databaseReference.child("time").setValue(String.valueOf((calendar.getTimeInMillis()/1000)*1000));
+                                databaseReference.child("name").setValue(userPrefs.getUserName());
 
                             }
 
@@ -604,10 +616,21 @@ progressDialog.dismiss();
 
             for(int x=0;x<sturecipients.size();x++){
                 String client_userid = sturecipients.get(x);
+                Students students=TeacherUserPrefs.studentsHashMap.get(client_userid);
                 databaseReference= Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child("sent").child(client_userid).push();
                 databaseReference.child("content").setValue(message.getText().toString());
                 java.util.Calendar calendar = Calendar.getInstance();
-                databaseReference.child("time").setValue(String.valueOf(calendar.getTimeInMillis()));
+                databaseReference.child("time").setValue(String.valueOf((calendar.getTimeInMillis()/1000)*1000));
+                databaseReference.child("name").setValue(students.getName());
+
+
+
+
+                databaseReference= Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(client_userid).child("received").child(firebaseAuth.getCurrentUser().getUid()).push();
+                databaseReference.child("content").setValue(message.getText().toString());
+                databaseReference.child("time").setValue(String.valueOf((calendar.getTimeInMillis()/1000)*1000));
+                databaseReference.child("name").setValue(userPrefs.getUserName());
+
 
             }
 
