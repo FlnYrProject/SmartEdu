@@ -440,6 +440,8 @@ msg_id=dataSnapshot1.getKey();
                 userPrefs.setFirstLoading(false);
                 ReceivedMessageItems receivedMessageItems = new ReceivedMessageItems(view_messages.this);
                 receivedMessageItems.execute();
+            }else {
+                setReceived();
             }
 
 
@@ -492,7 +494,7 @@ msg_id=dataSnapshot1.getKey();
                     reply.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            //sendReply(name + ". " + time);
+                            sendReply(name + ". " + time);
                             dialog.dismiss();
                         }
                     });
@@ -553,11 +555,13 @@ msg_id=dataSnapshot1.getKey();
 
 
             //see sent
-            if(userPrefs.isFirstLoading()) {
-                userPrefs.setFirstLoading(false);
+            if(userPrefs.isFirstMessageLoading()) {
+                userPrefs.setFirstMessageLoading(false);
                 SentMessageItems sentMessageItems = new SentMessageItems(view_messages.this);
                 sentMessageItems.execute();
 
+            }else {
+                setSent();
             }
 
 
@@ -654,7 +658,7 @@ msg_id=dataSnapshot1.getKey();
     }
 
 
-  /*  protected void sendReply(String key)            //key is name+". "+time
+    protected void sendReply(final String key)            //key is name+". "+time
     {
         final Dialog send_reply=new Dialog(view_messages.this);
         send_reply.setContentView(R.layout.sending_message_to_teacher);
@@ -671,45 +675,38 @@ msg_id=dataSnapshot1.getKey();
                     Toast.makeText(view_messages.this, "Empty message", Toast.LENGTH_LONG).show();
                 }else
                 {
-                    ParseQuery<ParseUser> reply_to_query=ParseUser.getQuery();
-                    reply_to_query.whereEqualTo("username",sender);
-                    reply_to_query.findInBackground(new FindCallback<ParseUser>() {
-                        @Override
-                        public void done(List<ParseUser> objects, ParseException e) {
-                            if(e==null)
-                            {
-                                ParseObject new_message=new ParseObject(MessageTable.TABLE_NAME);
-                                new_message.put(MessageTable.FROM_USER_REF,ParseUser.getCurrentUser());
-                                new_message.put(MessageTable.TO_USER_REF,objects.get(0));
-                                new_message.put(MessageTable.MESSAGE_CONTENT,reply_message.getText().toString());
-                                new_message.put(MessageTable.DELETED_BY_SENDER,false);
-                                new_message.put(MessageTable.DELETED_BY_RECEIVER,false);
-                                new_message.put(MessageTable.INSTITUTION,ParseObject.createWithoutData(InstitutionTable.TABLE_NAME,institution_code));
 
-                                java.util.Calendar calendar= Calendar.getInstance();
-                                SimpleDateFormat format=new SimpleDateFormat("dd/MM/yyyy hh:mm:ss aa");
-                                String date= format.format(new Date(calendar.getTimeInMillis()));
-                                Date d=null;
-                                try {
-                                    d=format.parse(date);
-                                } catch (java.text.ParseException e1) {
-                                    e1.printStackTrace();
-                                }
 
-                                new_message.put(MessageTable.SENT_AT,d.getTime());
-                                new_message.saveEventually();
-                                Toast.makeText(view_messages.this, "Reply Sent", Toast.LENGTH_LONG).show();
-                                send_reply.dismiss();
-                            }else
-                            {
-                                Log.d("user","sender not found");
-                            }
-                        }
-                    });
+                    Messages messages=UserPrefs.receivedmessagemap.get(key);
+
+                    String client_userid = messages.getName_id();
+
+
+                    databaseReference= Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child("sent").child(client_userid).push();
+                    databaseReference.child("content").setValue(reply_message.getText().toString());
+                    java.util.Calendar calendar = Calendar.getInstance();
+                    databaseReference.child("time").setValue(String.valueOf((calendar.getTimeInMillis()/1000)*1000));
+                    databaseReference.child("name").setValue(messages.getName());
+
+
+
+
+                    databaseReference= Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(client_userid).child("received").child(firebaseAuth.getCurrentUser().getUid()).push();
+                    databaseReference.child("content").setValue(reply_message.getText().toString());
+                    databaseReference.child("time").setValue(String.valueOf((calendar.getTimeInMillis()/1000)*1000));
+                    databaseReference.child("name").setValue(userPrefs.getUserName());
+
+
+
+                    send_reply.dismiss();
+
+                    Toast.makeText(view_messages.this, "Reply Sent", Toast.LENGTH_LONG).show();
+
+
                 }
             }
         });
-    }*/
+    }
 
 
     protected void sleep(int time)
@@ -799,6 +796,16 @@ msg_id=dataSnapshot1.getKey();
             Intent nouser=new Intent(view_messages.this,LoginActivity.class);
             startActivity(nouser);
         }
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent toHome=new Intent(view_messages.this,Home.class);
+        toHome.putExtra("role",role);
+        toHome.putExtra("institution_name",institutionName);
+        startActivity(toHome);
     }
 
 }

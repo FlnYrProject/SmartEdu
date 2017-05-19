@@ -194,7 +194,7 @@ UserPrefs userPrefs;
         RoleItems roleItemsasync=new RoleItems(ChooseRole.this);
         roleItemsasync.execute();
 
-        Toast.makeText(getApplicationContext(),userPrefs.getUserName(),Toast.LENGTH_LONG).show();
+     //   Toast.makeText(getApplicationContext(),userPrefs.getUserName(),Toast.LENGTH_LONG).show();
 
         teacher.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -246,8 +246,7 @@ UserPrefs userPrefs;
                 startActivity(j);
             }
 
-            Toast.makeText(getApplicationContext(), role + " Module", Toast.LENGTH_LONG)
-                    .show();
+
         }
 
 

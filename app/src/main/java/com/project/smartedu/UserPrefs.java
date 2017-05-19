@@ -13,6 +13,8 @@ import com.project.smartedu.database.Uploads;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static java.lang.Boolean.TRUE;
+
 /**
  * Created by Shubham Bhasin on 24-Feb-17.
  */
@@ -116,6 +118,10 @@ public class UserPrefs {
 
         // Storing user id in pref
         editor.putString(USER_ID, userid);
+
+        editor.putBoolean(FIRST_LOADING, TRUE);
+
+        editor.putBoolean(FIRST_MESSAGE_LOADING, true);
 
         // commit changes
         editor.commit();

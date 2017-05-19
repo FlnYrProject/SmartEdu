@@ -1191,6 +1191,12 @@ public class Home extends BaseActivity {
     }
 
 
-
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent tohome=new Intent(Home.this, Home.class);
+        tohome.putExtra("institution_name",institutionName);
+        tohome.putExtra("role","teacher");
+        startActivity(tohome);
+    }
 }
