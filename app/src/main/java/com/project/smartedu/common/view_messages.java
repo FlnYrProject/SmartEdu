@@ -551,11 +551,12 @@ msg_id=dataSnapshot1.getKey();
             });
 
 
-            SentMessageItems sentMessageItems = new SentMessageItems(view_messages.this);
-            sentMessageItems.execute();
+
             //see sent
             if(userPrefs.isFirstLoading()) {
                 userPrefs.setFirstLoading(false);
+                SentMessageItems sentMessageItems = new SentMessageItems(view_messages.this);
+                sentMessageItems.execute();
 
             }
 
