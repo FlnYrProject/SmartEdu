@@ -791,8 +791,7 @@ public class Home extends BaseActivity {
                 } else if (position == 2) {
                     Intent message_intent = new Intent(Home.this, view_messages.class);
                     message_intent.putExtra("role", role);
-                    message_intent.putExtra("classId", studentUserPrefs.getClassId());
-                    message_intent.putExtra("studentId",  studentUserPrefs.getClassId());
+
                     message_intent.putExtra("institution_name", institutionName);
                    
                     message_intent.putExtra("_for", "received");
@@ -845,7 +844,7 @@ public class Home extends BaseActivity {
     private void loadData(){
 
 
-     loadTaskData();
+  loadScheduleData();
 
     }
 

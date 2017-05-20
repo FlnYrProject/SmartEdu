@@ -109,7 +109,8 @@
         <activity
             android:name=".student.student_exams"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".common.message_to_teacher"></activity>
+        <activity android:name=".common.message_to_teacher"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
