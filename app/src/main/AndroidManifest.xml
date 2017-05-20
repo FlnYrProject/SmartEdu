@@ -70,8 +70,10 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".common.parent_choose_child" />
         <activity android:name=".common.select_institution" />
-        <activity android:name=".student.Home" />
-        <activity android:name=".parent.Home" />
+        <activity android:name=".student.Home"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".parent.Home"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".teacher.Home"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -107,7 +109,8 @@
         <activity
             android:name=".student.student_exams"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".common.message_to_teacher"></activity>
+        <activity android:name=".common.message_to_teacher"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

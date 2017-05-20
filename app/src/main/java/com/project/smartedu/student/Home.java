@@ -28,8 +28,11 @@ import com.project.smartedu.common.Schedule;
 import com.project.smartedu.common.Tasks;
 import com.project.smartedu.common.view_messages;
 import com.project.smartedu.database.Class;
+import com.project.smartedu.database.Students;
+import com.project.smartedu.database.Teachers;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
+import com.project.smartedu.teacher.TeacherUserPrefs;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -64,6 +67,234 @@ public class Home extends BaseActivity {
 
 
 
+    private class TeacherItems extends AsyncTask<Void, Void, Void> {
+
+        private Context async_context;
+        private ProgressDialog pd;
+
+        public TeacherItems(Context context){
+            this.async_context = context;
+            pd = new ProgressDialog(async_context);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd.setMessage("Fetching alloted teachers...");
+            pd.setCancelable(false);
+            pd.show();
+           StudentUserPrefs.teacherHashMap.clear();
+            StudentUserPrefs.teachersuseridLt.clear();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            final Object lock = new Object();
+            final Object lock2 = new Object();
+
+
+
+                final String classid=studentUserPrefs.getClassId();
+            Log.d("cid","class id = "+ classid);
+                String[] classitems=classid.split("_");
+
+                databaseReference=Constants.databaseReference.child(Constants.CLASS_TABLE).child(institutionName).child(classitems[1]).child(classitems[2]).child("teacher");
+
+
+                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        synchronized (lock) {
+                            for (DataSnapshot ds : dataSnapshot.getChildren()) {
+
+
+
+
+                                String serial_number=ds.getValue().toString(); //gives teacher serial
+                                String teacherid=ds.getKey();   //gives teacher id
+
+                                StudentUserPrefs.teachersuseridLt.add(teacherid);
+
+                                ArrayList<String> subjects=new ArrayList<String>();
+                                com.project.smartedu.database.Teachers teachers=new Teachers("",teacherid,serial_number,subjects);
+                               StudentUserPrefs.teacherHashMap.put(teacherid,teachers);
+
+
+
+                            }
+
+
+                            lock.notifyAll();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+
+
+                synchronized (lock){
+                    try {
+                        lock.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+
+
+
+
+
+            //getting names
+                for(int i=0;i<StudentUserPrefs.teachersuseridLt.size();i++) {
+
+                    final String teacherid=StudentUserPrefs.teachersuseridLt.get(i);
+                    DatabaseReference dataReference = Constants.databaseReference.child(Constants.USER_DETAILS_TABLE).child(teacherid);
+
+                    final int finalI = i;
+                    dataReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            synchronized (lock2) {
+                                for (DataSnapshot dsi : dataSnapshot.getChildren()) {
+                                    if (dsi.getKey().equals("name")) {
+
+                                        String stuname=dsi.getValue().toString();
+
+                                        StudentUserPrefs.teacherHashMap.get(teacherid).setName(stuname);
+
+
+                                    }
+                                }
+                                lock2.notifyAll();
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    synchronized (lock2) {
+                        try {
+                            lock2.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+
+
+
+
+
+
+
+
+        //setting subjects
+            databaseReference=Constants.databaseReference.child(Constants.CLASS_TABLE).child(institutionName).child(classitems[1]).child(classitems[2]).child("subject");
+
+
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    synchronized (lock) {
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+
+
+
+
+                            String teacherid=ds.getValue().toString(); //gives teacher id
+                            String subject_name=ds.getKey();   //gives subject name
+
+                            Teachers teachers=StudentUserPrefs.teacherHashMap.get(teacherid);
+
+                            ArrayList<String> subjects=teachers.getSubjects();
+                            subjects.add(subject_name);
+                            teachers.setSubjects(subjects);
+                            StudentUserPrefs.teacherHashMap.put(teacherid,teachers);
+
+
+
+
+                        }
+
+
+                        lock.notifyAll();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+
+
+            synchronized (lock){
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+
+
+
+
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //Handles the stuff after the synchronisation with the firebase listener has been achieved
+            //The main UI is already idle by this moment
+            super.onPostExecute(aVoid);
+
+
+            int size=StudentUserPrefs.teachersuseridLt.size();
+            Toast.makeText(getApplicationContext(),size + " total students found",Toast.LENGTH_LONG).show();
+
+            //Show the log in progress_bar for at least a few milliseconds
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    pd.dismiss();
+                    pd=null;
+
+                }
+            }, 500);  // 100 milliseconds
+        }
+
+
+        //end firebase_async_class
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
     private class ClassItem extends AsyncTask<Void, Void, Void> {
 
         private Context async_context;
@@ -73,7 +304,7 @@ public class Home extends BaseActivity {
             this.async_context = context;
             pd = new ProgressDialog(async_context);
 
-            databaseReference = Constants.databaseReference.child(Constants.STUDENTS_TABLE).child(firebaseAuth.getCurrentUser().getUid());
+            databaseReference = Constants.databaseReference.child(Constants.STUDENTS_TABLE).child(institutionName).child(firebaseAuth.getCurrentUser().getUid());
         }
 
         @Override
@@ -140,8 +371,10 @@ public class Home extends BaseActivity {
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
-                    pd.dismiss();
 
+                    pd.dismiss();
+                    pd=null;
+                    loadTeacherData();
                 }
             }, 500);  // 100 milliseconds
         }
@@ -162,7 +395,7 @@ public class Home extends BaseActivity {
         private Context async_context;
         private ProgressDialog pd;
 
-        public TaskItems(Context context) {
+        public TaskItems(Context context){
             this.async_context = context;
             pd = new ProgressDialog(async_context);
 
@@ -188,28 +421,33 @@ public class Home extends BaseActivity {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     synchronized (lock) {
                         for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                            HashMap<String, HashMap<String, String>> retTaskList = (HashMap<String, HashMap<String, String>>) ds.getValue();
+                            HashMap<String, String> retTaskList = (HashMap<String, String>) ds.getValue();
                             //   Toast.makeText(getApplicationContext(),"here in",Toast.LENGTH_LONG).show();
 
-                            for (String key : retTaskList.keySet()) {
-                                //  Toast.makeText(getApplicationContext(),"here",Toast.LENGTH_LONG).show();
-                                Log.d("key", key);
-                                HashMap<String, String> taskmap = (HashMap<String, String>) retTaskList.get(key);
-                                // Toast.makeText(getApplicationContext(),taskmap.get("name") + " " + taskmap.get("date"),Toast.LENGTH_LONG).show();
-                                /// System.out.print(taskmap.get("name") + " " + taskmap.get("date"));
+
+                            //String.valueOf(retTaskList.get(key); gives values
+                            // for ( String key : retTaskList.keySet() ) {
+                            //  Toast.makeText(getApplicationContext(),"here",Toast.LENGTH_LONG).show();
+                            // Log.d("key",String.valueOf(retTaskList.get(key)));
+                            //HashMap<String,String> taskmap=( HashMap<String,String>)retTaskList.get(key);
+                            // Toast.makeText(getApplicationContext(),taskmap.get("name") + " " + taskmap.get("date"),Toast.LENGTH_LONG).show();
+                            /// System.out.print(taskmap.get("name") + " " + taskmap.get("date"));
 
 
-                                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+
+                            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
 
-                                String dateString = formatter.format(new Date(Long.parseLong(taskmap.get("date"))));
 
-                                String entry = taskmap.get("name") + "\n" + taskmap.get("description") + "\n" + dateString;
-                                Log.d("key", key);
-                                taskidmap.put(entry, key);
-                                taskLt.add(entry);
+                            String dateString = formatter.format(new Date(Long.parseLong(retTaskList.get("date"))));
 
-                            }
+                            String entry=retTaskList.get("name")+ "\n" +retTaskList.get("description") + "\n" + dateString;
+                            //Log.d("key",key);
+                            taskidmap.put(entry,ds.getKey());
+                            taskLt.add(entry);
+
+                            //}
+
 
 
                         }
@@ -224,7 +462,8 @@ public class Home extends BaseActivity {
 
             });
 
-            synchronized (lock) {
+
+            synchronized (lock){
                 try {
                     lock.wait();
                 } catch (InterruptedException e) {
@@ -241,21 +480,23 @@ public class Home extends BaseActivity {
             super.onPostExecute(aVoid);
 
             //Show the log in progress_bar for at least a few milliseconds
-            Toast.makeText(getApplicationContext(), taskLt.size() + " tasks found", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(),taskLt.size() + " tasks found",Toast.LENGTH_LONG).show();
 
-            UserPrefs.taskItems = taskLt;
-            UserPrefs.taskidmap = taskidmap;
+            UserPrefs.taskItems=taskLt;
+            UserPrefs.taskidmap=taskidmap;
 
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
                     pd.dismiss();
+                    pd=null;
                     loadScheduleData();
                 }
             }, 500);  // 100 milliseconds
         }
         //end firebase_async_class
     }
+
 
 
 
@@ -362,7 +603,7 @@ public class Home extends BaseActivity {
                 public void run() {
                     pd.dismiss();
                     pd = null;
-                    //loadClassData();
+                    loadClassData();
                 }
             }, 500);  // 100 milliseconds
         }
@@ -550,8 +791,7 @@ public class Home extends BaseActivity {
                 } else if (position == 2) {
                     Intent message_intent = new Intent(Home.this, view_messages.class);
                     message_intent.putExtra("role", role);
-                    message_intent.putExtra("classId", studentUserPrefs.getClassId());
-                    message_intent.putExtra("studentId",  studentUserPrefs.getClassId());
+
                     message_intent.putExtra("institution_name", institutionName);
                    
                     message_intent.putExtra("_for", "received");
@@ -604,8 +844,7 @@ public class Home extends BaseActivity {
     private void loadData(){
 
 
-        loadTaskData();
-
+  loadScheduleData();
 
     }
 
@@ -630,6 +869,15 @@ public class Home extends BaseActivity {
 
         ClassItem classasync = new ClassItem(Home.this);        //get teacher data
         classasync.execute();
+
+    }
+
+
+
+    private void loadTeacherData(){
+
+        TeacherItems teacherItems = new TeacherItems(Home.this);        //get teacher data
+        teacherItems.execute();
 
     }
 

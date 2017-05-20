@@ -566,7 +566,7 @@ progressDialog.dismiss();
             sendmessage = (Button) marks_add.findViewById(R.id.send_message);
 
 
-            marks_add.show();
+
 
             sendmessage.setOnClickListener(new View.OnClickListener() {
                 @Override

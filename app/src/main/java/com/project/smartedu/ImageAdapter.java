@@ -34,15 +34,15 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     public int getCount() {
-        if(role.equals("Teacher")) {
+        if(role.equalsIgnoreCase("Teacher")) {
             return mThumbIdsTeacher.length;
         }
-        else if(role.equals("Parent"))  {
+        else if(role.equalsIgnoreCase("Parent"))  {
             return mThumbIdsParent.length;
         }
-        else if(role.equals("Student")) {
+        else if(role.equalsIgnoreCase("Student")) {
             return mThumbIdsStudent.length;
-        }else if(role.equals("admin"))
+        }else if(role.equalsIgnoreCase("admin"))
         {
             return mThumbIdsAdmin.length;
         }

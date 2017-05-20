@@ -396,15 +396,11 @@ msg_id=dataSnapshot1.getKey();
             new_message.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //classId=from_student.getStringExtra("classId");
-                    studentId=from_student.getStringExtra("studentId");
-                    // Log.d("test",classId);
-                    Log.d("test",studentId);
+
                     Intent message_intent = new Intent(view_messages.this, message_to_teacher.class);
                     message_intent.putExtra("role", role);
                     message_intent.putExtra("institution",institutionName);
-                    message_intent.putExtra("classGradeId", classGradeId);
-                    message_intent.putExtra("studentId", studentId);
+
                     message_intent.putExtra("for", "message");
                     startActivity(message_intent);
                 }
@@ -802,10 +798,21 @@ msg_id=dataSnapshot1.getKey();
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Intent toHome=new Intent(view_messages.this,Home.class);
-        toHome.putExtra("role",role);
-        toHome.putExtra("institution_name",institutionName);
-        startActivity(toHome);
+
+
+        if(role.equalsIgnoreCase("Teacher")) {
+            Intent toHome = new Intent(view_messages.this, Home.class);
+            toHome.putExtra("role", role);
+            toHome.putExtra("institution_name", institutionName);
+            startActivity(toHome);
+        }
+
+        if(role.equalsIgnoreCase("student")){
+            Intent toHome = new Intent(view_messages.this, com.project.smartedu.student.Home.class);
+            toHome.putExtra("role", role);
+            toHome.putExtra("institution_name", institutionName);
+            startActivity(toHome);
+        }
     }
 
 }
