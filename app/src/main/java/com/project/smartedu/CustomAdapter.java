@@ -214,10 +214,10 @@ public class CustomAdapter extends ArrayAdapter<Model> implements View.OnClickLi
         final Dialog dialog2 = new Dialog(context);
         dialog2.setContentView(R.layout.show_attendance_daily);
         dialog2.setTitle("Attendance Information");
-        this.absentDays = (TextView) dialog2.findViewById(R.id.exam);
-        this.totalDays = (TextView) dialog2.findViewById(R.id.totalMarks);
+        this.absentDays = (TextView) dialog2.findViewById(R.id.absentdays);
+        this.totalDays = (TextView) dialog2.findViewById(R.id.totalDays);
         this.percentage = (TextView) dialog2.findViewById(R.id.percentage);
-        myDate = (TextView) dialog2.findViewById(R.id.dateText1);
+
         String absentDays = absent + "";
         String total = totalDays + "";
         String PER = percentage + "";
@@ -231,7 +231,7 @@ public class CustomAdapter extends ArrayAdapter<Model> implements View.OnClickLi
 
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
         final String string_current_date = df.format(calendar.getTime());
-        myDate.setText(string_current_date);
+
 
         // dialog2.dismiss();
         dialog2.show();

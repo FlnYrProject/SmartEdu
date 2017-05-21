@@ -815,7 +815,7 @@ userPrefs=new UserPrefs(Home.this);
                     atten_intent.putExtra("role", "Parent");
                     atten_intent.putExtra("studentId",parentUserPrefs.getSelectedChildId() );
                     atten_intent.putExtra("classGradeId", studentUserPrefs.getClassId());
-
+                    atten_intent.putExtra("for","attendance");
                     atten_intent.putExtra("institution_name",institutionName);
                     startActivity(atten_intent);
 

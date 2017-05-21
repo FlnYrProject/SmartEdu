@@ -9,7 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,9 +31,11 @@ import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
+import com.project.smartedu.student.student_classes;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -48,6 +52,9 @@ public class view_attendance extends BaseActivity implements FragmentDrawer.Frag
     TextView totalDays;
     TextView percentage;
     java.util.Calendar calendar;
+    ListView attendanceLogs;
+    Button showLogButton;
+
     TextView myDate;
     // Students students = new Students();
     //ArrayList<Task> myList;
@@ -60,9 +67,9 @@ public class view_attendance extends BaseActivity implements FragmentDrawer.Frag
     HashMap<String,String> attendancemap;
 
 
-    double present = 0;
-    double absent = 0;
-    double totalDaysnumber = 0;
+    int present = 0;
+   int absent = 0;
+    int totalDaysnumber = 0;
     double percent = 0.0;
 
 
@@ -108,15 +115,11 @@ public class view_attendance extends BaseActivity implements FragmentDrawer.Frag
                           Log.d("att",ds.getKey()+ " " + ds.getValue().toString());
                             attendancemap.put(ds.getKey(),ds.getValue().toString());
 
-
-
                                 if (ds.getValue().toString().equalsIgnoreCase("A")) {
                                     absent++;
-
-                                totalDaysnumber++;
-                            }
+                                 }
+                            totalDaysnumber++;
                             present = totalDaysnumber - absent;
-                            percent = (present / totalDaysnumber) * 100;
 
                         }
                         lock.notifyAll();
@@ -150,7 +153,7 @@ public class view_attendance extends BaseActivity implements FragmentDrawer.Frag
             handler.postDelayed(new Runnable() {
                 public void run() {
 //                   Toast.makeText(async_context,userPrefs.getUserName(),Toast.LENGTH_LONG).show();
-                    information(absent, totalDaysnumber, percent);
+                    information(absent, totalDaysnumber);
                    // setAttendanceList();
                     // noti_bar.setTexts(userPrefs.getUserName(), role,institutionName);
                     pd.dismiss();
@@ -171,6 +174,13 @@ public class view_attendance extends BaseActivity implements FragmentDrawer.Frag
         super.onCreate(savedInstanceState);
         setContentView(R.layout.show_attendance_daily);
 
+        absentDays = (TextView) findViewById(R.id.absentdays);
+        totalDays = (TextView) findViewById(R.id.totalDays);
+       percentage = (TextView) findViewById(R.id.percentage);
+        attendanceLogs=(ListView)findViewById(R.id.attendancelog);
+        showLogButton=(Button)findViewById(R.id.show_logs);
+
+
         Intent from_home = getIntent();
         role = from_home.getStringExtra("role");
         studentId = from_home.getStringExtra("studentId");
@@ -178,7 +188,26 @@ public class view_attendance extends BaseActivity implements FragmentDrawer.Frag
         subject=from_home.getStringExtra("subject");
         institutionName=from_home.getStringExtra("institution_name");
 
-        Log.d("test",studentId + " " + classId + " " +subject);
+        attendanceLogs.setVisibility(View.INVISIBLE);
+
+        showLogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            if(attendanceLogs.getVisibility()==View.VISIBLE)  {
+                showLogButton.setText("SEE LOGS");
+
+                attendanceLogs.setVisibility(View.INVISIBLE);
+
+            }else if(attendanceLogs.getVisibility()==View.INVISIBLE){
+                showLogButton.setText("HIDE LOGS");
+                makeList();
+                attendanceLogs.setVisibility(View.VISIBLE);
+
+            }
+
+            }
+        });
         /*
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
@@ -206,14 +235,44 @@ attendancemap=new HashMap<>();
 
     }
 
-    public void information(double absent, double totalDays, double percentage){
-        this.absentDays = (TextView) findViewById(R.id.exam);
-        this.totalDays = (TextView) findViewById(R.id.totalMarks);
-        this.percentage = (TextView) findViewById(R.id.percentage);
-        myDate = (TextView) findViewById(R.id.dateText1);
-        String absentDays= absent+"";
-        String total= totalDays+"";
-        String PER= percentage+"";
+
+
+    public void makeList(){
+
+        ArrayList<String> attendancelist=new ArrayList<>();
+
+        for(String key:attendancemap.keySet()){
+            SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+
+            String messsage="";
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(Long.parseLong(key));
+            final String string_current_date= df.format(calendar.getTime());
+
+            if(attendancemap.get(key).equalsIgnoreCase("p")){
+                messsage="Present on "+ string_current_date;
+            }
+
+            if(attendancemap.get(key).equalsIgnoreCase("a")){
+                messsage="Absent on "+ string_current_date;
+            }
+
+            attendancelist.add(messsage);
+
+        }
+
+        ArrayAdapter adapter = new ArrayAdapter(view_attendance.this, android.R.layout.simple_list_item_1, attendancelist);
+        attendanceLogs.setAdapter(adapter);
+
+    }
+
+    public void information(int absent, int totalDays){
+
+        String absentDays= String.valueOf(absent);
+        String total=String.valueOf( totalDays);
+        percent=((totalDays-absent)/(double)totalDays)*100;
+        String PER= String.valueOf(percent)+"%";
 
         this.absentDays.setText(absentDays.trim());
         this.totalDays.setText(total.trim());
@@ -224,7 +283,7 @@ attendancemap=new HashMap<>();
 
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
         final String string_current_date = df.format(calendar.getTime());
-        myDate.setText(string_current_date);
+//        myDate.setText(string_current_date);
     }
 
 
