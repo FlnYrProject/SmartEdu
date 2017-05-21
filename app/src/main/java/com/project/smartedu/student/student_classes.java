@@ -13,6 +13,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -21,8 +22,13 @@ import com.parse.ParseUser;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
+import com.project.smartedu.UserPrefs;
+import com.project.smartedu.common.UploadMaterial_students;
+import com.project.smartedu.common.view_attendance;
+import com.project.smartedu.database.Teachers;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
+import com.project.smartedu.parent.ParentUserPrefs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,10 +44,17 @@ public class student_classes extends BaseActivity {
     String _for;
 
     ListView classList;
+
     NotificationBar noti_bar;
     String studentId;
     String classId;
 
+
+    DatabaseReference databaseReference;
+
+    UserPrefs userPrefs;
+    StudentUserPrefs studentUserPrefs;
+    ParentUserPrefs parentUserPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,8 +76,14 @@ public class student_classes extends BaseActivity {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle("Classes");
+
+
+            userPrefs=new UserPrefs(student_classes.this);
+            parentUserPrefs=new ParentUserPrefs(student_classes.this);
+            studentUserPrefs=new StudentUserPrefs(student_classes.this);
+
             noti_bar = (NotificationBar) getSupportFragmentManager().findFragmentById(R.id.noti);
-            noti_bar.setTexts(ParseUser.getCurrentUser().getUsername(), role,super.institutionName);
+            noti_bar.setTexts(userPrefs.getUserName(), role,institutionName);
 
 
 
@@ -80,54 +99,35 @@ public class student_classes extends BaseActivity {
 
 
 
+        final HashMap<String,Teachers> classMap=new HashMap<String,Teachers>();         //map from subject to teacher
+
+        ArrayList<String> classLt = new ArrayList<String>();
+
+        for(int x=0;x<StudentUserPrefs.teachersuseridLt.size();x++){
+
+            String teacherid=StudentUserPrefs.teachersuseridLt.get(x);
+
+            Teachers teachers =StudentUserPrefs.teacherHashMap.get(teacherid);
 
 
+            for(int y=0;y<teachers.getSubjects().size();y++){
 
+                classLt.add(teachers.getSubjects().get(y));
 
-
-
-
-
-        final HashMap<String,String> classMap=new HashMap<String,String>();
-
-       /* ParseQuery<ParseObject> classQuery = ParseQuery.getQuery(ClassTable.TABLE_NAME);
-        classQuery.whereEqualTo(ClassTable.CLASS_NAME, ParseObject.createWithoutData(ClassGradeTable.TABLE_NAME, classGradeId));
-        classQuery.findInBackground(new FindCallback<ParseObject>() {
-            public void done(List<ParseObject> classListRet, ParseException e) {
-                if (e == null) {
-
-                    if (classListRet.size() != 0) {
-
-                        ArrayList<String> classLt = new ArrayList<String>();
-                        ArrayAdapter adapter = new ArrayAdapter(student_classes.this, android.R.layout.simple_list_item_1, classLt);
-
-
-                        Log.d("classes", "Retrieved " + classListRet.size() + " users");
-                        //Toast.makeText(getApplicationContext(), studentListRet.toString(), Toast.LENGTH_LONG).show();
-                        for (int i = 0; i < classListRet.size(); i++) {
-                            ParseObject u = (ParseObject) classListRet.get(i);
-                            // ParseObject classGradeObject = ((ParseObject) u.get(ClassTable.CLASS_NAME));
-
-                            String name = u.getString(ClassTable.SUBJECT);
-
-
-                            adapter.add(name);
-                            classMap.put(name, u.getObjectId());
-
-
-                        }
-                        classList.setAdapter(adapter);
-                    } else {
-                        Log.d("class", "error in query");
-                    }
-                } else {
-                    Log.d("user", "Error: " + e.getMessage());
-                }
+                classMap.put(teachers.getSubjects().get(y),teachers);
 
             }
-        });
 
-*/
+
+
+        }
+
+
+        ArrayAdapter adapter = new ArrayAdapter(student_classes.this, android.R.layout.simple_list_item_1, classLt);
+        classList.setAdapter(adapter);
+
+
+
 
 
 
@@ -138,27 +138,41 @@ public class student_classes extends BaseActivity {
                 //String[] classSpecs=item.split(" ");
 
 
-                classId = classMap.get(item);          //object id corresponding to selected item will be retreived
-                Log.d("student_classes ", "class id: " + classId);
+                Teachers teachers=classMap.get(item);
 
-              /*  if (_for.equals("attendance")) {
+
+
+                if (_for.equals("attendance")) {
                     Intent to_view_atten = new Intent(student_classes.this, view_attendance.class);
-                    to_view_atten.putExtra("studentId", studentId);
-                    to_view_atten.putExtra("classId", classId);
+                    if(role.equalsIgnoreCase("Parent")){
+                        to_view_atten.putExtra("studentId",parentUserPrefs.getSelectedChildId());
+                        to_view_atten.putExtra("classId", parentUserPrefs.getChildClass());
+                    }else {
+                        to_view_atten.putExtra("studentId", firebaseAuth.getCurrentUser().getUid());
+                        to_view_atten.putExtra("classId", studentUserPrefs.getClassId());
+
+                    }
+
+                    to_view_atten.putExtra("subject", item);
                     to_view_atten.putExtra("institution_name",institutionName);
                     to_view_atten.putExtra("role", role);
                     startActivity(to_view_atten);
                 }
                 else if (_for.equals("upload")) {
                     Intent to_upload = new Intent(student_classes.this, UploadMaterial_students.class);
-                    to_upload.putExtra("studentId", studentId);
-                    to_upload.putExtra("classId", classId);
+                    if(role.equalsIgnoreCase("Parent")){
+                        to_upload.putExtra("studentId",parentUserPrefs.getSelectedChildId());
+                        to_upload.putExtra("classId", parentUserPrefs.getChildClass());
+                    }else {
+                        to_upload.putExtra("studentId", firebaseAuth.getCurrentUser().getUid());
+                        to_upload.putExtra("classId", studentUserPrefs.getClassId());
+                    }
+                    to_upload.putExtra("subject", item);
                     to_upload.putExtra("institution_name",institutionName);
                     to_upload.putExtra("role", role);
 
                     startActivity(to_upload);
                 }
-*/
 
             }
         });

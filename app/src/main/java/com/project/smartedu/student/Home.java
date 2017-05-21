@@ -856,8 +856,7 @@ public class Home extends BaseActivity {
     private void loadData(){
 
 
-  loadScheduleData();
-
+  loadTaskData();
     }
 
 

@@ -33,6 +33,7 @@ public class ParentUserPrefs {
 
 
     private static final String SELECTED_CHILD_CLASS = "ChildClass";
+    private static final String SELECTED_CHILD_ROLL_NUMBER = "ChildRollNumber";
 
 
 
@@ -91,9 +92,26 @@ public class ParentUserPrefs {
 
 
 
+    public void setSelectedChildRollNumber(String rollNumber){
+
+        // Storing name in pref
+        editor.putString(SELECTED_CHILD_ROLL_NUMBER, rollNumber);
+
+        // commit changes
+        editor.commit();
+    }
 
 
-    public String getChildCLass(){
+
+
+
+
+    public String getSelectedChildRollNumber(){
+        return pref.getString(SELECTED_CHILD_ROLL_NUMBER,"");
+    }
+
+
+    public String getChildClass(){
         return pref.getString(SELECTED_CHILD_CLASS,"");
     }
 

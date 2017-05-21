@@ -19,7 +19,7 @@ import com.project.smartedu.BaseActivity;
 import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
 import com.project.smartedu.UserPrefs;
-import com.project.smartedu.student.ParentUserPrefs;
+import com.project.smartedu.parent.ParentUserPrefs;
 import com.project.smartedu.teacher.Home;
 
 import java.util.ArrayList;

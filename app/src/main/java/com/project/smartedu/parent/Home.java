@@ -344,7 +344,7 @@ public class Home extends BaseActivity {
 
 
                             if(ds.getKey().equals("class")){
-                                studentUserPrefs.setClassId(ds.getValue().toString());
+                                parentUserPrefs.setSelectedChildClass(ds.getValue().toString());
                             }
 
                             if(ds.getKey().equals("roll_number")){
