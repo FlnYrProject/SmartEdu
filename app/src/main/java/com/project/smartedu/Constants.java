@@ -23,7 +23,7 @@ public class Constants {
   public static final String PARENT_RELATION_TABLE= "parents";
   public static final String UPLOADS_TABLE= "uploads";
   public static final String MESSAGES_TABLE= "messages";
-
+  public static final String EXAMS_TABLE= "exams";
 
 
   public static final String[] days= {"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};

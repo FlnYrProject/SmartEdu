@@ -189,7 +189,7 @@ setAttendanceList();
                 }
 
 
-                attendanceitems.add(subject + " total = " + total + " present = " + presentcount);
+                attendanceitems.add(subject + "|| total = " + total + " present = " + presentcount);
 
               }
 
