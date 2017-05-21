@@ -6,11 +6,14 @@ import android.content.SharedPreferences;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.project.smartedu.database.Messages;
 import com.project.smartedu.database.Schedule;
 import com.project.smartedu.database.Uploads;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import static java.lang.Boolean.TRUE;
 
 /**
  * Created by Shubham Bhasin on 24-Feb-17.
@@ -54,9 +57,11 @@ public class UserPrefs {
 
     public static final String FIRST_LOADING= "isfirstloading";
 
+    public static final String FIRST_MESSAGE_LOADING= "isfirstmessageloading";
+
 
     public static HashMap<String,ArrayList<String>> roleslistmap;
-    public static HashMap<String,ArrayList<String>> parentchildinstmap;
+    public static HashMap<String,ArrayList<String>> parentchildidmap;         //parent->childuid
 
     public static ArrayList<String> taskItems;
     public static HashMap<String,String> taskidmap; //to map task to its id
@@ -68,13 +73,26 @@ public class UserPrefs {
     // public static HashMap<String,ArrayList<Schedule>> schedulesmaplt; // a map from day to its schedules
     public static HashMap<Schedule,String> schedulekeymap;        ///to map schedule to key
 
+
+
+
+
+
+
+
+
+    public static HashMap<String,Messages> receivedmessagemap;      //name+time--->message
+    public static HashMap<String,Messages> sentmessagemap;      //name+time--->message
+
     static {
         roleslistmap=new HashMap<>();           //role type mapped to list of institutions
-        parentchildinstmap=new HashMap<>();     //child user id to list of institutions
+        parentchildidmap=new HashMap<>();     //child user id to list of institutions
         taskItems=new ArrayList<>();
         taskidmap=new HashMap<>();
         schedulekeymap=new HashMap<>();
         uploadkeymap=new HashMap<>();
+        receivedmessagemap=new HashMap<>();
+        sentmessagemap=new HashMap<>();
     }
 
     public UserPrefs(Context context){
@@ -101,6 +119,10 @@ public class UserPrefs {
         // Storing user id in pref
         editor.putString(USER_ID, userid);
 
+        editor.putBoolean(FIRST_LOADING, TRUE);
+
+        editor.putBoolean(FIRST_MESSAGE_LOADING, true);
+
         // commit changes
         editor.commit();
     }
@@ -117,8 +139,6 @@ public class UserPrefs {
     public Boolean isFirstLoading(){
         // Storing flag for admin in pref
        return pref.getBoolean(FIRST_LOADING,true);
-
-
     }
 
 
@@ -130,6 +150,20 @@ public class UserPrefs {
         editor.commit();
     }
 
+
+    public Boolean isFirstMessageLoading(){
+        // Storing flag for admin in pref
+        return pref.getBoolean(FIRST_MESSAGE_LOADING,true);
+    }
+
+
+    public void setFirstMessageLoading(Boolean isfirstmessageloading){
+        // Storing flag for admin in pref
+        editor.putBoolean(FIRST_MESSAGE_LOADING, isfirstmessageloading);
+
+        // commit changes
+        editor.commit();
+    }
 
 
     public void clearUserDetails(){
@@ -200,7 +234,7 @@ public class UserPrefs {
 
     public void clearAllSavedData(){
         roleslistmap.clear();
-        parentchildinstmap.clear();
+        parentchildidmap.clear();
         taskidmap.clear();
         taskItems.clear();
         schedulekeymap.clear();

@@ -113,4 +113,10 @@
     <string name="title_activity_exams">Exams</string>
     <string name="title_activity_new_upload">NewUpload</string>
     <string name="title_activity_upload_image">UploadImage</string>
+
+
+    <string-array name="sex">
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
 </resources>

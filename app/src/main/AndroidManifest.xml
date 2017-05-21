@@ -68,18 +68,27 @@
             android:name=".common.Schedule"
             android:label="@string/title_activity_schedule"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".common.parent_choose_child" />
-        <activity android:name=".common.select_institution" />
-        <activity android:name=".student.Home" />
-        <activity android:name=".parent.Home" />
+        <activity
+            android:name=".common.parent_choose_child"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".common.select_institution"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".student.Home"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".parent.Home"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".teacher.Home"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".teacher.Classes"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".common.view_messages"
-            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".common.view_messages"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".teacher.Students"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -89,8 +98,9 @@
         <activity
             android:name=".teacher.UploadMaterial"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".teacher.teacher_message"
-            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".teacher.teacher_message"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".teacher.Attendance"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -107,7 +117,11 @@
         <activity
             android:name=".student.student_exams"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".common.message_to_teacher"></activity>
+        <activity
+            android:name=".common.message_to_teacher"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".common.view_attendance" />
+        <activity android:name=".common.UploadMaterial_students"></activity>
     </application>
 
 </manifest>

@@ -13,20 +13,30 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.project.smartedu.BaseActivity;
+import com.project.smartedu.Constants;
 import com.project.smartedu.CustomAdapter;
 import com.project.smartedu.LoginActivity;
 import com.project.smartedu.Model;
 import com.project.smartedu.R;
+import com.project.smartedu.UserPrefs;
+import com.project.smartedu.database.Students;
+import com.project.smartedu.database.Teachers;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
+import com.project.smartedu.student.StudentUserPrefs;
+import com.project.smartedu.teacher.StudentInfo;
+import com.project.smartedu.teacher.TeacherUserPrefs;
+import com.project.smartedu.teacher.teacher_message;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -53,6 +63,16 @@ public class message_to_teacher extends BaseActivity {
     CustomAdapter customAdapter;
     String studentId;
 
+
+    UserPrefs userPrefs;
+    StudentUserPrefs studentUserPrefs;
+
+    HashMap<String,String> localteachermap;
+
+    DatabaseReference databaseReference;
+
+    ArrayList<String> teacherrecipients;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,10 +87,14 @@ public class message_to_teacher extends BaseActivity {
         role = from_student.getStringExtra("role");
         institutionName= from_student.getStringExtra("institution");
         noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
-        noti_bar.setTexts(ParseUser.getCurrentUser().getUsername(),role,institutionName);
 
-        classGradeId = from_student.getStringExtra("classGradeId");
-        studentId=from_student.getStringExtra("studentId");
+        userPrefs=new UserPrefs(message_to_teacher.this);
+        studentUserPrefs=new StudentUserPrefs(message_to_teacher.this);
+        teacherrecipients=new ArrayList<>();
+
+        noti_bar.setTexts(userPrefs.getUserName(),role,institutionName);
+
+
 
         broadcast=(Button)findViewById(R.id.broadcast);;
         teacherList = (ListView) findViewById(R.id.studentList);
@@ -81,79 +105,68 @@ public class message_to_teacher extends BaseActivity {
         drawerFragment.setDrawerListener(this);
 
 
-        Toast.makeText(message_to_teacher.this, "id class selected is = " +studentId, Toast.LENGTH_LONG).show();
+
+        localteachermap=new HashMap<>();
 
 
-       /* broadcast.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                broadcasting();
+
+
+
+
+        if(StudentUserPrefs.teachersuseridLt.size()>0) {
+            modelItems = new Model[StudentUserPrefs.teachersuseridLt.size()];
+            //ArrayList<String> studentLt = new ArrayList<String>();
+            // ArrayAdapter adapter = new ArrayAdapter(AddAttendance_everyday.this, android.R.layout.simple_list_item_1, studentLt);
+            //Toast.makeText(Students.this, "here = ", Toast.LENGTH_LONG).show();
+
+            Log.d("user", "Retrieved " + StudentUserPrefs.teachersuseridLt.size() + " students in this class");
+            //Toast.makeText(getApplicationContext(), studentListRet.toString(), Toast.LENGTH_LONG).show();
+            for (int i = 0; i < StudentUserPrefs.teachersuseridLt.size(); i++) {
+
+                String teacherid=StudentUserPrefs.teachersuseridLt.get(i);
+                Teachers teachers=StudentUserPrefs.teacherHashMap.get(teacherid);
+               String entry= teachers.getSerial_number() + ". " + teachers.getName();
+                localteachermap.put(entry,teacherid);
+
+
+                modelItems[i] = new Model(entry, 0);
+
+
             }
-        });
 
-         final HashMap<String,ParseObject> teacherMap=new HashMap<>();
-        ParseQuery<ParseObject> studentQuery = ParseQuery.getQuery(ClassTable.TABLE_NAME);
-        studentQuery.whereEqualTo(ClassTable.CLASS_NAME, ParseObject.createWithoutData(ClassGradeTable.TABLE_NAME,classGradeId));
+            customAdapter = new CustomAdapter(message_to_teacher.this, modelItems, studentUserPrefs.getClassId());
+            // no use of the reference context here but in attendance_everyday
 
-        studentQuery.findInBackground(new FindCallback<ParseObject>() {
-            public void done(List<ParseObject> studentListRet, ParseException e) {
-                if (e == null) {
+            teacherList.setAdapter(customAdapter);
+            selected_button.setVisibility(View.VISIBLE);
 
 
-                    Log.d("user", "Retrieved " + studentListRet.size() + " teachers");
-                    modelItems= new Model[studentListRet.size()];
-                    //Toast.makeText(getApplicationContext(), studentListRet.toString(), Toast.LENGTH_LONG).show();
-                    for (int i = 0; i < studentListRet.size(); i++) {
-                        ParseObject u = (ParseObject) studentListRet.get(i);
-                        //  if(u.getString("class").equals(id)) {
-
-                        String subject = u.getString(ClassTable.SUBJECT);
-                        String teacher_name= null;
-                        try {
-                            teacher_name = ((ParseUser)u.get(ClassTable.TEACHER_USER_REF)).fetchIfNeeded().getUsername();
-                        } catch (ParseException e1) {
-                            e1.printStackTrace();
-                        }
-                        String name= teacher_name + ", " + subject;
-                        teacherMap.put(name,(ParseObject)(u.get(ClassTable.TEACHER_USER_REF)));
-                        //name += "\n";
-                        // name += u.getInt("age");
-
-                        //  adapter.add(name);
-                        // }
-                        modelItems[i]=new Model(name,0);
-
-                    }
-
-
-                    customAdapter = new CustomAdapter(message_to_teacher.this, modelItems, ParseObject.createWithoutData(ClassGradeTable.TABLE_NAME,classGradeId));
-                    // no use of the reference context here but in attendance_everyday
-
-                    teacherList.setAdapter(customAdapter);
-                    selected_button.setVisibility(View.VISIBLE);
-
-                    selected_button.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            sendToSelected();
-                        }
-                    });
-
-
-                } else {
-                    Toast.makeText(message_to_teacher.this, "error", Toast.LENGTH_LONG).show();
-                    Log.d("user", "Error: " + e.getMessage());
+            broadcast.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                       broadcasting();
                 }
-            }
-        });
-*/
+            });
+
+
+            selected_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    sendToSelected();
+                }
+            });
+
+        }else{
+            Toast.makeText(message_to_teacher.this,"No teachers alloted to class",Toast.LENGTH_LONG).show();
+        }
+
 
 
     }
 
 
 
-   /* protected void broadcasting()
+    protected void broadcasting()
     {
         final Dialog marks_add=new Dialog(message_to_teacher.this);
         marks_add.setContentView(R.layout.sending_message_to_teacher);
@@ -172,56 +185,39 @@ public class message_to_teacher extends BaseActivity {
                 }else
                 {
 
+                    for(int x = 0; x< StudentUserPrefs.teachersuseridLt.size(); x++){
 
-                      *//*  final ParseObject[] classRef = new ParseObject[1];
-                        ParseQuery<ParseObject> classQuery = ParseQuery.getQuery(ClassTable.TABLE_NAME);
-                        classQuery.whereEqualTo(ClassTable.OBJECT_ID, classId);
-                        classQuery.findInBackground(new FindCallback<ParseObject>() {
-                            public void done(List<ParseObject> studentListRet, ParseException e) {
-                                if (e == null) {
-                                    classRef[0] = studentListRet.get(0); *//*
-                    ParseQuery<ParseObject> studentQuery = ParseQuery.getQuery(ClassTable.TABLE_NAME);
-                    studentQuery.whereEqualTo(ClassTable.CLASS_NAME, ParseObject.createWithoutData(ClassGradeTable.TABLE_NAME,classGradeId));
-                    // studentQuery.whereEqualTo(ClassTable.INSTITUTION,ParseObject.createWithoutData(InstitutionTable.TABLE_NAME,institution_code));
-                    studentQuery.findInBackground(new FindCallback<ParseObject>() {
-                        public void done(List<ParseObject> studentListRet, ParseException e) {
-                            if (e == null) {
-
-                                for (int i = 0; i < studentListRet.size(); i++) {
-                                    ParseUser client_user = (ParseUser) studentListRet.get(i).get(ClassTable.TEACHER_USER_REF);
-                                    ParseObject newmessage = new ParseObject(MessageTable.TABLE_NAME);
-                                    newmessage.put(MessageTable.FROM_USER_REF, ParseUser.getCurrentUser());
-                                    newmessage.put(MessageTable.TO_USER_REF, client_user);
-                                    newmessage.put(MessageTable.MESSAGE_CONTENT, message.getText().toString());
-                                    newmessage.put(MessageTable.DELETED_BY_SENDER,false);
-                                    newmessage.put(MessageTable.DELETED_BY_RECEIVER,false);
-                                    newmessage.put(MessageTable.INSTITUTION,ParseObject.createWithoutData(InstitutionTable.TABLE_NAME,institution_code));
+                        String teacherid= StudentUserPrefs.teachersuseridLt.get(x);
+                        Teachers teachers= StudentUserPrefs.teacherHashMap.get(teacherid);
 
 
-                                    java.util.Calendar calendar= Calendar.getInstance();
-                                    SimpleDateFormat format=new SimpleDateFormat("dd/MM/yyyy hh:mm:ss aa");
-                                    String date= format.format(new Date(calendar.getTimeInMillis()));
-                                    Date d=null;
-                                    try {
-                                        d=format.parse(date);
-                                    } catch (java.text.ParseException e1) {
-                                        e1.printStackTrace();
-                                    }
-
-                                    newmessage.put(MessageTable.SENT_AT, d.getTime());
-                                    newmessage.saveEventually();
-                                    marks_add.dismiss();
-                                    Toast.makeText(message_to_teacher.this, "Message Successfully Broadcasted to teachers", Toast.LENGTH_LONG).show();
 
 
-                                }
+                            String client_userid = teacherid;
 
-                            } else {
-                                Toast.makeText(message_to_teacher.this, "error broadcasting to teachers", Toast.LENGTH_LONG).show();
-                                Log.d("user", "Error: " + e.getMessage());
-                            }
-                        }
-                    });
+
+                            databaseReference= Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child("sent").child(client_userid).push();
+                            databaseReference.child("content").setValue(message.getText().toString());
+                            java.util.Calendar calendar = Calendar.getInstance();
+                            databaseReference.child("time").setValue(String.valueOf((calendar.getTimeInMillis()/1000)*1000));
+                            databaseReference.child("name").setValue(teachers.getName());
+
+
+
+
+                            databaseReference= Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(client_userid).child("received").child(firebaseAuth.getCurrentUser().getUid()).push();
+                            databaseReference.child("content").setValue(message.getText().toString());
+                            databaseReference.child("time").setValue(String.valueOf((calendar.getTimeInMillis()/1000)*1000));
+                            databaseReference.child("name").setValue(userPrefs.getUserName());
+
+
+
+
+
+
+                    }
+                    Toast.makeText(message_to_teacher.this, "Message Successfully Broadcasted to Teachers", Toast.LENGTH_LONG).show();
+                    marks_add.dismiss();
 
 
                 }
@@ -230,11 +226,10 @@ public class message_to_teacher extends BaseActivity {
         });
         marks_add.show();
     }
-*/
 
 
 
- /*   protected void sendToSelected()
+    protected void sendToSelected()
     {
         int count=0;
         for(int i=0;i<customAdapter.getCount();i++)
@@ -257,88 +252,73 @@ public class message_to_teacher extends BaseActivity {
             message = (EditText) marks_add.findViewById(R.id.message);
             sendmessage = (Button) marks_add.findViewById(R.id.send_message);
 
+
+
             sendmessage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
+                    teacherrecipients.clear();
                     if (message.getText().equals("")) {
                         Toast.makeText(getApplicationContext(), "no message", Toast.LENGTH_LONG).show();
                     } else {
-                        //   giveMessage(classobject);
-
 
                         for (int i = 0; i < customAdapter.getCount(); i++) {
                             final Model item = customAdapter.getItem(i);
 
                             if(item.isChecked()) {
-                                String[] studentdetails = item.getName().split(", ");
 
-                                final String[] details = new String[2];
-                                int j = 0;
+                                String teacherentry=item.getName();
+                                String teacherid=localteachermap.get(teacherentry);
+                                teacherrecipients.add(teacherid);
 
-                                for (String x : studentdetails) {
-                                    details[j++] = x;
-                                }
-                                Log.d("user", "username: " + details[0].trim() + "subject " + details[1]);  //extracts Chit as Chi and query fails???
 
-                                ParseQuery<ParseUser> studentQuery = ParseUser.getQuery();
-                                studentQuery.whereEqualTo("username", details[0]);
-                                studentQuery.findInBackground(new FindCallback<ParseUser>() {
-                                    @Override
-                                    public void done(List<ParseUser> objects, ParseException e) {
-                                        if (e == null) {
-                                            if (objects.size() != 0) {
-                                                ParseUser teacher = objects.get(0);
-                                                giveMessage(teacher);
-                                                marks_add.dismiss();
-                                            }
-                                        } else {
-                                            Log.d("user", "Error: " + e.getMessage());
-                                        }
-                                    }
-                                });
 
                             }
 
                         }
+
+                        giveMessage();
+                        marks_add.dismiss();
 
                     }
                 }
             });
             marks_add.show();
         }
-    }*/
+    }
 
 
 
 
-   /* protected void giveMessage(final ParseUser teacher)
+    protected void giveMessage()
     {
 
-        ParseUser client_user=teacher;
-        ParseObject newmessage=new ParseObject(MessageTable.TABLE_NAME);
-        newmessage.put(MessageTable.FROM_USER_REF,ParseUser.getCurrentUser());
-        newmessage.put(MessageTable.TO_USER_REF,client_user);
-        newmessage.put(MessageTable.MESSAGE_CONTENT, message.getText().toString());
-        newmessage.put(MessageTable.DELETED_BY_SENDER,false);
-        newmessage.put(MessageTable.DELETED_BY_RECEIVER,false);
-        newmessage.put(MessageTable.INSTITUTION,ParseObject.createWithoutData(InstitutionTable.TABLE_NAME,institution_code));
-        java.util.Calendar calendar= Calendar.getInstance();
-        SimpleDateFormat format=new SimpleDateFormat("dd/MM/yyyy hh:mm:ss aa");
-        String date= format.format(new Date(calendar.getTimeInMillis()));
-        Date d=null;
-        try {
-            d=format.parse(date);
-        } catch (java.text.ParseException e1) {
-            e1.printStackTrace();
+
+        for(int x=0;x<teacherrecipients.size();x++){
+            String client_userid = teacherrecipients.get(x);
+            Teachers teachers=StudentUserPrefs.teacherHashMap.get(client_userid);
+            databaseReference= Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child("sent").child(client_userid).push();
+            databaseReference.child("content").setValue(message.getText().toString());
+            java.util.Calendar calendar = Calendar.getInstance();
+            databaseReference.child("time").setValue(String.valueOf((calendar.getTimeInMillis()/1000)*1000));
+            databaseReference.child("name").setValue(teachers.getName());
+
+
+
+
+            databaseReference= Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(client_userid).child("received").child(firebaseAuth.getCurrentUser().getUid()).push();
+            databaseReference.child("content").setValue(message.getText().toString());
+            databaseReference.child("time").setValue(String.valueOf((calendar.getTimeInMillis()/1000)*1000));
+            databaseReference.child("name").setValue(userPrefs.getUserName());
+
+
         }
 
-        newmessage.put(MessageTable.SENT_AT, d.getTime());
-        newmessage.saveEventually();
         Toast.makeText(message_to_teacher.this, "Message Successfully Sent to Teacher", Toast.LENGTH_LONG).show();
 
 
-    }*/
+    }
 
     @Override
     protected void onPostResume() {
