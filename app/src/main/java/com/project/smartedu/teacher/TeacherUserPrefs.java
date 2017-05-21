@@ -44,6 +44,10 @@ public class TeacherUserPrefs {
     public static HashMap<String,Students> studentsHashMap;                 //user id to student details
 
 
+    public static ArrayList<String> examidLt;
+    public static HashMap<String,Exam> examHashMap;
+
+
 
 
     static {
@@ -52,6 +56,9 @@ public class TeacherUserPrefs {
         subjectallotmentmap=new HashMap<>();
         studentsuseridLt=new ArrayList<>();
         studentsHashMap=new HashMap<>();
+        examidLt=new ArrayList<>();
+        examHashMap=new HashMap<>();
+
     }
 
 

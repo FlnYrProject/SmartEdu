@@ -27,6 +27,7 @@ import com.project.smartedu.UserPrefs;
 import com.project.smartedu.common.Schedule;
 import com.project.smartedu.common.Tasks;
 import com.project.smartedu.common.view_messages;
+import com.project.smartedu.database.Exam;
 import com.project.smartedu.database.Students;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
@@ -64,6 +65,156 @@ public class Home extends BaseActivity {
     SwipeRefreshLayout swipeRefreshLayout;
 
     ArrayList<String> subjects;
+
+
+
+
+
+
+
+
+
+
+    private class ExamItems extends AsyncTask<Void, Void, Void> {
+
+        private Context async_context;
+        private ProgressDialog pd;
+
+        public ExamItems(Context context){
+            this.async_context = context;
+            pd = new ProgressDialog(async_context);
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd.setMessage("Fetching Exams");
+            pd.setCancelable(false);
+            pd.show();
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            final Object lock = new Object();
+
+
+            for(int x=0;x<TeacherUserPrefs.allotments.size();x++){
+
+                String allotted_classid=TeacherUserPrefs.allotments.get(x);
+
+                for(int y=0;y<TeacherUserPrefs.subjectallotmentmap.get(allotted_classid).size();y++){
+
+
+                    final String subject=TeacherUserPrefs.subjectallotmentmap.get(allotted_classid).get(y);
+
+                    databaseReference=Constants.databaseReference.child(Constants.EXAMS_TABLE).child(institutionName).child(allotted_classid).child(subject);
+
+
+                    databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            synchronized (lock) {
+                                for(DataSnapshot ds:dataSnapshot.getChildren()) {
+
+                                    Log.d("key"," " + ds.getKey());     //key of exam
+
+                                    TeacherUserPrefs.examidLt.add(ds.getKey());
+                                    String name="";
+                                    String max_marks="";
+                                    String date="";
+                                    for(DataSnapshot dataSnapshot1:ds.getChildren()){
+
+
+                                        if(dataSnapshot1.getKey().equalsIgnoreCase("name")){
+                                            name=dataSnapshot1.getValue().toString();
+                                        }
+
+                                        if(dataSnapshot1.getKey().equalsIgnoreCase("max_marks")){
+                                            max_marks=dataSnapshot1.getValue().toString();
+                                        }
+
+                                        if(dataSnapshot1.getKey().equalsIgnoreCase("date")){
+                                            date=dataSnapshot1.getValue().toString();
+                                        }
+
+
+
+                                    }
+
+                                    Exam exam=new Exam(ds.getKey(),name,date,max_marks,subject);
+                                    TeacherUserPrefs.examHashMap.put(ds.getKey(),exam);
+
+                                }
+                                lock.notifyAll();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+
+                    });
+
+                    synchronized (lock){
+                        try {
+                            lock.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+
+
+
+
+                }
+
+
+
+            }
+
+
+
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //Handles the stuff after the synchronisation with the firebase listener has been achieved
+            //The main UI is already idle by this moment
+            super.onPostExecute(aVoid);
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+//                   Toast.makeText(async_context,userPrefs.getUserName(),Toast.LENGTH_LONG).show();
+                    //setAttendanceList();
+                    // noti_bar.setTexts(userPrefs.getUserName(), role,institutionName);
+                    pd.dismiss();
+                    pd=null;
+
+                }
+            }, 500);  // 100 milliseconds
+
+
+        }
+        //end firebase_async_class
+    }
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -164,15 +315,6 @@ public class Home extends BaseActivity {
             }
 
 
-
-
-
-
-
-
-
-
-
             return null;
         }
 
@@ -201,6 +343,7 @@ public class Home extends BaseActivity {
                     pd.dismiss();
                     pd=null;
                     //loadUploadData();
+                    loadExamData();
 
                 }
             }, 500);  // 100 milliseconds
@@ -1193,6 +1336,16 @@ public class Home extends BaseActivity {
         subjectAllotmentItems.execute();
 
     }
+
+
+
+    private void loadExamData(){
+
+        ExamItems examItems = new ExamItems(Home.this);        //get teacher data
+        examItems.execute();
+
+    }
+
 
     public void swipeRefresh(){
         userPrefs.setFirstLoading(true);
