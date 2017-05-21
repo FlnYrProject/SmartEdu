@@ -1,8 +1,12 @@
 package com.project.smartedu.teacher;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -20,7 +24,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.R;
@@ -35,7 +42,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
+
+import static com.project.smartedu.UserPrefs.uploadkeymap;
 
 
 public class UploadMaterial extends BaseActivity implements FragmentDrawer.FragmentDrawerListener {
@@ -106,6 +116,148 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
     Spinner subjectSpinner;
     ArrayAdapter subjectadapter;
 
+    private class UploadItems extends AsyncTask<Void, Void, Void> {
+
+        private Context async_context;
+        private ProgressDialog pd;
+
+        public UploadItems(Context context){
+            this.async_context = context;
+            pd = new ProgressDialog(async_context);
+            uploadLt=new ArrayList<>();
+
+            databaseReference = Constants.databaseReference.child(Constants.UPLOADS_TABLE).child(institutionName);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd.setMessage("Fetching Upload List");
+            pd.setCancelable(false);
+            pd.show();
+            //uploadLt.clear();
+            //uploadidmap.clear();
+            uploadkeymap.clear();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            final Object lock = new Object();
+
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    synchronized (lock) {
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                            HashMap<String, String> retUploadList = (HashMap<String, String>) ds.getValue();
+
+                            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+
+                            String upload_type = retUploadList.get("upload_type");
+                            String subject = retUploadList.get("subject");
+                            String topic = retUploadList.get("topic");
+                            String imageUrl = retUploadList.get("imageUrl");
+                            String teacher = retUploadList.get("teacher");
+                            Long date = Long.parseLong(retUploadList.get("date"));
+
+
+                            //String dateString = formatter.format(new Date(Long.parseLong(retUploadList.get("date"))));
+                            com.project.smartedu.database.Uploads upload = new com.project.smartedu.database.Uploads(upload_type, subject, topic, imageUrl, teacher, date);
+
+                            //String entry=retUploadList.get("upload_type")+ "\n" +retUploadList.get("subject") +"\n" +retUploadList.get("topic")+"\n" +retUploadList.get("imageUrl")+"\n" +retUploadList.get("teacher") + "\n" + dateString;
+                            //Log.d("key",key);
+                            uploadkeymap.put(upload, ds.getKey());
+                            //uploadidmap.put(entry,ds.getKey());
+                            //uploadLt.add(entry);
+
+                            //}
+
+
+
+                        }
+                        lock.notifyAll();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+
+            });
+
+
+            synchronized (lock){
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //Handles the stuff after the synchronisation with the firebase listener has been achieved
+            //The main UI is already idle by this moment
+            super.onPostExecute(aVoid);
+
+            //Show the log in progress_bar for at least a few milliseconds
+            Toast.makeText(getApplicationContext(),uploadkeymap.size() + " uploads found",Toast.LENGTH_LONG).show();
+
+            UserPrefs.uploadkeymap=uploadkeymap;
+            // UserPrefs.uploadidmap=uploadidmap;
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    setUploadList();
+                    pd.dismiss();
+                    //pd=null;
+
+                }
+
+
+            }, 500);  // 100 milliseconds
+        }
+        //end firebase_async_class
+    }
+
+    public void setUploadList(){
+
+        for(Uploads upl: uploadkeymap.keySet()){
+            uploadLt.add(upl);
+        }
+
+        if (uploadLt.size() == 0) {
+            uploadList.setVisibility(View.INVISIBLE);
+
+        } else {
+            items = new String[uploadLt.size()];
+
+
+            for (int i = 0; i < uploadLt.size(); i++) {
+                Uploads uploadobject = uploadLt.get(i);
+               
+                long date = TimeUnit.MILLISECONDS.toMinutes(uploadobject.getDate());
+                String upload_type = uploadobject.getUploadType();
+                String subject = uploadobject.getSubject();
+                String topic = uploadobject.getTopic();
+                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                String dateString = formatter.format(new Date(date));
+                String uploaditem = upload_type + "\n" + topic + "\n" + subject + "\n" + dateString;
+                items[i] = uploaditem;
+
+            }
+            uploadLtString = new ArrayList<>(Arrays.asList(items));
+            adapter = new ArrayAdapter(UploadMaterial.this, android.R.layout.simple_list_item_1, uploadLtString);
+            uploadList.setAdapter(adapter);
+
+
+        }
+
+    }
 
 
 
@@ -154,34 +306,12 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
         uploadLt=new ArrayList<>();
         uploadLtString=new ArrayList<>();
 
-        for(Uploads upl:UserPrefs.uploadkeymap.keySet()){
-                uploadLt.add(upl);
-        }
 
-        if (uploadLt.size() == 0) {
-            uploadList.setVisibility(View.INVISIBLE);
-
-        } else {
-            items = new String[uploadLt.size()];
+        UploadItems uploadItems=new UploadItems(this);
+        uploadItems.execute();
 
 
-            for (int i = 0; i < uploadLt.size(); i++) {
-                Uploads uploadobject = uploadLt.get(i);
-                long date = TimeUnit.MILLISECONDS.toMinutes(uploadobject.getDate());
-                String upload_type = uploadobject.getUploadType();
-                String subject = uploadobject.getSubject();
-                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-                String dateString = formatter.format(new Date(date));
-                String uploaditem = upload_type + "\n" + subject + "\n" + dateString;
-                items[i] = uploaditem;
 
-            }
-            uploadLtString = new ArrayList<>(Arrays.asList(items));
-            adapter = new ArrayAdapter(UploadMaterial.this, android.R.layout.simple_list_item_1, uploadLtString);
-            uploadList.setAdapter(adapter);
-
-
-        }
 
 
 
