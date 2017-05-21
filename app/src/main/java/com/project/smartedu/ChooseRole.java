@@ -25,7 +25,8 @@ import com.project.smartedu.admin.Home;
 import com.project.smartedu.common.parent_choose_child;
 import com.project.smartedu.common.select_institution;
 import com.project.smartedu.database.Children;
-import com.project.smartedu.student.ParentUserPrefs;
+import com.project.smartedu.parent.ParentUserPrefs;
+
 
 import java.nio.charset.spi.CharsetProvider;
 import java.text.SimpleDateFormat;

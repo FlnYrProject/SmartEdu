@@ -35,7 +35,8 @@ import com.project.smartedu.UserPrefs;
 import com.project.smartedu.database.Children;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
-import com.project.smartedu.student.ParentUserPrefs;
+import com.project.smartedu.parent.ParentUserPrefs;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
