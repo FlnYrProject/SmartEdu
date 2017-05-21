@@ -68,8 +68,10 @@
             android:name=".common.Schedule"
             android:label="@string/title_activity_schedule"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".common.parent_choose_child" />
-        <activity android:name=".common.select_institution" />
+        <activity android:name=".common.parent_choose_child"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".common.select_institution"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".student.Home"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".parent.Home"

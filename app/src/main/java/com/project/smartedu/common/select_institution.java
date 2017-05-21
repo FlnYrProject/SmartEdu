@@ -19,6 +19,7 @@ import com.project.smartedu.BaseActivity;
 import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
 import com.project.smartedu.UserPrefs;
+import com.project.smartedu.student.ParentUserPrefs;
 import com.project.smartedu.teacher.Home;
 
 import java.util.ArrayList;
@@ -37,6 +38,9 @@ public class select_institution extends BaseActivity {
     //String child_code;
     String child_username;
 
+
+    ParentUserPrefs parentUserPrefs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,10 +50,11 @@ public class select_institution extends BaseActivity {
 
         role=from_student.getStringExtra("role");
 
+        parentUserPrefs=new ParentUserPrefs(select_institution.this);
         if(role.equalsIgnoreCase("Parent"))
         {
             //child_code=from_student.getStringExtra("child_code");
-            child_username=from_student.getStringExtra("child_username");
+            child_username=ParentUserPrefs.childinsitutionmap.get(parentUserPrefs.getSelectedChildId()).getName();
         }
 /*
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -80,13 +85,17 @@ public class select_institution extends BaseActivity {
         }else {
             institutionLt= UserPrefs.roleslistmap.get(role);
 
+            if(role.equalsIgnoreCase("parent")){
+                institutionLt=ParentUserPrefs.childinsitutionmap.get(parentUserPrefs.getSelectedChildId()).getInsitutions();
+            }
+
 
             if(institutionLt.size()==1){
 
             Log.d("institution", "Single institution");
 
                 institutionName=institutionLt.get(0);
-
+            parentUserPrefs.setSelectedInstituion(institutionName);
               loadInstitution(institutionName);
 
         }else {
@@ -108,7 +117,7 @@ public class select_institution extends BaseActivity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                    institutionName = ((TextView) view).getText().toString();
                     Log.d("institution", institutionName);
-
+                    parentUserPrefs.setSelectedInstituion(institutionName);
                     loadInstitution(institutionName);
 
 
@@ -153,6 +162,8 @@ public class select_institution extends BaseActivity {
     }
 
 
-
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
 }

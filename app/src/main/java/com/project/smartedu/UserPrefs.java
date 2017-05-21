@@ -61,7 +61,7 @@ public class UserPrefs {
 
 
     public static HashMap<String,ArrayList<String>> roleslistmap;
-    public static HashMap<String,ArrayList<String>> parentchildinstmap;
+    public static HashMap<String,ArrayList<String>> parentchildidmap;         //parent->childuid
 
     public static ArrayList<String> taskItems;
     public static HashMap<String,String> taskidmap; //to map task to its id
@@ -86,7 +86,7 @@ public class UserPrefs {
 
     static {
         roleslistmap=new HashMap<>();           //role type mapped to list of institutions
-        parentchildinstmap=new HashMap<>();     //child user id to list of institutions
+        parentchildidmap=new HashMap<>();     //child user id to list of institutions
         taskItems=new ArrayList<>();
         taskidmap=new HashMap<>();
         schedulekeymap=new HashMap<>();
@@ -234,7 +234,7 @@ public class UserPrefs {
 
     public void clearAllSavedData(){
         roleslistmap.clear();
-        parentchildinstmap.clear();
+        parentchildidmap.clear();
         taskidmap.clear();
         taskItems.clear();
         schedulekeymap.clear();

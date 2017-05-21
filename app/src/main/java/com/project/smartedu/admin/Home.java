@@ -648,33 +648,45 @@ public class Home extends BaseActivity{
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     synchronized (lock) {
                         for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                            HashMap<String, String> retTaskList = (HashMap<String, String>) ds.getValue();
+                            // HashMap<String, HashMap<String,String>> retTaskList = (HashMap<String, HashMap<String,String>>) ds.getValue();
                             //   Toast.makeText(getApplicationContext(),"here in",Toast.LENGTH_LONG).show();
+                            String name="",description="",time="0";
 
-
-                            //String.valueOf(retTaskList.get(key); gives values
-                           // for ( String key : retTaskList.keySet() ) {
-                                //  Toast.makeText(getApplicationContext(),"here",Toast.LENGTH_LONG).show();
-                               // Log.d("key",String.valueOf(retTaskList.get(key)));
-                                //HashMap<String,String> taskmap=( HashMap<String,String>)retTaskList.get(key);
-                                // Toast.makeText(getApplicationContext(),taskmap.get("name") + " " + taskmap.get("date"),Toast.LENGTH_LONG).show();
-                               /// System.out.print(taskmap.get("name") + " " + taskmap.get("date"));
+                            for(DataSnapshot dataSnapshot1:ds.getChildren()){
 
 
 
-                                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+
+                                if (dataSnapshot1.getKey().equalsIgnoreCase("name")){
+                                    Log.d("key","here");
+                                    name=dataSnapshot1.getValue().toString();
+                                }
+
+                                if (dataSnapshot1.getKey().equalsIgnoreCase("description")){
+                                    description=dataSnapshot1.getValue().toString();
+                                }
+
+                                if (dataSnapshot1.getKey().equalsIgnoreCase("date")){
+                                    time=dataSnapshot1.getValue().toString();
+                                }
 
 
 
-                                String dateString = formatter.format(new Date(Long.parseLong(retTaskList.get("date"))));
 
-                                String entry=retTaskList.get("name")+ "\n" +retTaskList.get("description") + "\n" + dateString;
-                                //Log.d("key",key);
-                                taskidmap.put(entry,ds.getKey());
-                                taskLt.add(entry);
 
-                            //}
+                            }
 
+
+
+                            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+
+
+
+                            String dateString = formatter.format(new Date(Long.parseLong(time)));
+                            String entry=name+ "\n" + description + "\n" + dateString;
+                            Log.d("key",ds.getKey());
+                            taskidmap.put(entry,ds.getKey());
+                            taskLt.add(entry);
 
 
                         }

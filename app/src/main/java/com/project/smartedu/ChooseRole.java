@@ -24,6 +24,8 @@ import com.project.smartedu.admin.AdminUserPrefs;
 import com.project.smartedu.admin.Home;
 import com.project.smartedu.common.parent_choose_child;
 import com.project.smartedu.common.select_institution;
+import com.project.smartedu.database.Children;
+import com.project.smartedu.student.ParentUserPrefs;
 
 import java.nio.charset.spi.CharsetProvider;
 import java.text.SimpleDateFormat;
@@ -45,6 +47,7 @@ public class ChooseRole extends BaseActivity {
 
 UserPrefs userPrefs;
 
+    boolean parentflag;
 
 
 
@@ -89,17 +92,11 @@ UserPrefs userPrefs;
                                 Log.d("role",ds.getKey() + " at " + retRolesList.get(key));
 
                                 if(ds.getKey().equalsIgnoreCase("parent")){
-                                    parentinst.add(retRolesList.get(key));
 
-                                    ArrayList<String> instlist;
-                                    if( UserPrefs.parentchildinstmap.containsKey(key)){
-                                        instlist=UserPrefs.parentchildinstmap.get(key);
-                                    }else{
-                                        instlist=new ArrayList<String>();
-                                    }
-                                    instlist.add(retRolesList.get(key));
-                                    UserPrefs.parentchildinstmap.put(key,instlist);
+                                    parentflag=true;
+                                    parentinst.add(retRolesList.get(key));                  //hashmap gives student id
 
+                                    ParentUserPrefs.childuseridLt.add(retRolesList.get(key));
                                 }else if(ds.getKey().equalsIgnoreCase("student")){
                                     studentinst.add(retRolesList.get(key));
                                 }else if(ds.getKey().equalsIgnoreCase("teacher")){
@@ -134,6 +131,93 @@ UserPrefs userPrefs;
                     e.printStackTrace();
                 }
             }
+
+
+
+
+
+
+            /*if(parentflag){             //allot instiutions to child
+
+                for(int x=0;x<ParentUserPrefs.childuseridLt.size();x++) {
+                    final String childid=ParentUserPrefs.childuseridLt.get(x);
+                    final Children children=new Children();
+                    final String[] name = new String[1];
+                    databaseReference = Constants.databaseReference.child(Constants.USER_DETAILS_TABLE).child(childid);
+
+                    databaseReference.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            for (DataSnapshot ds : dataSnapshot.getChildren()) {
+
+
+                                if(ds.getKey().equalsIgnoreCase("name")){
+                                    children.setName(ds.getValue().toString());
+                                    Log.d("name",children.getName());
+                                }
+
+
+                                if(ds.getKey().equalsIgnoreCase("role")){
+
+
+                                    for(DataSnapshot dataSnapshot1:ds.getChildren()){
+
+                                        if(dataSnapshot1.getKey().equalsIgnoreCase("student")){
+                                            ArrayList<String> childinstitutes=new ArrayList<String>();
+
+                                            for(DataSnapshot dataSnapshot2:dataSnapshot1.getChildren()){
+
+
+                                                Log.d("institute",dataSnapshot2.getValue().toString());        //gives institute
+
+                                            childinstitutes.add(dataSnapshot2.getValue().toString());
+                                            }
+
+                                            children.setInsitutions(childinstitutes);
+
+                                        }
+
+
+                                    }
+
+
+                                }
+
+                            }
+
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+
+                    synchronized (lock){
+                        try {
+                            lock.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+
+                }
+
+
+
+            }*/
+
+
+
+
+
+
+
+
             return null;
         }
 
@@ -170,6 +254,8 @@ UserPrefs userPrefs;
         setSupportActionBar(toolbar);
 
         userPrefs=new UserPrefs(ChooseRole.this);
+
+        parentflag=false;
 
         //change to add role button
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);

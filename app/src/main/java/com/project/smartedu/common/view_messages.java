@@ -813,6 +813,14 @@ msg_id=dataSnapshot1.getKey();
             toHome.putExtra("institution_name", institutionName);
             startActivity(toHome);
         }
+
+
+        if(role.equalsIgnoreCase("parent")){
+            Intent toHome = new Intent(view_messages.this, com.project.smartedu.parent.Home.class);
+            toHome.putExtra("role", role);
+            toHome.putExtra("institution_name", institutionName);
+            startActivity(toHome);
+        }
     }
 
 }
