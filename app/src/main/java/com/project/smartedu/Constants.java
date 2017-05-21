@@ -27,7 +27,7 @@ public class Constants {
 
 
   public static final String[] days= {"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
-
+  public static final String[] sex= {"Male","Female"};
 
 
 

@@ -416,6 +416,8 @@ public class Home extends BaseActivity {
         protected Void doInBackground(Void... params) {
             final Object lock = new Object();
 
+            databaseReference = Constants.databaseReference.child(Constants.TASK_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child(role);
+
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {

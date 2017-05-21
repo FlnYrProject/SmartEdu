@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +44,7 @@ public class NewTeacher extends BaseActivity {
     String address;
     String contact;
     String parentname;
+    String sex;
 
     int serial;
 
@@ -54,7 +56,7 @@ public class NewTeacher extends BaseActivity {
     EditText teacheraddress;
     EditText teachercontact;
     EditText teacherparent;
-
+Spinner teachersex;
 
     String admin_pass;
 
@@ -91,7 +93,8 @@ public class NewTeacher extends BaseActivity {
         teacherdob = (EditText) findViewById(R.id.teacherdob);
         teachercontact = (EditText) findViewById(R.id.teachercontact);
         teacheraddress=(EditText) findViewById(R.id.teacheraddress);
-        teacherparent=(EditText) findViewById(R.id.teacherparentname);;
+        teacherparent=(EditText) findViewById(R.id.teacherparentname);
+        teachersex=(Spinner)findViewById(R.id.teachersex);
 
 
         addTeacherButton = (Button) findViewById(R.id.addTeacherButton);
@@ -106,7 +109,7 @@ public class NewTeacher extends BaseActivity {
                 contact=teachercontact.getText().toString();
                 address=teacheraddress.getText().toString();
                 parentname=teacherparent.getText().toString();
-
+                sex=teachersex.getSelectedItem().toString();
 
                 if (name.equals(null) || email.equals(null) || dob.equals(null) || contact.equals(null) || address.equals(null) || parentname.equals(null) ) {
                     Toast.makeText(getApplicationContext(), "Teacher details cannot be empty!", Toast.LENGTH_LONG).show();
@@ -133,7 +136,7 @@ public class NewTeacher extends BaseActivity {
 
                             if(task.isSuccessful()){
 
-                                addTeacherUser(name,dob,contact,address,parentname,email, firebaseUser);
+                                addTeacherUser(name,sex,dob,contact,address,parentname,email, firebaseUser);
                                 sleep(3000);
 
                             }else{
@@ -195,7 +198,7 @@ public class NewTeacher extends BaseActivity {
     }
 
 
-    protected void addTeacherUser(final String Name,final String DOB,final String contact,final String address, final String parentname, String email, final FirebaseUser prefirebaseuser)
+    protected void addTeacherUser(final String Name,final String sex,final String DOB,final String contact,final String address, final String parentname, String email, final FirebaseUser prefirebaseuser)
     {
 
         String password="qwerty";
@@ -214,6 +217,7 @@ public class NewTeacher extends BaseActivity {
                     databaseReference.child(teacherfirebaseUser.getUid()).child("dob").setValue(DOB);
                     databaseReference.child(teacherfirebaseUser.getUid()).child("contact").setValue(contact);
                     databaseReference.child(teacherfirebaseUser.getUid()).child("parent_name").setValue(parentname);
+                    databaseReference.child(teacherfirebaseUser.getUid()).child("sex").setValue(sex);
 
                     DatabaseReference dataReference = databaseReference.child(teacherfirebaseUser.getUid()).child("role").child("teacher").push();
                     dataReference.setValue(institutionName);
