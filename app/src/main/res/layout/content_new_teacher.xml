@@ -5,6 +5,17 @@
     android:layout_height="match_parent"
     android:background="#000000">
 
+
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
     <EditText
         android:layout_width="match_parent"
         android:layout_height="30dp"
@@ -25,7 +36,8 @@
         android:layout_centerHorizontal="true"
         android:background="#20BF9F"
         android:textSize="15sp"
-        android:textColor="#ffffff" />
+        android:textColor="#ffffff"
+        android:layout_below="@+id/teachercontact"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -36,8 +48,33 @@
         android:textSize="25sp"
         android:textColor="#ffff"
         android:layout_marginTop="20dp"
+        android:layout_below="@+id/teachersex"
+        android:layout_alignParentStart="true" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Sex:"
+        android:id="@+id/sex"
+        android:textSize="25sp"
+        android:textColor="#ffff"
+        android:layout_marginTop="20dp"
         android:layout_below="@+id/teacherName"
         android:layout_alignParentStart="true" />
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:id="@+id/teachersex"
+        android:layout_gravity="center_horizontal"
+        android:background="#ffffffff"
+        android:layout_below="@+id/sex"
+        android:layout_alignParentStart="true"
+        android:entries="@array/sex"/>
+
+
 
     <EditText
         android:layout_width="match_parent"
@@ -143,5 +180,7 @@
         android:background="#ffffffff"
         android:layout_below="@+id/contact"
         android:layout_alignParentStart="true" />
+            </RelativeLayout>
+    </ScrollView>
 
 </RelativeLayout>

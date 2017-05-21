@@ -1,7 +1,9 @@
 package com.project.smartedu.teacher;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,7 +19,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -32,8 +37,11 @@ import com.project.smartedu.R;
 import com.project.smartedu.UserPrefs;
 import com.project.smartedu.admin.AdminUserPrefs;
 import com.project.smartedu.admin.NewClass;
+import com.project.smartedu.database.*;
+import com.project.smartedu.database.Students;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
+import com.project.smartedu.student.StudentUserPrefs;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -105,7 +113,101 @@ public class Attendance extends BaseActivity {
     TextView present_count;
     TextView present_percentage;
 
-    @Override
+
+
+
+
+ArrayList<String> recipientLt;
+ArrayList<String> sturecipients;
+
+
+
+
+    private class ParentItems extends AsyncTask<Void, Void, Void> {
+
+        private Context async_context;
+
+
+        public ParentItems(Context context){
+            this.async_context = context;
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            recipientLt.clear();
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            final Object lock = new Object();
+
+
+            for(int x=0;x<sturecipients.size();x++){
+                String studentid=sturecipients.get(x);
+                final com.project.smartedu.database.Students students=TeacherUserPrefs.studentsHashMap.get(studentid);
+                databasereference=Constants.databaseReference.child(Constants.PARENT_RELATION_TABLE).child(studentid);
+
+                databasereference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+                        synchronized (lock) {
+
+                            recipientLt.add(dataSnapshot.getValue().toString()+". "+ students.getName());
+                            lock.notifyAll();
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+                synchronized (lock){
+                    try {
+                        lock.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //Handles the stuff after the synchronisation with the firebase listener has been achieved
+            //The main UI is already idle by this moment
+            super.onPostExecute(aVoid);
+
+          sendMessage();
+
+
+            Toast.makeText(Attendance.this, "Message Successfully Sent to Parents", Toast.LENGTH_LONG).show();
+
+        }
+        //end firebase_async_class
+    }
+
+
+
+
+
+
+
+
+
+
+
+            @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_attendance);
@@ -145,7 +247,8 @@ public class Attendance extends BaseActivity {
         subjectadapter = new ArrayAdapter(Attendance.this, android.R.layout.simple_list_item_1, TeacherUserPrefs.subjectallotmentmap.get(classId));
         subjectSpinner.setAdapter(subjectadapter);
 
-
+                sturecipients=new ArrayList<>();
+                recipientLt=new ArrayList<>();
 
         studentLt = new ArrayList<String>();
         localstumap=new HashMap<>();
@@ -436,6 +539,7 @@ public class Attendance extends BaseActivity {
         try {
             //int checked=0;
             String subject=subjectSpinner.getSelectedItem().toString();
+            sturecipients.clear();
             for (int i = 0; i < adapter.getCount(); i++) {
                 Model item = adapter.getItem(i);
                 String stuentry=item.getName();
@@ -450,7 +554,7 @@ public class Attendance extends BaseActivity {
                 databasereference.setValue("a");
 
 
-
+                sturecipients.add(studentid);
 
 
             }
@@ -460,16 +564,11 @@ public class Attendance extends BaseActivity {
 
         else{ */
 
+            giveMessageToParent();
 
 
 
 
-            Intent task_intent = new Intent(Attendance.this, Classes.class);
-            task_intent.putExtra("institution_name", institutionName);
-            task_intent.putExtra("for","attendance");
-            task_intent.putExtra("role", role);
-            //task_intent.putExtra("id", classId);
-            startActivity(task_intent);
 
         }
 
@@ -523,6 +622,7 @@ public class Attendance extends BaseActivity {
         try {
             //int checked=0;
             String subject=subjectSpinner.getSelectedItem().toString();
+            sturecipients.clear();
             for (int i = 0; i < adapter.getCount(); i++) {
                 Model item = adapter.getItem(i);
                 String stuentry=item.getName();
@@ -535,7 +635,8 @@ public class Attendance extends BaseActivity {
 //setting attendance bool to date
                 if(item.isChecked()) {
                     databasereference.setValue("a");
-                   // giveMessageParent(studentRef[0], string_date);
+                    sturecipients.add(studentid);
+
 
                 }else{
                     databasereference.setValue("p");
@@ -546,21 +647,11 @@ public class Attendance extends BaseActivity {
 
             }
 
-       /* if (checked==0)
-            Toast.makeText(getApplicationContext(), "None Selected", Toast.LENGTH_LONG).show();
-
-        else{ */
 
 
 
+            giveMessageToParent();
 
-
-            Intent task_intent = new Intent(Attendance.this, Classes.class);
-            task_intent.putExtra("institution_name", institutionName);
-            task_intent.putExtra("for","attendance");
-            task_intent.putExtra("role", role);
-            //task_intent.putExtra("id", classId);
-            startActivity(task_intent);
 
         }
 
@@ -575,52 +666,54 @@ public class Attendance extends BaseActivity {
 
     }
 
-    public void giveMessageParent(final ParseObject studentRef, final String string_date) {
+    public void giveMessageToParent() {
+        ParentItems parentItems=new ParentItems(Attendance.this);
+        parentItems.execute();
 
-     /*   Log.d("user", "in give message");
-        ParseUser student_ofclient = (ParseUser) studentRef.get(StudentTable.STUDENT_USER_REF);
-        ParseQuery<ParseObject> parent_relation = ParseQuery.getQuery(ParentTable.TABLE_NAME);
-        parent_relation.whereEqualTo(ParentTable.CHILD_USER_REF, student_ofclient);
-        parent_relation.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> objects, ParseException e) {
-                if (e == null) {
-                    if (objects.size() != 0) {
-                        Log.d("user", "in query");
-                        ParseUser client_user = (ParseUser) objects.get(0).get(ParentTable.PARENT_USER_REF);
-                        ParseObject newmessage = new ParseObject(MessageTable.TABLE_NAME);
-                        newmessage.put(MessageTable.FROM_USER_REF, ParseUser.getCurrentUser());
-                        newmessage.put(MessageTable.TO_USER_REF, client_user);
-                        Log.d("user", "to parent " + client_user.getObjectId());
-                        newmessage.put(MessageTable.MESSAGE_CONTENT, studentRef.get("name") + " was absent today on " + string_date);
-
-                        newmessage.put(MessageTable.DELETED_BY_SENDER,false);
-                        newmessage.put(MessageTable.DELETED_BY_RECEIVER,false);
-
-                        java.util.Calendar calendar = Calendar.getInstance();
-                        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss aa");
-                        String date = format.format(new Date(calendar.getTimeInMillis()));
-                        Date d = null;
-                        try {
-                            d = format.parse(date);
-                        } catch (java.text.ParseException e1) {
-                            e1.printStackTrace();
-                        }
-
-                        newmessage.put(MessageTable.SENT_AT, d.getTime());
-                        newmessage.saveEventually();
-                        //Toast.makeText(AddAttendance_everyday.this, "Message Successfully Sent to Parent", Toast.LENGTH_LONG).show();
-
-
-                    }else{
-                        Log.d("user ", "error in query");
-                    }
-                } else {
-                    Log.d("user ", e.getMessage());
-                }
-            }
-        });*/
     }
+
+
+
+    public void  sendMessage(){
+
+        java.util.Calendar calendar = Calendar.getInstance();
+        long millis=calendar.getTimeInMillis();
+        millis=(millis/1000)*1000;
+
+        for(int x=0;x<recipientLt.size();x++){
+
+            String values[]=recipientLt.get(x).split("\\. ");
+
+            String client_userid=values[0];
+            String name=values[1];
+
+            String subject=subjectSpinner.getSelectedItem().toString();
+
+            String message="Hello "+ name + ", Your child was absent today for " + subject;
+            databasereference= Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child("sent").child(client_userid).push();
+            databasereference.child("content").setValue(message);
+            databasereference.child("time").setValue(String.valueOf(millis));
+            databasereference.child("name").setValue(name);
+
+
+            databasereference= Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(client_userid).child("received").child(firebaseAuth.getCurrentUser().getUid()).push();
+            databasereference.child("content").setValue(message);
+            databasereference.child("time").setValue(String.valueOf(millis));
+            databasereference.child("name").setValue(userPrefs.getUserName());
+
+        }
+
+
+        Intent task_intent = new Intent(Attendance.this, Classes.class);
+        task_intent.putExtra("institution_name", institutionName);
+        task_intent.putExtra("for","attendance");
+        task_intent.putExtra("role", role);
+        //task_intent.putExtra("id", classId);
+        startActivity(task_intent);
+
+
+    }
+
 
     protected void sleep(int time)
     {

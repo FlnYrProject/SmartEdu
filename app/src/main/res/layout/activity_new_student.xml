@@ -70,7 +70,7 @@
         android:textSize="25sp"
         android:textColor="#ffff"
         android:layout_marginTop="20dp"
-        android:layout_below="@+id/studentName"
+        android:layout_below="@+id/studentsex"
         android:layout_alignParentStart="true" />
 
     <EditText
@@ -93,8 +93,30 @@
         android:textSize="25sp"
         android:textColor="#ffff"
         android:layout_alignParentStart="true" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Sex:"
+                android:id="@+id/sex"
+                android:textSize="25sp"
+                android:textColor="#ffff"
+                android:layout_marginTop="20dp"
+                android:layout_below="@+id/studentName"
+                android:layout_alignParentStart="true" />
 
-    <TextView
+            <Spinner
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:id="@+id/studentsex"
+                android:layout_gravity="center_horizontal"
+                android:background="#ffffffff"
+                android:layout_below="@+id/sex"
+                android:layout_alignParentStart="true"
+                android:entries="@array/sex"/>
+
+
+            <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"

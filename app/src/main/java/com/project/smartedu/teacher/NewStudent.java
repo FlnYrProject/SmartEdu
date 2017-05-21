@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -46,6 +47,7 @@ public class NewStudent extends BaseActivity {
     String contact;
     String parentname;
     String parentemail;
+    String sex;
     int rollno= -1;
 
     EditText studentName;
@@ -55,6 +57,7 @@ public class NewStudent extends BaseActivity {
     EditText studentcontact;
     EditText studentparent;
     EditText studentparentemail;
+    Spinner studentsex;
 
     NotificationBar noti_bar;
     String classId;
@@ -101,6 +104,9 @@ public class NewStudent extends BaseActivity {
         studentaddress = (EditText) findViewById(R.id.studentaddress);
         studentparent = (EditText) findViewById(R.id.studentparentname);
         studentparentemail=(EditText)findViewById(R.id.studentparentemail);
+        studentsex=(Spinner)findViewById(R.id.studentsex);
+
+
 
 
         Button addStudentButton = (Button) findViewById(R.id.addstudentButton);
@@ -120,7 +126,7 @@ public class NewStudent extends BaseActivity {
                 contact=studentcontact.getText().toString().trim();
                 parentemail = studentparentemail.getText().toString().trim();
                 parentname=studentparent.getText().toString().trim();
-
+                sex=studentsex.getSelectedItem().toString();
 
                 rollno = no_of_stu+1;
 
@@ -169,6 +175,7 @@ public class NewStudent extends BaseActivity {
                     databaseReference.child(studentfirebaseUser.getUid()).child("contact").setValue(contact);
                     databaseReference.child(studentfirebaseUser.getUid()).child("parent_name").setValue(parentname);
                     databaseReference.child(studentfirebaseUser.getUid()).child("parent_email").setValue(parentemail);
+                    databaseReference.child(studentfirebaseUser.getUid()).child("sex").setValue(sex);
 
                     DatabaseReference dataReference = databaseReference.child(studentfirebaseUser.getUid()).child("role").child("student").push();
                     dataReference.setValue(institutionName);
@@ -252,7 +259,7 @@ public class NewStudent extends BaseActivity {
 
 
 
-                    databaseReference=Constants.databaseReference.child(Constants.PARENT_RELATION_TABLE).child(institutionName).child(studentuid);
+                    databaseReference=Constants.databaseReference.child(Constants.PARENT_RELATION_TABLE).child(studentuid);
                     databaseReference.setValue(parentfirebaseuser.getUid());
 
 
