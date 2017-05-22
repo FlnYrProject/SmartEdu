@@ -35,6 +35,7 @@ import com.project.smartedu.LoginActivity;
 import com.project.smartedu.Model;
 import com.project.smartedu.R;
 import com.project.smartedu.UserPrefs;
+import com.project.smartedu.common.view_messages;
 import com.project.smartedu.database.*;
 import com.project.smartedu.database.Students;
 import com.project.smartedu.navigation.FragmentDrawer;
@@ -296,6 +297,8 @@ for(int x=0;x<sturecipients.size();x++){
 
         }
 
+        goToViewMessage();
+
 
     }
 
@@ -513,6 +516,8 @@ marks_add.dismiss();
 
 progressDialog.dismiss();
 
+                        goToViewMessage();
+
 
                     }else       //if parent selected
                     {
@@ -638,6 +643,7 @@ progressDialog.dismiss();
 progressDialog.dismiss();
 
             Toast.makeText(teacher_message.this, "Message Successfully Sent to Student", Toast.LENGTH_LONG).show();
+            goToViewMessage();
 
         }else       //if parent selected
         {
@@ -645,6 +651,15 @@ progressDialog.dismiss();
            ParentItems parentItems=new ParentItems(teacher_message.this);
             parentItems.execute();
         }
+    }
+
+
+    private void goToViewMessage(){
+        Intent to_view_message=new Intent(teacher_message.this,view_messages.class);
+        to_view_message.putExtra("institution_name",institutionName);
+        to_view_message.putExtra("role",super.role);
+        to_view_message.putExtra("_for","received");
+        startActivity(to_view_message);
     }
 
     @Override
