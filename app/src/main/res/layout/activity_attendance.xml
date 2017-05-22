@@ -47,25 +47,24 @@
                 android:layout_height="wrap_content">
 
 
-
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="All Present"
                     android:id="@+id/allpresent"
-                    android:layout_gravity="left"
-                    android:textColor="#ffff"
-                    android:background="#080808" />
-
-
+                    android:layout_gravity="start"
+                    android:background="#20BF9F"
+                    android:textColor="#ffff"  />
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="All Absent"
+                    android:layout_gravity="end"
                     android:id="@+id/allabsent"
+                    android:background="#20BF9F"
                     android:textColor="#ffff"
-                    android:background="#080808"
-                  />
+                    />
+
 
             </LinearLayout>
 

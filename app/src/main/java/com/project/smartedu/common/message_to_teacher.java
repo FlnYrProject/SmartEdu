@@ -2,9 +2,8 @@ package com.project.smartedu.common;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -14,11 +13,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
-import com.parse.FindCallback;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
-import com.parse.ParseUser;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.CustomAdapter;
@@ -26,21 +20,14 @@ import com.project.smartedu.LoginActivity;
 import com.project.smartedu.Model;
 import com.project.smartedu.R;
 import com.project.smartedu.UserPrefs;
-import com.project.smartedu.database.Students;
 import com.project.smartedu.database.Teachers;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
 import com.project.smartedu.student.StudentUserPrefs;
-import com.project.smartedu.teacher.StudentInfo;
-import com.project.smartedu.teacher.TeacherUserPrefs;
-import com.project.smartedu.teacher.teacher_message;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 
 public class message_to_teacher extends BaseActivity {
 
@@ -171,6 +158,7 @@ public class message_to_teacher extends BaseActivity {
         final Dialog marks_add=new Dialog(message_to_teacher.this);
         marks_add.setContentView(R.layout.sending_message_to_teacher);
         marks_add.setTitle("Give Message");
+        setDialogSize(marks_add);
 
         message = (EditText)marks_add.findViewById(R.id.message);
         sendmessage=(Button)marks_add.findViewById(R.id.send_message);
@@ -249,6 +237,7 @@ public class message_to_teacher extends BaseActivity {
             final Dialog marks_add = new Dialog(message_to_teacher.this);
             marks_add.setContentView(R.layout.sending_message_to_teacher);
             marks_add.setTitle("Give Message");
+            setDialogSize(marks_add);
             message = (EditText) marks_add.findViewById(R.id.message);
             sendmessage = (Button) marks_add.findViewById(R.id.send_message);
 

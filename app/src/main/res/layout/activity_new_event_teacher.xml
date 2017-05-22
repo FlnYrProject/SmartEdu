@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:text="Edit"
         android:id="@+id/editButton"
-        android:background="#ff8d94"
+        android:background="#20BF9F"
         android:textColor="#ffff"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
@@ -60,7 +60,7 @@
         android:layout_alignBottom="@+id/date"
         android:layout_toLeftOf="@+id/date"
         android:layout_toStartOf="@+id/date"
-        android:backgroundTint="#ff8d94"
+        android:backgroundTint="#20BF9F"
         android:onClick="open" />
 
 
