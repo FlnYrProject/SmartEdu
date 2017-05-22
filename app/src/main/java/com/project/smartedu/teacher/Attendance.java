@@ -689,7 +689,7 @@ ArrayList<String> sturecipients;
 
             String subject=subjectSpinner.getSelectedItem().toString();
 
-            String message="Hello "+ name + ", Your child was absent today for " + subject;
+            String message="Hello, Your child, " + name + " was absent today for " + subject;
             databasereference= Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child("sent").child(client_userid).push();
             databasereference.child("content").setValue(message);
             databasereference.child("time").setValue(String.valueOf(millis));

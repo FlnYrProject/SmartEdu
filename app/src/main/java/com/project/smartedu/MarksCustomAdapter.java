@@ -218,10 +218,14 @@ public class MarksCustomAdapter extends ArrayAdapter<MarksModel> implements View
                 ok.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                     mark[0] = Integer.parseInt(editText.getText().toString());
-                        marksModel.setValue(Integer.parseInt(editText.getText().toString()));
-edittext.setText(editText.getText().toString());
-                        dialog.dismiss();
+                        if(editText.getText().equals("") || editText.getText().equals(null)){
+                            Toast.makeText(context,"Add marks",Toast.LENGTH_LONG).show();
+                        }else {
+                            mark[0] = Integer.parseInt(editText.getText().toString());
+                            marksModel.setValue(Integer.parseInt(editText.getText().toString()));
+                            edittext.setText(editText.getText().toString());
+                            dialog.dismiss();
+                        }
                     }
                 });
 
