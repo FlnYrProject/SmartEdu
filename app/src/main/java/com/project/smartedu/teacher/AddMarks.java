@@ -1,6 +1,7 @@
 package com.project.smartedu.teacher;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -15,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,6 +54,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import static java.lang.Boolean.FALSE;
 
 public class AddMarks extends BaseActivity {
     private Toolbar mToolbar;
@@ -117,6 +121,7 @@ public class AddMarks extends BaseActivity {
     TextView total_count;
     TextView present_count;
     TextView present_percentage;
+    ProgressDialog progressDialog;
 
 
 
@@ -151,7 +156,11 @@ public class AddMarks extends BaseActivity {
 
 
             for(int x=0;x<sturecipients.size();x++){
-                String studentid=sturecipients.get(x);
+
+                String arr[]=sturecipients.get(x).split("\\. ");
+
+                String studentid=arr[0];
+                final String marks=arr[1];
                 final com.project.smartedu.database.Students students=TeacherUserPrefs.studentsHashMap.get(studentid);
                 databasereference=Constants.databaseReference.child(Constants.PARENT_RELATION_TABLE).child(studentid);
 
@@ -162,7 +171,7 @@ public class AddMarks extends BaseActivity {
 
                         synchronized (lock) {
 
-                            recipientLt.add(dataSnapshot.getValue().toString()+". "+ students.getName());
+                            recipientLt.add(dataSnapshot.getValue().toString()+". "+ students.getName() + ". " +marks);
                             lock.notifyAll();
                         }
 
@@ -238,6 +247,8 @@ public class AddMarks extends BaseActivity {
         noti_bar.setTexts(userPrefs.getUserName(), "Teacher", institutionName);
 
 
+        progressDialog=new ProgressDialog(AddMarks.this);
+        progressDialog.setCancelable(FALSE);
 
         studentList = (ListView) findViewById(R.id.studentList);
         saveButton = (Button) findViewById(R.id.saveButton);
@@ -313,14 +324,27 @@ public class AddMarks extends BaseActivity {
                 @Override
                 public void onClick(View v) {
 
-
+                    boolean flag=false;
                     for (int i = 0; i < adapter.getCount(); i++) {
                         MarksModel item = adapter.getItem(i);
+                        if(item.getValue()>Integer.parseInt(TeacherUserPrefs.examHashMap.get(examId).getMax_marks())){
+                            Toast.makeText(AddMarks.this,"Marks cannot be greater than maximum marks",Toast.LENGTH_LONG).show();
+                            flag=true;
+                            break;
+                        }
+                        if(item.getValue()<0){
+                            Toast.makeText(AddMarks.this,"Marks cannot be less than zero",Toast.LENGTH_LONG).show();
+                            flag=true;
+                            break;
+                        }
 
 
                         Log.d("marks",String.valueOf(item.getValue()));
                     }
-                    save();
+
+                    if(!flag) {
+                        save();
+                    }
 
 
 
@@ -348,6 +372,9 @@ public class AddMarks extends BaseActivity {
 
     public void save() {
 
+
+        progressDialog.setMessage("Adding Marks and Sending notification...");
+        progressDialog.show();
 
         calendar = java.util.Calendar.getInstance();
         //System.out.println("Current time =&gt; " + calendar.getTime());
@@ -398,7 +425,7 @@ public class AddMarks extends BaseActivity {
                 databasereference.child("max_marks").setValue(exam.getMax_marks());
                 databasereference.child("marks_obtained").setValue(String.valueOf(item.getValue()));
 
-                    //sturecipients.add(studentid);
+                    sturecipients.add(studentid + ". " + String.valueOf(item.getValue()));
 
 
 
@@ -410,7 +437,7 @@ public class AddMarks extends BaseActivity {
 
 
 
-           /// giveMessageToParent();
+            giveMessageToParent();
 
 
         }
@@ -446,10 +473,9 @@ public class AddMarks extends BaseActivity {
 
             String client_userid=values[0];
             String name=values[1];
-
-            String subject=subjectSpinner.getSelectedItem().toString();
-
-            String message="Hello "+ name + ", Your child was absent today for " + subject;
+            String marks=values[2];
+          String subject=TeacherUserPrefs.examHashMap.get(examId).getSubject();
+            String message="Hello, Your child, " +name +" attained " + marks + " in the test help for " + subject;
             databasereference= Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child("sent").child(client_userid).push();
             databasereference.child("content").setValue(message);
             databasereference.child("time").setValue(String.valueOf(millis));
@@ -464,11 +490,12 @@ public class AddMarks extends BaseActivity {
         }
 
 
-        Intent task_intent = new Intent(AddMarks.this, Classes.class);
+        progressDialog.dismiss();
+        Intent task_intent = new Intent(AddMarks.this, Exams.class);
         task_intent.putExtra("institution_name", institutionName);
         task_intent.putExtra("for","attendance");
         task_intent.putExtra("role", role);
-        //task_intent.putExtra("id", classId);
+        task_intent.putExtra("id", classId);
         startActivity(task_intent);
 
 
