@@ -322,6 +322,7 @@ UserPrefs userPrefs;
             Toast.makeText(getApplicationContext(), "Role not added", Toast.LENGTH_LONG).show();
         }else{
 
+            userPrefs.setFirstLoading(true);
             if(role.equalsIgnoreCase("parent")) {
                 Intent j = new Intent(ChooseRole.this, parent_choose_child.class);
                 j.putExtra("role", role);

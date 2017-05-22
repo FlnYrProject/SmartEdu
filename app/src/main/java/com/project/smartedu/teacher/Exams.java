@@ -71,6 +71,7 @@ public class Exams extends BaseActivity implements FragmentDrawer.FragmentDrawer
     TextView examname;
     TextView exammarks;
     TextView examsdate;
+    Button addmarksbutton;
 
     Button OkButton;
 
@@ -172,6 +173,7 @@ setExamList();
                 exammarks = (TextView) dialog.findViewById(R.id.end_time);
                 examsdate = (TextView) dialog.findViewById(R.id.date);
 
+
                 Log.d("name",exam.getName());
                 examname.setText(exam.getName());
                 exammarks.setText(exam.getMax_marks());
@@ -184,7 +186,7 @@ setExamList();
                 final String dateString = formatter.format(new Date(Long.parseLong(exam.getDate())));
                 examsdate.setText(dateString);
 
-
+                addmarksbutton=(Button)dialog.findViewById(R.id.addmarks);
                 okButton = (Button) dialog.findViewById(R.id.doneButton);
                 delButton = (Button) dialog.findViewById(R.id.delButton);
                 editButton = (Button) dialog.findViewById(R.id.editButton);
@@ -348,14 +350,21 @@ setExamList();
 
 
 
+                addmarksbutton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                           Intent to_marksstudent = new Intent(Exams.this, AddMarks.class);
+                        to_marksstudent.putExtra("institution_name",institutionName);
+                        to_marksstudent.putExtra("examid", exam.getId());
+                        to_marksstudent.putExtra("classId", classId);
+                      to_marksstudent.putExtra("role",role);
+                              startActivity(to_marksstudent);
+                    }
+                });
 
-               /* Intent to_marksstudent = new Intent(Exams.this, teacher_marks_studentlist.class);
-                to_marksstudent.putExtra("institution_name",institutionName);
-                to_marksstudent.putExtra("examid", examid);
-                to_marksstudent.putExtra("classId", classId);
-                to_marksstudent.putExtra("role",role);
 
-                startActivity(to_marksstudent);*/
+
 
 
 
@@ -385,6 +394,7 @@ protected void setExamList(){
 
 
     ArrayList<String> examsLt = new ArrayList<String>();
+    examMap.clear();
 
     for(int x=0;x<TeacherUserPrefs.examidLt.size();x++){
 

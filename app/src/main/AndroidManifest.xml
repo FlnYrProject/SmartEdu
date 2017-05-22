@@ -95,7 +95,7 @@
         <activity
             android:name=".teacher.Exams"
             android:label="@string/title_activity_exams"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".teacher.UploadMaterial"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -123,7 +123,10 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".common.view_attendance" />
         <activity android:name=".common.UploadMaterial_students" />
-        <activity android:name=".teacher.NewExam"
+        <activity
+            android:name=".teacher.NewExam"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".teacher.AddMarks"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
