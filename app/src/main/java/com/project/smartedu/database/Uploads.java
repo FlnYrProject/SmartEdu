@@ -13,12 +13,14 @@ public class Uploads {
     String imageUrl;
     String teacher;
     long date;
+    long due_date;
 
-    public Uploads(String upload_type, String subject, String topic, String imageUrl, String teacher, long date) {
+    public Uploads(String upload_type, String subject, String topic, String imageUrl, long date) {
 
         this.upload_type = upload_type;
         this.subject = subject;
         this.date = date;
+        this.due_date = due_date;
         this.imageUrl= imageUrl;
         this.teacher= teacher;
         this.topic = topic;
@@ -70,6 +72,9 @@ public class Uploads {
 
     public void setDate(long date) {
         this.date = date;
+    }
+    public long getDueDate() {
+        return due_date;
     }
 
 

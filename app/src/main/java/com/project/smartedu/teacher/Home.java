@@ -505,7 +505,6 @@ public class Home extends BaseActivity {
 
         private Context async_context;
         private ProgressDialog pd;
-
         public TaskItems(Context context){
             this.async_context = context;
             pd = new ProgressDialog(async_context);
@@ -515,6 +514,7 @@ public class Home extends BaseActivity {
 
         @Override
         protected void onPreExecute() {
+
             super.onPreExecute();
             pd.setMessage("Fetching Task List");
             pd.setCancelable(false);
@@ -888,12 +888,13 @@ public class Home extends BaseActivity {
                             String subject = retUploadList.get("subject");
                             String topic = retUploadList.get("topic");
                             String imageUrl = retUploadList.get("imageUrl");
-                            String teacher = retUploadList.get("teacher");
+                            //String teacher = retUploadList.get("teacher");
                             Long date = Long.parseLong(retUploadList.get("date"));
+                            //Long due_date = Long.parseLong(retUploadList.get("due_date"));
 
 
                             //String dateString = formatter.format(new Date(Long.parseLong(retUploadList.get("date"))));
-                            com.project.smartedu.database.Uploads upload = new com.project.smartedu.database.Uploads(upload_type, subject, topic, imageUrl, teacher, date);
+                            com.project.smartedu.database.Uploads upload = new com.project.smartedu.database.Uploads(upload_type, subject, topic, imageUrl, date);
 
                             //String entry=retUploadList.get("upload_type")+ "\n" +retUploadList.get("subject") +"\n" +retUploadList.get("topic")+"\n" +retUploadList.get("imageUrl")+"\n" +retUploadList.get("teacher") + "\n" + dateString;
                             //Log.d("key",key);

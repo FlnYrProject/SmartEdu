@@ -45,6 +45,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
+import static com.project.smartedu.R.id.date;
 import static com.project.smartedu.UserPrefs.uploadkeymap;
 
 
@@ -157,12 +158,13 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
                             String subject = retUploadList.get("subject");
                             String topic = retUploadList.get("topic");
                             String imageUrl = retUploadList.get("imageUrl");
-                            String teacher = retUploadList.get("teacher");
+                            //String teacher = retUploadList.get("teacher");
                             Long date = Long.parseLong(retUploadList.get("date"));
+                            //Long due_date = Long.parseLong(retUploadList.get("due_date"));
 
 
                             //String dateString = formatter.format(new Date(Long.parseLong(retUploadList.get("date"))));
-                            com.project.smartedu.database.Uploads upload = new com.project.smartedu.database.Uploads(upload_type, subject, topic, imageUrl, teacher, date);
+                            com.project.smartedu.database.Uploads upload = new com.project.smartedu.database.Uploads(upload_type, subject, topic, imageUrl, date);
 
                             //String entry=retUploadList.get("upload_type")+ "\n" +retUploadList.get("subject") +"\n" +retUploadList.get("topic")+"\n" +retUploadList.get("imageUrl")+"\n" +retUploadList.get("teacher") + "\n" + dateString;
                             //Log.d("key",key);
@@ -239,13 +241,13 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
 
             for (int i = 0; i < uploadLt.size(); i++) {
                 Uploads uploadobject = uploadLt.get(i);
-               
-                long date = TimeUnit.MILLISECONDS.toMinutes(uploadobject.getDate());
+
+                long due_date = TimeUnit.MILLISECONDS.toMinutes(uploadobject.getDate());
                 String upload_type = uploadobject.getUploadType();
                 String subject = uploadobject.getSubject();
                 String topic = uploadobject.getTopic();
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-                String dateString = formatter.format(new Date(date));
+                String dateString = formatter.format(new Date(due_date));
                 String uploaditem = upload_type + "\n" + topic + "\n" + subject + "\n" + dateString;
                 items[i] = uploaditem;
 
@@ -307,6 +309,10 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
         uploadLtString=new ArrayList<>();
 
 
+
+
+
+
         UploadItems uploadItems=new UploadItems(this);
         uploadItems.execute();
 
@@ -347,7 +353,7 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
         DeadlineHead= (TextView) dialog_upload.findViewById(R.id.deadlineHead);
         DeadlineHead.setSelected(true);
 
-        myDate = (TextView) dialog_upload.findViewById(R.id.date);
+        myDate = (TextView) dialog_upload.findViewById(date);
         myDueDate= (TextView) dialog_upload.findViewById(R.id.deadline);
         subjectAssigned=(TextView) dialog_upload.findViewById(R.id.subject);
         cal=(ImageButton) dialog_upload.findViewById(R.id.calButton);
@@ -414,6 +420,7 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
             e.printStackTrace();
         }
         final long upload_date_milliseconds = d.getTime();
+       // final long upload_date_milliseconds = calendar.getTime();
 
 
         cal.setOnClickListener(new View.OnClickListener() {
@@ -436,6 +443,15 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
                 Yearcal=0;
             }
         });
+
+        String string_due_date = String.valueOf(Daycal) + "-" + String.valueOf(Monthcal) + "-" + String.valueOf(Yearcal);
+        d = null;
+        try {
+            d = f1.parse(string_due_date);
+        } catch (java.text.ParseException e) {
+            e.printStackTrace();
+        }
+        final long upload_due_date_milliseconds = d.getTime();
 
 
 
@@ -463,6 +479,7 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
                     databaseReference.child("topic").setValue(topicDesc);
                     databaseReference.child("subject").setValue(subject);
                     databaseReference.child("date").setValue(String.valueOf(upload_date_milliseconds));
+                    databaseReference.child("due_date").setValue(String.valueOf(upload_due_date_milliseconds));
                     databaseReference.child("teacher").setValue(firebaseAuth.getCurrentUser().getUid());//adding to server
 
                     Log.d("Upload", "Object Id: uploadImage: " + uploadId);
@@ -515,7 +532,7 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
                     Toast.makeText(getApplicationContext(), "Choose Future Date!", Toast.LENGTH_LONG).show();
                 }
                 else {
-                    date1 = new Date(Yearcal - 1900, Monthcal - 1, Daycal);
+                    date1 = new Date((Yearcal - 1900) , Monthcal - 1, Daycal);
                     DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(getApplicationContext());
                     myDueDate.setText(dateFormat.format(date1), TextView.BufferType.EDITABLE);
                     Toast.makeText(getApplicationContext(), Daycal + "/" + Monthcal + "/" + Yearcal, Toast.LENGTH_LONG).show();
