@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -116,6 +117,8 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
 
     Spinner subjectSpinner;
     ArrayAdapter subjectadapter;
+
+    SwipeRefreshLayout swipeRefreshLayout;
 
     private class UploadItems extends AsyncTask<Void, Void, Void> {
 
@@ -242,12 +245,12 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
             for (int i = 0; i < uploadLt.size(); i++) {
                 Uploads uploadobject = uploadLt.get(i);
 
-                long due_date = TimeUnit.MILLISECONDS.toMinutes(uploadobject.getDate());
+                long date = TimeUnit.MILLISECONDS.toMinutes(uploadobject.getDate());
                 String upload_type = uploadobject.getUploadType();
                 String subject = uploadobject.getSubject();
                 String topic = uploadobject.getTopic();
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-                String dateString = formatter.format(new Date(due_date));
+                String dateString = formatter.format(uploadobject.getDate());
                 String uploaditem = upload_type + "\n" + topic + "\n" + subject + "\n" + dateString;
                 items[i] = uploaditem;
 
@@ -309,12 +312,25 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
         uploadLtString=new ArrayList<>();
 
 
+        swipeRefreshLayout=(SwipeRefreshLayout)findViewById(R.id.swipe_layout);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefresh();
+            }
+        });
+
+        if(userPrefs.isFirstLoading()) {
+            userPrefs.setFirstLoading(false);
+            UploadItems uploadItems=new UploadItems(this);
+            uploadItems.execute();
+        }else{
+            setUploadList();
+
+        }
 
 
-
-
-        UploadItems uploadItems=new UploadItems(this);
-        uploadItems.execute();
 
 
 
@@ -338,6 +354,16 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
 
 
 
+    }
+
+    public void swipeRefresh(){
+        userPrefs.setFirstLoading(true);
+        Intent tohome=new Intent(UploadMaterial.this, UploadMaterial.class);
+        tohome.putExtra("institution_name",institutionName);
+        tohome.putExtra("role","teacher");
+        tohome.putExtra("for",_for);
+        tohome.putExtra("id",classId);
+        startActivity(tohome);
     }
 
 
