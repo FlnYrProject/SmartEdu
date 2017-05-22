@@ -28,11 +28,9 @@ import com.project.smartedu.LoginActivity;
 import com.project.smartedu.Model;
 import com.project.smartedu.R;
 import com.project.smartedu.UserPrefs;
-<<<<<<< HEAD
-=======
+
 import com.project.smartedu.common.view_messages;
-import com.project.smartedu.database.*;
->>>>>>> 96e9b1a3cac880e9779d433a488ccddbbab8acae
+
 import com.project.smartedu.database.Students;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
