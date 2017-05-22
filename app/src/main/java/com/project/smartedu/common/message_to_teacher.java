@@ -24,6 +24,7 @@ import com.project.smartedu.database.Teachers;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
 import com.project.smartedu.student.StudentUserPrefs;
+import com.project.smartedu.teacher.teacher_message;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -205,6 +206,7 @@ public class message_to_teacher extends BaseActivity {
 
                     }
                     Toast.makeText(message_to_teacher.this, "Message Successfully Broadcasted to Teachers", Toast.LENGTH_LONG).show();
+                    goToViewMessage();
                     marks_add.dismiss();
 
 
@@ -304,10 +306,25 @@ public class message_to_teacher extends BaseActivity {
 
         }
 
+
+        goToViewMessage();
+
         Toast.makeText(message_to_teacher.this, "Message Successfully Sent to Teacher", Toast.LENGTH_LONG).show();
 
 
     }
+
+
+
+
+    private void goToViewMessage(){
+        Intent to_view_message=new Intent(message_to_teacher.this,view_messages.class);
+        to_view_message.putExtra("institution_name",institutionName);
+        to_view_message.putExtra("role",super.role);
+        to_view_message.putExtra("_for","received");
+        startActivity(to_view_message);
+    }
+
 
     @Override
     protected void onPostResume() {
