@@ -475,7 +475,8 @@ public class AddMarks extends BaseActivity {
             String name=values[1];
             String marks=values[2];
           String subject=TeacherUserPrefs.examHashMap.get(examId).getSubject();
-            String message="Hello, Your child, " +name +" attained " + marks + " in the test help for " + subject;
+            String max_marks=TeacherUserPrefs.examHashMap.get(examId).getMax_marks();
+            String message="Hello, Your child, " +name +" attained " + marks + "/" + max_marks+ " in the test help for " + subject;
             databasereference= Constants.databaseReference.child(Constants.MESSAGES_TABLE).child(firebaseAuth.getCurrentUser().getUid()).child("sent").child(client_userid).push();
             databasereference.child("content").setValue(message);
             databasereference.child("time").setValue(String.valueOf(millis));

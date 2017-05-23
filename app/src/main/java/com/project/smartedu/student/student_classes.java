@@ -172,6 +172,20 @@ public class student_classes extends BaseActivity {
                     to_upload.putExtra("role", role);
 
                     startActivity(to_upload);
+                }else if (_for.equals("exam")) {
+                    Intent to_upload = new Intent(student_classes.this, student_exams.class);
+                    if(role.equalsIgnoreCase("Parent")){
+                        to_upload.putExtra("studentId",parentUserPrefs.getSelectedChildId());
+                        to_upload.putExtra("classId", parentUserPrefs.getChildClass());
+                    }else {
+                        to_upload.putExtra("studentId", firebaseAuth.getCurrentUser().getUid());
+                        to_upload.putExtra("classId", studentUserPrefs.getClassId());
+                    }
+                    to_upload.putExtra("subject", item);
+                    to_upload.putExtra("institution_name",institutionName);
+                    to_upload.putExtra("role", role);
+
+                    startActivity(to_upload);
                 }
 
             }

@@ -3,6 +3,7 @@ package com.project.smartedu.student;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.project.smartedu.database.Exam;
 import com.project.smartedu.database.Students;
 import com.project.smartedu.database.Teachers;
 
@@ -41,6 +42,8 @@ public class StudentUserPrefs {
 
     public static ArrayList<String> teachersuseridLt;
     public static HashMap<String,Teachers> teacherHashMap;                 //user id to student details
+
+
 
 
 

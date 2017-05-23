@@ -12,6 +12,12 @@ public class Exam {
     String max_marks;
     String subject;
 
+
+    public Exam(){
+
+    }
+
+
     public Exam(String id, String name, String date, String max_marks, String subject) {
         this.id = id;
         this.name = name;

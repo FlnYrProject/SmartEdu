@@ -75,7 +75,7 @@ public class select_institution extends BaseActivity {
         drawerFragment.setDrawerListener(this);
 */
 
-        Toast.makeText(select_institution.this, "role selected = " +role, Toast.LENGTH_LONG).show();
+      //  Toast.makeText(select_institution.this, "role selected = " +role, Toast.LENGTH_LONG).show();
 
         ArrayList<String> institutionLt;
 
@@ -99,15 +99,10 @@ public class select_institution extends BaseActivity {
               loadInstitution(institutionName);
 
         }else {
-            Log.d("institution", "Retrieved the institutions");
+
 
             ArrayList<String> studentLt = new ArrayList<String>();
             ArrayAdapter adapter = new ArrayAdapter(select_institution.this, android.R.layout.simple_list_item_1, institutionLt);
-            //Toast.makeText(Students.this, "here = ", Toast.LENGTH_LONG).show();
-
-            Log.d("user", "Retrieved " + institutionLt.size() + " institutions");
-            //Toast.makeText(getApplicationContext(), studentListRet.toString(), Toast.LENGTH_LONG).show();
-
 
             institutionList.setAdapter(adapter);
 

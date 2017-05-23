@@ -135,19 +135,19 @@ String institutionName;
 
         } else {
 
-            Log.d("inds","ohoo");
+
             firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
 
                     if (task.isSuccessful()) {
-                        Log.d("inds","ohoo2");
+
 
                         Toast.makeText(getApplicationContext(), "User Login Successful", Toast.LENGTH_LONG).show();
                         adminCheck();
 
                     } else {
-                        Log.d("inds","ohoo3");
+
                         Toast.makeText(getApplicationContext(), "User Login Failed", Toast.LENGTH_LONG).show();
                         progressDialog.dismiss();
 

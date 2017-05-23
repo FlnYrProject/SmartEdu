@@ -82,6 +82,12 @@ public class Home extends BaseActivity {
 
 
 
+
+
+
+
+
+
     private class TeacherItems extends AsyncTask<Void, Void, Void> {
 
         private Context async_context;
@@ -234,6 +240,7 @@ public class Home extends BaseActivity {
                             ArrayList<String> subjects=teachers.getSubjects();
                             subjects.add(subject_name);
                             teachers.setSubjects(subjects);
+                            Log.d("testing",subject_name);
                             StudentUserPrefs.teacherHashMap.put(teacherid,teachers);
 
 
@@ -345,10 +352,12 @@ public class Home extends BaseActivity {
 
                             if(ds.getKey().equals("class")){
                                 parentUserPrefs.setSelectedChildClass(ds.getValue().toString());
+                                studentUserPrefs.setClassId(ds.getValue().toString());
                             }
 
                             if(ds.getKey().equals("roll_number")){
                                 studentUserPrefs.setRollNumber(Integer.parseInt(ds.getValue().toString()));
+                                parentUserPrefs.setSelectedChildRollNumber(ds.getValue().toString());
                             }
 
                         }
@@ -390,7 +399,7 @@ public class Home extends BaseActivity {
 
                     pd.dismiss();
                     pd=null;
-                    loadTeacherData();
+                   loadTeacherData();
                 }
             }, 500);  // 100 milliseconds
         }
@@ -814,7 +823,7 @@ userPrefs=new UserPrefs(Home.this);
                     Intent atten_intent = new Intent(Home.this, student_classes.class);
                     atten_intent.putExtra("role", "Parent");
                     atten_intent.putExtra("studentId",parentUserPrefs.getSelectedChildId() );
-                    atten_intent.putExtra("classGradeId", studentUserPrefs.getClassId());
+                    atten_intent.putExtra("classId", studentUserPrefs.getClassId());
                     atten_intent.putExtra("for","attendance");
                     atten_intent.putExtra("institution_name",institutionName);
                     startActivity(atten_intent);
@@ -828,7 +837,7 @@ userPrefs=new UserPrefs(Home.this);
                 } else if (position == 2) {
                     Intent message_intent = new Intent(Home.this, view_messages.class);
                     message_intent.putExtra("role", "Parent");
-                    message_intent.putExtra("classGradeId", studentUserPrefs.getClassId());
+
                     message_intent.putExtra("studentId", parentUserPrefs.getSelectedChildId());
                     message_intent.putExtra("institution_name", institutionName);
             
@@ -837,11 +846,11 @@ userPrefs=new UserPrefs(Home.this);
 
                 } else if (position == 3) {
 
-                    Intent exam_intent = new Intent(Home.this, student_exams.class);
+                    Intent exam_intent = new Intent(Home.this, student_classes.class);
                     exam_intent.putExtra("role", "Parent");
                     exam_intent.putExtra("institution_name", institutionName);
-
-                    exam_intent.putExtra("classGradeId", studentUserPrefs.getClassId());
+                    exam_intent.putExtra("for","exam");
+                    exam_intent.putExtra("classId", studentUserPrefs.getClassId());
                     exam_intent.putExtra("studentId",parentUserPrefs.getSelectedChildId());
                     startActivity(exam_intent);
 
@@ -908,6 +917,17 @@ TeacherItems teacherItems = new TeacherItems(Home.this);        //get teacher da
         tohome.putExtra("institution_name",institutionName);
         tohome.putExtra("child_username",child_username);
         tohome.putExtra("role",role);
+        startActivity(tohome);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent tohome=new Intent(Home.this, Home.class);
+        tohome.putExtra("institution_name",institutionName);
+        tohome.putExtra("role","Parent");
+        tohome.putExtra("child_username",child_username);
+       
         startActivity(tohome);
     }
 
