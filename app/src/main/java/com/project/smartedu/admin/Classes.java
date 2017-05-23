@@ -3,14 +3,10 @@ package com.project.smartedu.admin;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -22,25 +18,20 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
 import com.project.smartedu.database.Allotments;
 import com.project.smartedu.database.Class;
-import com.project.smartedu.database.TeacherTable;
+import com.project.smartedu.navigation.FragmentDrawer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
 
-public class Classes extends BaseActivity {
+public class Classes extends BaseActivity implements FragmentDrawer.FragmentDrawerListener{
 
 
     ArrayList<String>  classLt;
@@ -78,6 +69,8 @@ public class Classes extends BaseActivity {
     DatabaseReference databaseReference;
     Class selectedclass;
 
+    private FragmentDrawer drawerFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,6 +92,10 @@ public class Classes extends BaseActivity {
         Intent from_student = getIntent();
         role=from_student.getStringExtra("role");
         institutionName=from_student.getStringExtra("institution_name");
+
+        drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
+        drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), toolbar,role);
+        drawerFragment.setDrawerListener(this);
 
 
         classList = (ListView) findViewById(R.id.classList);

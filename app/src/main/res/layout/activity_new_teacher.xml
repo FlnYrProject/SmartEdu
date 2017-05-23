@@ -10,6 +10,7 @@
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/container_toolbar"
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.v7.widget.Toolbar
@@ -21,7 +22,194 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_new_teacher" />
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/container_toolbar"
+        >
+
+
+
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/teacherName"
+
+                    android:layout_below="@+id/textView36"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true" />
+
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="add teacher"
+                    android:id="@+id/addTeacherButton"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:background="#20BF9F"
+                    android:textSize="15sp"
+                    android:textColor="#ffffff"
+                    android:layout_below="@+id/teachercontact"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Email:"
+                    android:id="@+id/serialHead"
+                    android:textSize="25sp"
+
+                    android:layout_marginTop="20dp"
+                    android:layout_below="@+id/teachersex"
+                    android:layout_alignParentStart="true" />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Sex:"
+                    android:id="@+id/sex"
+                    android:textSize="25sp"
+
+                    android:layout_marginTop="20dp"
+                    android:layout_below="@+id/teacherName"
+                    android:layout_alignParentStart="true" />
+
+                <Spinner
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/teachersex"
+                    android:layout_gravity="center_horizontal"
+
+                    android:layout_below="@+id/sex"
+                    android:layout_alignParentStart="true"
+                    android:entries="@array/sex"/>
+
+
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/teacheremail"
+                    android:layout_gravity="center_horizontal"
+
+                    android:layout_below="@+id/serialHead"
+                    android:layout_alignParentStart="true" />
+
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Name:"
+                    android:id="@+id/textView36"
+                    android:textSize="25sp"
+                    android:layout_marginTop="75dp"
+                    android:layout_alignParentStart="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Date of Birth:"
+                    android:id="@+id/dob"
+                    android:textSize="25sp"
+
+                    android:layout_marginTop="20dp"
+                    android:layout_below="@+id/teacheremail"
+                    android:layout_alignParentStart="true" />
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/teacherdob"
+                    android:layout_gravity="center_horizontal"
+
+                    android:layout_below="@+id/dob"
+                    android:layout_alignParentStart="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Address:"
+                    android:id="@+id/address"
+                    android:textSize="25sp"
+
+                    android:layout_marginTop="20dp"
+                    android:layout_below="@+id/teacherdob"
+                    android:layout_alignParentStart="true" />
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/teacheraddress"
+                    android:layout_gravity="center_horizontal"
+
+                    android:layout_below="@+id/address"
+                    android:layout_alignParentStart="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Parent Name:"
+                    android:id="@+id/parentname"
+                    android:textSize="25sp"
+
+                    android:layout_marginTop="20dp"
+                    android:layout_below="@+id/teacheraddress"
+                    android:layout_alignParentStart="true" />
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/teacherparentname"
+                    android:layout_gravity="center_horizontal"
+
+                    android:layout_below="@+id/parentname"
+                    android:layout_alignParentStart="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Contact:"
+                    android:id="@+id/contact"
+                    android:textSize="25sp"
+
+                    android:layout_marginTop="20dp"
+                    android:layout_below="@+id/teacherparentname"
+                    android:layout_alignParentStart="true" />
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/teachercontact"
+                    android:layout_gravity="center_horizontal"
+
+                    android:layout_below="@+id/contact"
+                    android:layout_alignParentStart="true" />
+            </RelativeLayout>
+        </ScrollView>
+
+    </LinearLayout>
 
 
 

@@ -20,7 +20,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-import com.parse.ParseUser;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.ImageAdapter;
@@ -945,15 +944,7 @@ public class Home extends BaseActivity{
                   //  loadAllotmentData();
 
                 }
-                else if (position == 3) {   //allotments
 
-                    Intent task_intent = new Intent(Home.this, com.project.smartedu.common.Schedule.class);
-                    //task_intent.putExtra("institution_code",institution_code);
-                    task_intent.putExtra("institution_name",institutionName);
-                    task_intent.putExtra("role", "admin");
-                    startActivity(task_intent);
-
-                }
 
             }
         });

@@ -3,34 +3,23 @@ package com.project.smartedu.admin;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
-import com.project.smartedu.Constants;
+import com.project.smartedu.BaseActivity;
 import com.project.smartedu.R;
-import com.project.smartedu.common.Tasks;
-import com.project.smartedu.database.Task;
+import com.project.smartedu.navigation.FragmentDrawer;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 
-public class Teachers extends AppCompatActivity {
+public class Teachers extends BaseActivity implements FragmentDrawer.FragmentDrawerListener{
 
     String classId;
     String name;
@@ -50,6 +39,8 @@ public class Teachers extends AppCompatActivity {
 
     DatabaseReference databaseReference;
     FirebaseAuth firebaseAuth;
+
+    private FragmentDrawer drawerFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +68,10 @@ public class Teachers extends AppCompatActivity {
        
         createIDs=(Button)findViewById(R.id.shareCode);
         teacherList = (ListView) findViewById(R.id.teacherList);
+
+        drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
+        drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), toolbar,role);
+        drawerFragment.setDrawerListener(this);
 
 
 //        firebaseAuth=FirebaseAuth.getInstance();

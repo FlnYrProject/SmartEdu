@@ -24,13 +24,27 @@
 
                 android:id="@+id/student">
 
+                <LinearLayout
+                    android:id="@+id/container_toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <include
+                        android:id="@+id/toolbar"
+                        layout="@layout/toolbar" />
+
+
+
+                </LinearLayout>
+
 
                 <Button
                     android:layout_width="match_parent"
                     android:layout_height="37dp"
                     android:text="Create Id&apos;s"
                     android:id="@+id/shareCode"
-
+                    android:layout_below="@+id/container_toolbar"
                     android:background="#20BF9F"
                     android:textColor="#ffff" />
 
@@ -56,6 +70,15 @@
 
         </RelativeLayout>
     </LinearLayout>
+
+    <fragment
+        android:id="@+id/fragment_navigation_drawer"
+        android:name="com.project.smartedu.navigation.FragmentDrawer"
+        android:layout_width="@dimen/nav_drawer_width"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:layout="@layout/fragment_navigation_drawer"
+        tools:layout="@layout/fragment_navigation_drawer" />
 
 
 

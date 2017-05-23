@@ -24,6 +24,20 @@
 
                 android:id="@+id/Classes">
 
+                <LinearLayout
+                    android:id="@+id/container_toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <include
+                        android:id="@+id/toolbar"
+                        layout="@layout/toolbar" />
+
+
+
+                </LinearLayout>
+
 
                 <ListView
                     android:layout_width="match_parent"
@@ -37,6 +51,15 @@
 
         </RelativeLayout>
     </LinearLayout>
+
+    <fragment
+        android:id="@+id/fragment_navigation_drawer"
+        android:name="com.project.smartedu.navigation.FragmentDrawer"
+        android:layout_width="@dimen/nav_drawer_width"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:layout="@layout/fragment_navigation_drawer"
+        tools:layout="@layout/fragment_navigation_drawer" />
 
 
 
