@@ -21,7 +21,6 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.project.smartedu.admin.AdminUserPrefs;
-import com.project.smartedu.admin.Home;
 import com.project.smartedu.common.view_messages;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.parent.ParentUserPrefs;
@@ -427,13 +426,16 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
             }
 
             if (position == 4) { //assignments
-                /*
-                Intent upload_intent = new Intent(BaseActivity.this, teacher_classes.class);
-                upload_intent.putExtra("institution_code",institution_code);
-                upload_intent.putExtra("institution_name", institution_name);
-                upload_intent.putExtra("role", role);
-                upload_intent.putExtra("for", "upload");
-                startActivity(upload_intent); */
+                if(TeacherUserPrefs.allotments.size()==0){
+                    Toast.makeText(getApplicationContext(),"No Classes Allotted",Toast.LENGTH_LONG).show();
+                }else {
+
+                    Intent upload_intent = new Intent(BaseActivity.this, Classes.class);
+                    upload_intent.putExtra("institution_name", institutionName);
+                    upload_intent.putExtra("role", role);
+                    upload_intent.putExtra("for", "upload");
+                    startActivity(upload_intent);
+                }
 
             }
 
@@ -611,7 +613,7 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
         } else if(role.equalsIgnoreCase("Admin")){
             if (position == 0) { //dashboard
 
-                Intent i = new Intent(getApplicationContext(), Home.class);
+                Intent i = new Intent(BaseActivity.this, com.project.smartedu.admin.Home.class);
 
                 i.putExtra("institution_name",institutionName);
 
@@ -627,9 +629,19 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
             if (position == 2) { //teachers
 
+                Intent task_intent = new Intent(BaseActivity.this, com.project.smartedu.admin.Teachers.class);
+                task_intent.putExtra("role", role);
+                task_intent.putExtra("institution_name", institutionName);
+                startActivity(task_intent);
+
             }
 
             if (position == 3) { //classes
+
+                Intent task_intent = new Intent(BaseActivity.this, com.project.smartedu.admin.Classes.class);
+                task_intent.putExtra("role", role);
+                task_intent.putExtra("institution_name", institutionName);
+                startActivity(task_intent);
 
 
             }
@@ -646,7 +658,7 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 userPrefs.clearUserDetails();
             }
 
-        } else{
+        } /*else{
             if(position==0)
             {
                 AdminUserPrefs adminUserPrefs=new AdminUserPrefs(BaseActivity.this);
@@ -656,7 +668,7 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 UserPrefs userPrefs=new UserPrefs(BaseActivity.this);
                 userPrefs.clearUserDetails();
             }
-        }
+        } */
 
 
     }

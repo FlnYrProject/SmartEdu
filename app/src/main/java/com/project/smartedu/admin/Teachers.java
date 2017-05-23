@@ -65,13 +65,15 @@ public class Teachers extends BaseActivity implements FragmentDrawer.FragmentDra
         role=from_home.getStringExtra("role");
         institutionName=from_home.getStringExtra("institution_name");
 
-       
-        createIDs=(Button)findViewById(R.id.shareCode);
-        teacherList = (ListView) findViewById(R.id.teacherList);
 
         drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), toolbar,role);
         drawerFragment.setDrawerListener(this);
+
+       
+        createIDs=(Button)findViewById(R.id.shareCode);
+        teacherList = (ListView) findViewById(R.id.teacherList);
+
 
 
 //        firebaseAuth=FirebaseAuth.getInstance();
