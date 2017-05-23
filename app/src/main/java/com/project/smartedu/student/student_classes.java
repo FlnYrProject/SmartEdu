@@ -28,7 +28,7 @@ import com.project.smartedu.common.view_attendance;
 import com.project.smartedu.database.Teachers;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
-import com.project.smartedu.parent.ParentUserPrefs;
+import com.project.smartedu.parent.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -203,6 +203,28 @@ public class student_classes extends BaseActivity {
         {
             Intent nouser=new Intent(student_classes.this,LoginActivity.class);
             startActivity(nouser);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        if(role.equalsIgnoreCase("Student")) {
+            Intent tohome = new Intent(student_classes.this, Home.class);
+            tohome.putExtra("institution_name", institutionName);
+            tohome.putExtra("role", "Student");
+            startActivity(tohome);
+        }
+
+        if(role.equalsIgnoreCase("Parent")){
+
+            Intent tohome = new Intent(student_classes.this, com.project.smartedu.parent.Home.class);
+            tohome.putExtra("institution_name", institutionName);
+            tohome.putExtra("role", "Parent");
+            tohome.putExtra("child_username", parentUserPrefs.getSelectedChildName());
+            startActivity(tohome);
+
         }
     }
 

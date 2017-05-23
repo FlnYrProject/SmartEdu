@@ -29,6 +29,7 @@ public class ParentUserPrefs {
     private static final String PREF_NAME = "ParentUserDetails";
     private static final String SELECTED_CHILD_ID = "SelectedChildId";
     private static final String SELECTED_CHILD_INSTITUTE = "SelectedInstitute";
+    private static final String SELECTED_CHILD_NAME = "SelectedChildName";
 
 
 
@@ -99,6 +100,26 @@ public class ParentUserPrefs {
 
         // commit changes
         editor.commit();
+    }
+
+
+
+    public void setSelectedChildNameString(String name){
+
+        // Storing name in pref
+        editor.putString(SELECTED_CHILD_NAME, name);
+
+        // commit changes
+        editor.commit();
+    }
+
+
+
+
+
+
+    public String getSelectedChildName(){
+        return pref.getString(SELECTED_CHILD_NAME,"");
     }
 
 

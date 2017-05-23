@@ -76,7 +76,7 @@ public class parent_choose_child  extends BaseActivity implements FragmentDrawer
             pd.setMessage("Fetching your Childs...");
             pd.setCancelable(false);
             pd.show();
-
+ParentUserPrefs.childinsitutionmap.clear();
         }
 
         @Override
@@ -297,7 +297,7 @@ public class parent_choose_child  extends BaseActivity implements FragmentDrawer
 
                         if(child.getName().equalsIgnoreCase(selected_child)){
                             parentUserprefs.setSelectedChildId(child_id);
-
+                            parentUserprefs.setSelectedChildNameString(child.getName());
                             Intent parent_home_page = new Intent(parent_choose_child.this, select_institution.class);
                             parent_home_page.putExtra("role", role);
                             startActivity(parent_home_page);

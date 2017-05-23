@@ -70,6 +70,7 @@ UserPrefs userPrefs;
             pd.setCancelable(false);
             pd.show();
             UserPrefs.roleslistmap.clear();
+            ParentUserPrefs.childuseridLt.clear();
         }
 
         @Override

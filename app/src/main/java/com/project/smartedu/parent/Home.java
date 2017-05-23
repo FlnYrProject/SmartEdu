@@ -927,7 +927,7 @@ TeacherItems teacherItems = new TeacherItems(Home.this);        //get teacher da
         tohome.putExtra("institution_name",institutionName);
         tohome.putExtra("role","Parent");
         tohome.putExtra("child_username",child_username);
-       
+
         startActivity(tohome);
     }
 

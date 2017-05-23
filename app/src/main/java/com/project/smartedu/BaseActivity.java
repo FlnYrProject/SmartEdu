@@ -22,7 +22,13 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.project.smartedu.admin.AdminUserPrefs;
 import com.project.smartedu.admin.Home;
+import com.project.smartedu.common.view_messages;
 import com.project.smartedu.navigation.FragmentDrawer;
+import com.project.smartedu.parent.ParentUserPrefs;
+import com.project.smartedu.student.StudentUserPrefs;
+import com.project.smartedu.student.student_classes;
+import com.project.smartedu.teacher.Classes;
+import com.project.smartedu.teacher.TeacherUserPrefs;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -48,6 +54,10 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
     public int densityY;
     public FirebaseAuth firebaseAuth;
 
+    StudentUserPrefs studentUserPrefs;
+    ParentUserPrefs parentUserPrefs;
+
+
 
 
     @Override
@@ -64,6 +74,9 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
         Display display = windowManager.getDefaultDisplay();
         densityX = display.getWidth();
         densityY= display.getHeight();
+
+        studentUserPrefs=new StudentUserPrefs(BaseActivity.this);
+        parentUserPrefs=new ParentUserPrefs(BaseActivity.this);
     }
 
     @Override
@@ -395,13 +408,15 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
             }
 
             if (position == 2) { //attendance
-                /*
-                Intent attendance_intent = new Intent(BaseActivity.this, teacher_classes.class);
-                attendance_intent.putExtra("institution_code",institution_code);
-                attendance_intent.putExtra("institution_name",institution_name);
-                attendance_intent.putExtra("for","attendance");
-                attendance_intent.putExtra("role", role);
-                startActivity(attendance_intent); */
+                if(TeacherUserPrefs.allotments.size()==0){
+                    Toast.makeText(getApplicationContext(),"No Classes Allotted",Toast.LENGTH_LONG).show();
+                }else{
+                    Intent attendance_intent = new Intent(BaseActivity.this, Classes.class);
+                    attendance_intent.putExtra("institution_name",institutionName);
+                    attendance_intent.putExtra("for", "attendance");
+                    attendance_intent.putExtra("role", role);
+                    startActivity(attendance_intent);
+                }
             }
 
             if (position == 3) { //schedule
@@ -423,13 +438,15 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
             }
 
             if (position == 5) { //grades
-                /*
-                Intent addmarks_intent = new Intent(BaseActivity.this, teacher_classes.class);
-                addmarks_intent.putExtra("institution_code",institution_code);
-                addmarks_intent.putExtra("institution_name", institution_name);
-                addmarks_intent.putExtra("role", role);
-                addmarks_intent.putExtra("for", "exam");
-                startActivity(addmarks_intent); */
+                if(TeacherUserPrefs.allotments.size()==0){
+                    Toast.makeText(getApplicationContext(),"No Classes Allotted",Toast.LENGTH_LONG).show();
+                }else{
+                    Intent addmarks_intent = new Intent(BaseActivity.this, Classes.class);
+                    addmarks_intent.putExtra("institution_name",institutionName);
+                    addmarks_intent.putExtra("role", role);
+                    addmarks_intent.putExtra("for", "exam");
+                    startActivity(addmarks_intent);
+                }
             }
 
             if(position==6) //choose another role
@@ -467,17 +484,14 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
             }
 
             if (position == 2) { //attendance
-                /*
                 Intent atten_intent = new Intent(BaseActivity.this, student_classes.class);
 
                 atten_intent.putExtra("role", role);
-                atten_intent.putExtra("studentId", studentId);
-                atten_intent.putExtra("classId", classId);
-                atten_intent.putExtra("classGradeId", classGradeId);
-                atten_intent.putExtra("institution_code",institution_code);
-                atten_intent.putExtra("institution_name",institution_name);
+                atten_intent.putExtra("studentId",firebaseAuth.getCurrentUser().getUid());
+                atten_intent.putExtra("classId", studentUserPrefs.getClassId());
+                atten_intent.putExtra("institution_name", institutionName);
                 atten_intent.putExtra("for", "attendance");
-                startActivity(atten_intent); */
+                startActivity(atten_intent);
             }
 
             if (position == 3) { //schedule
@@ -500,15 +514,14 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
             }
 
             if (position == 5) { //grades
-                /*
-                Intent exam_intent = new Intent(BaseActivity.this, student_exams.class);
-                exam_intent.putExtra("institution_name", institution_name);
-                exam_intent.putExtra("institution_code", institution_code);
-                exam_intent.putExtra("role", role);
-                exam_intent.putExtra("classId", classId);
-                exam_intent.putExtra("classGradeId", classGradeId);
-                exam_intent.putExtra("studentId", studentId);
-                startActivity(exam_intent); */
+                Intent atten_intent = new Intent(BaseActivity.this, student_classes.class);
+
+                atten_intent.putExtra("role", role);
+                atten_intent.putExtra("studentId",firebaseAuth.getCurrentUser().getUid());
+                atten_intent.putExtra("classId", studentUserPrefs.getClassId());
+                atten_intent.putExtra("institution_name", institutionName);
+                atten_intent.putExtra("for", "exam");
+                startActivity(atten_intent);
             }
 
             if(position==6) //choose another role
@@ -532,13 +545,10 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
         else if(role.equalsIgnoreCase("Parent")){
             if (position == 0) { //dashboard
-                /*
-                Intent i = new Intent(getApplicationContext(),com.project.smartedu.parent.Home.class);
-                i.putExtra("role", role);
-                i.putExtra("institution_name",institutionName);
-
-                i.putExtra("child_username",child_username);
-                startActivity(i); */
+                Intent tohome=new Intent(BaseActivity.this, com.project.smartedu.parent.Home.class);
+                tohome.putExtra("institution_name",institutionName);
+                tohome.putExtra("role","Parent");
+                tohome.putExtra("child_username",parentUserPrefs.getSelectedChildName());
             }
 
             if (position == 1) { //tasks
@@ -549,42 +559,35 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
             }
 
             if (position == 2) { //attendance
-                /*
-                Intent atten_intent = new Intent(getApplicationContext(), student_classes.class);
+                Intent atten_intent = new Intent(BaseActivity.this, student_classes.class);
                 atten_intent.putExtra("role", "Parent");
-                atten_intent.putExtra("studentId", studentId);
+                atten_intent.putExtra("studentId",parentUserPrefs.getSelectedChildId() );
+                atten_intent.putExtra("classId", studentUserPrefs.getClassId());
                 atten_intent.putExtra("for","attendance");
-                atten_intent.putExtra("classGradeId", classGradeId);
-                atten_intent.putExtra("institution_code",institution_code);
-                atten_intent.putExtra("institution_name",institution_name);
-
-                startActivity(atten_intent); */
+                atten_intent.putExtra("institution_name",institutionName);
+                startActivity(atten_intent);
             }
 
             if (position == 3) { //grades
-                /*
-                Intent exam_intent = new Intent(getApplicationContext(), student_exams.class);
+
+                Intent exam_intent = new Intent(BaseActivity.this, student_classes.class);
                 exam_intent.putExtra("role", "Parent");
-                exam_intent.putExtra("classId", classId);
-                exam_intent.putExtra("studentId", studentId);
-                exam_intent.putExtra("institution_name", institution_name);
-                exam_intent.putExtra("institution_code", institution_code);
-                exam_intent.putExtra("classGradeId", classGradeId);
-                startActivity(exam_intent); */
+                exam_intent.putExtra("institution_name", institutionName);
+                exam_intent.putExtra("for","exam");
+                exam_intent.putExtra("classId", studentUserPrefs.getClassId());
+                exam_intent.putExtra("studentId",parentUserPrefs.getSelectedChildId());
+                startActivity(exam_intent);
+
 
             }
 
             if (position == 4) { //messages
-                /*
-                Intent message_intent = new Intent(getApplicationContext(), view_messages.class);
+                Intent message_intent = new Intent(BaseActivity.this, view_messages.class);
                 message_intent.putExtra("role", "Parent");
-                message_intent.putExtra("classId", classId);
-                message_intent.putExtra("classGradeId", classGradeId);
-                message_intent.putExtra("studentId", studentId);
-                message_intent.putExtra("institution_name", institution_name);
-                message_intent.putExtra("institution_code", institution_code);
-                message_intent.putExtra("for", "received");
-                startActivity(message_intent); */
+                message_intent.putExtra("studentId", parentUserPrefs.getSelectedChildId());
+                message_intent.putExtra("institution_name", institutionName);
+                message_intent.putExtra("_for", "received");
+                startActivity(message_intent);
             }
 
             if(position==5) //choose another role
