@@ -452,7 +452,15 @@ protected void setExamList(){
     }
 
 
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent to_teacher_classes=new Intent(Exams.this,Classes.class);
+        to_teacher_classes.putExtra("for","exam");
+        to_teacher_classes.putExtra("role",role);
+        to_teacher_classes.putExtra("institution_name",institutionName);
+        startActivity(to_teacher_classes);
+    }
 
     @Override
     protected void onPostResume() {

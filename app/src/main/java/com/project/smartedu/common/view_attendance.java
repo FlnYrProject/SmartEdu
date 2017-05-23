@@ -149,6 +149,12 @@ public class view_attendance extends BaseActivity implements FragmentDrawer.Frag
             //The main UI is already idle by this moment
             super.onPostExecute(aVoid);
 
+
+            if(attendancemap.size()==0){
+                showLogButton.setVisibility(View.INVISIBLE);
+            }else{
+                showLogButton.setVisibility(View.VISIBLE);
+            }
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
@@ -262,16 +268,24 @@ attendancemap=new HashMap<>();
 
         }
 
+
+
         ArrayAdapter adapter = new ArrayAdapter(view_attendance.this, android.R.layout.simple_list_item_1, attendancelist);
         attendanceLogs.setAdapter(adapter);
 
     }
 
+
+
     public void information(int absent, int totalDays){
 
         String absentDays= String.valueOf(absent);
         String total=String.valueOf( totalDays);
-        percent=((totalDays-absent)/(double)totalDays)*100;
+        if(totalDays!=0) {
+            percent = ((totalDays - absent) / (double) totalDays) * 100;
+        }else{
+            percent=0.0;
+        }
         String PER= String.valueOf(percent)+"%";
 
         this.absentDays.setText(absentDays.trim());

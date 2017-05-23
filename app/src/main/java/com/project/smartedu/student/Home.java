@@ -65,8 +65,6 @@ public class Home extends BaseActivity {
 
 
 
-
-
     private class TeacherItems extends AsyncTask<Void, Void, Void> {
 
         private Context async_context;
@@ -817,11 +815,12 @@ public class Home extends BaseActivity {
                     startActivity(schedule_intent);
 
                 } else if (position == 4) {
-                    Intent exam_intent = new Intent(Home.this, student_exams.class);
+                    Intent exam_intent = new Intent(Home.this, student_classes.class);
                     exam_intent.putExtra("institution_name", institutionName);
                     exam_intent.putExtra("role", role);
                     exam_intent.putExtra("classId", studentUserPrefs.getClassId());
                     exam_intent.putExtra("studentId", studentUserPrefs.getClassId());
+                    exam_intent.putExtra("for", "exam");
                     startActivity(exam_intent);
 
                 } else if (position == 5) {
@@ -897,6 +896,17 @@ public class Home extends BaseActivity {
         Intent tohome=new Intent(Home.this, Home.class);
         tohome.putExtra("institution_name",institutionName);
         tohome.putExtra("role","student");
+        startActivity(tohome);
+    }
+
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent tohome=new Intent(Home.this, Home.class);
+        tohome.putExtra("institution_name",institutionName);
+        tohome.putExtra("role","Student");
         startActivity(tohome);
     }
 

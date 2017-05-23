@@ -1,8 +1,12 @@
 package com.project.smartedu.student;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,18 +21,28 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.project.smartedu.BaseActivity;
+import com.project.smartedu.Constants;
 import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
+import com.project.smartedu.UserPrefs;
+import com.project.smartedu.database.Exam;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
+import com.project.smartedu.parent.ParentUserPrefs;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -37,7 +51,7 @@ public class student_exams extends BaseActivity {
 
 
     private Toolbar mToolbar;
-    Button addExamButton;
+
     private FragmentDrawer drawerFragment;
 
 
@@ -47,7 +61,8 @@ public class student_exams extends BaseActivity {
     String studentId;
     String examid;
     String examName;
-    ListView subjectList;
+    String subject;
+
 
     Number totalMarks;
     Number marksObtained;
@@ -56,11 +71,147 @@ public class student_exams extends BaseActivity {
     TextView myTotalMarks;
     TextView myMarksObtained;
 
+
+
+DatabaseReference databaseReference;
+
+    UserPrefs userPrefs;
+    ParentUserPrefs parentUserPrefs;
+    StudentUserPrefs studentUserPrefs;
+
+
+
+
+
+    HashMap<String,String> exammarksobtMap;             //exam id--> marks obtained
+    HashMap<String,Exam> examMap;               //exam id---> exam
+
+
+
+
+
+
+
+
+    private class ExamResultItems extends AsyncTask<Void, Void, Void> {
+
+        private Context async_context;
+        private ProgressDialog pd;
+
+        public ExamResultItems(Context context){
+            this.async_context = context;
+            pd = new ProgressDialog(async_context);
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd.setMessage("Fetching Exams Data");
+            pd.setCancelable(false);
+            pd.show();
+            databaseReference= Constants.databaseReference.child(Constants.STUDENTS_TABLE).child(institutionName).child(studentId).child("exam").child(subject);
+            exammarksobtMap.clear();
+            examMap.clear();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            final Object lock = new Object();
+
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    synchronized (lock) {
+                        for(DataSnapshot ds:dataSnapshot.getChildren()) {
+
+                            Log.d("nowdata","sname = " + ds.getKey());          //gives exam id
+
+                            String subject=ds.getKey();
+                            Exam exam=new Exam();
+                            exam.setId(ds.getKey());
+                            exam.setSubject(subject);
+
+                            for(DataSnapshot dataSnapshot1:ds.getChildren()){
+                                //dataSnapshot1.getKey() gives exam details
+
+                                if(dataSnapshot1.getKey().equalsIgnoreCase("name")){
+                                    exam.setName(dataSnapshot1.getValue().toString());
+                                }
+
+                                if(dataSnapshot1.getKey().equalsIgnoreCase("date")){
+                                    exam.setDate(dataSnapshot1.getValue().toString());
+                                }
+
+                                if(dataSnapshot1.getKey().equalsIgnoreCase("max_marks")){
+                                    exam.setMax_marks(dataSnapshot1.getValue().toString());
+                                }
+
+                                if(dataSnapshot1.getKey().equalsIgnoreCase("marks_obtained")){
+                                    exammarksobtMap.put(ds.getKey(),dataSnapshot1.getValue().toString());
+                                }
+
+
+                            }
+
+                            examMap.put(ds.getKey(),exam);
+
+                        }
+                        lock.notifyAll();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+
+            });
+
+            synchronized (lock){
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //Handles the stuff after the synchronisation with the firebase listener has been achieved
+            //The main UI is already idle by this moment
+            super.onPostExecute(aVoid);
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+//                   Toast.makeText(async_context,userPrefs.getUserName(),Toast.LENGTH_LONG).show();
+                    setExamSubjectList();
+                    // noti_bar.setTexts(userPrefs.getUserName(), role,institutionName);
+                    pd.dismiss();
+
+                }
+            }, 500);  // 100 milliseconds
+
+
+        }
+        //end firebase_async_class
+    }
+
+
+
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student_exams);
-
+        exammarksobtMap=new HashMap<>();
+        examMap=new HashMap<>();
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -71,82 +222,80 @@ public class student_exams extends BaseActivity {
         classId = from_student.getStringExtra("classId");
         studentId = from_student.getStringExtra("studentId");
         role = from_student.getStringExtra("role");
-
+        subject=from_student.getStringExtra("subject");
         institutionName = from_student.getStringExtra("institution_name");
 
+        userPrefs=new UserPrefs(student_exams.this);
+        parentUserPrefs=new ParentUserPrefs(student_exams.this);
+        studentUserPrefs=new StudentUserPrefs(student_exams.this);
+
         noti_bar = (NotificationBar) getSupportFragmentManager().findFragmentById(R.id.noti);
-        noti_bar.setTexts(ParseUser.getCurrentUser().getUsername(), role, institutionName);
+        noti_bar.setTexts(userPrefs.getUserName(), role, institutionName);
 
 
 
         // examsList = (ListView) findViewById(R.id.examList);
-        subjectList = (ListView) findViewById(R.id.examList);
+        examsList = (ListView) findViewById(R.id.examdetailList);
+
+        exammarksobtMap=new HashMap<>();
+        examMap=new HashMap<>();
 
         drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar, role);
         drawerFragment.setDrawerListener(this);
 
-        //  myList = dbHandler.getAllTasks();
 
-        //Log.i("Anmol", "(Inside MainActivity) dbHandler.getAllTasks().toString() gives " + dbHandler.getAllTasks().toString());
-        //ListAdapter adapter = new CustomListAdapter(getApplicationContext(), dbHandler.getAllTasks());
-        //taskList.setAdapter(adapter);
+        ExamResultItems examResultItems=new ExamResultItems(student_exams.this);
+        examResultItems.execute();
 
-        /*ParseQuery<ParseObject> studentQuery = ParseQuery.getQuery("Class");
-        studentQuery.whereEqualTo("class",classname);
-        studentQuery.whereEqualTo("teacher",ParseUser.getCurrentUser());*/
-
-
-        final HashMap<String, String> classMap = new HashMap<String, String>();
-
-
-      /*  final ParseObject[] classRef = new ParseObject[1];
-        ParseQuery<ParseObject> classQuery = ParseQuery.getQuery(ClassTable.TABLE_NAME);
-        // classQuery.whereEqualTo(ClassTable.OBJECT_ID, classId);
-        classQuery.whereEqualTo(ClassTable.CLASS_NAME, ParseObject.createWithoutData(ClassGradeTable.TABLE_NAME, classGradeId));
-        classQuery.findInBackground(new FindCallback<ParseObject>() {
-            public void done(List<ParseObject> studentListRet, ParseException e) {
-                if (e == null) {
-                    Log.d("class", "Retrieved the class");
-                    //Toast.makeText(getApplicationContext(), studentListRet.toString(), Toast.LENGTH_LONG).show();
-                    if (studentListRet.size() != 0) {
-
-                        ArrayList<String> classLt = new ArrayList<String>();
-                        //ArrayAdapter adapter = new ArrayAdapter(teacher_exams.this, android.R.layout.simple_list_item_1, studentLt);
-                        //Toast.makeText(Students.this, "here = ", Toast.LENGTH_LONG).show();
-                        ArrayAdapter subjectadapter = new ArrayAdapter(student_exams.this, android.R.layout.simple_list_item_1, classLt);
-
-                        for (int x = 0; x < studentListRet.size(); x++) {
-                            ParseObject u = (ParseObject) studentListRet.get(x);
-                            // ParseObject classGradeObject = ((ParseObject) u.get(ClassTable.CLASS_NAME));
-
-                            String name = u.getString(ClassTable.SUBJECT);
-
-                            classMap.put(name, u.getObjectId());
-                            subjectadapter.add(name);
-                        }
-                        // classRef[0] = studentListRet.get(0);
-                        subjectList.setAdapter(subjectadapter);
-                    } else {
-                        Log.d("class", "error in query");
-                    }
-                } else {
-                    Log.d("class", "error");
-                }
-            }
-        });
-*/
-
-        subjectList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final String item = ((TextView) view).getText().toString();
-                displayExams(item, classMap.get(item));
-            }
-        });
     }
 
 
+
+    public void setExamSubjectList(){
+
+        if (examMap.size()==0){
+            Toast.makeText(student_exams.this,"No exam result uploaded",Toast.LENGTH_LONG).show();
+        }else{
+
+
+                    ArrayList<String> exammarksitems=new ArrayList<>();
+
+                    for (String examId:examMap.keySet()){
+
+                        Exam exam=examMap.get(examId);
+
+
+
+                            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                            String dateString = formatter.format(new Date(Long.parseLong(exam.getDate())));
+
+                            String entry=exam.getName() + " on " + dateString + "\nMaximum Marks = " + exam.getMax_marks() +"\nMarks Obtained = " + exammarksobtMap.get(exam.getId());
+
+                            exammarksitems.add(entry);
+                        Log.d("testing",entry);
+
+
+
+                    }
+
+                    ArrayAdapter marksadapter = new ArrayAdapter(student_exams.this, android.R.layout.simple_list_item_1, exammarksitems);
+
+
+                    examsList.setAdapter(marksadapter);
+
+
+
+
+
+
+
+
+
+
+        }
+
+    }
 
 
 
@@ -294,22 +443,6 @@ public class student_exams extends BaseActivity {
     }
 
 
-    public void callDialog(){
-       /* Dialog dialog = new Dialog(student_exams.this);
-        dialog.setContentView(R.layout.view_marks);
-        dialog.setTitle("Marks Information");
-
-        myExamName= (TextView) dialog.findViewById(R.id.exam);
-        myMarksObtained= (TextView) dialog.findViewById(R.id.obtained);
-        myTotalMarks= (TextView) dialog.findViewById(R.id.totalMarks);
-        myExamName.setText(examName);
-        myMarksObtained.setText(marksObtained.toString());
-        myTotalMarks.setText(totalMarks.toString());
-
-        dialog.dismiss();
-
-        dialog.show();*/
-    }
 
     @Override
     protected void onPostResume() {
