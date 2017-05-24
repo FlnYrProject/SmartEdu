@@ -1,6 +1,7 @@
 package com.project.smartedu.teacher;
 
 import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -29,13 +30,14 @@ import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 public class Students extends BaseActivity {
 
     private Toolbar mToolbar;
-    Button addStudentButton;
+    FloatingActionButton addStudentButton;
     private FragmentDrawer drawerFragment;
 
     UserPrefs userPrefs;
@@ -48,7 +50,7 @@ public class Students extends BaseActivity {
     String name;
     Integer age;
     Integer rollno;
-    Button createIDs;
+
 
     HashMap<String ,String> localstumap;
 
@@ -78,10 +80,9 @@ public class Students extends BaseActivity {
         noti_bar.setTexts(userPrefs.getUserName(), role,institutionName);
 
 
-        addStudentButton = (Button)findViewById(R.id.addButton);
+        addStudentButton =(FloatingActionButton) findViewById(R.id.fab);
         studentList = (ListView) findViewById(R.id.studentList);
-        createIDs=(Button)findViewById(R.id.shareCode);
-        createIDs.setVisibility(View.INVISIBLE);
+
         drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar,role);
         drawerFragment.setDrawerListener(this);
@@ -124,16 +125,11 @@ public class Students extends BaseActivity {
         }
 
         if(studentLt.size()>0){
+
             no_of_stu=studentLt.size();
             ArrayAdapter adapter = new ArrayAdapter(Students.this, android.R.layout.simple_list_item_1, studentLt);
             studentList.setAdapter(adapter);
-            createIDs.setVisibility(View.VISIBLE);
-            createIDs.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    shareCode();
-                }
-            });
+
 
 
             studentList.setOnItemClickListener(new AdapterView.OnItemClickListener() {

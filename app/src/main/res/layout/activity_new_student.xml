@@ -51,6 +51,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/studentName"
+                android:inputType="text"
                 android:layout_below="@+id/textView36"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
@@ -75,7 +76,8 @@
         android:id="@+id/studentemail"
         android:layout_gravity="center_horizontal"
         android:layout_below="@+id/serialHead"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:inputType="textEmailAddress"/>
 
 
 
@@ -118,7 +120,8 @@
         android:id="@+id/studentdob"
         android:layout_gravity="center_horizontal"
         android:layout_below="@+id/dob"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:inputType="date"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -178,7 +181,8 @@
         android:id="@+id/studentparentemail"
         android:layout_gravity="center_horizontal"
         android:layout_below="@+id/parentemail"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:inputType="textEmailAddress"/>
 
 
     <TextView
@@ -198,7 +202,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/studentcontact"
         android:layout_gravity="center_horizontal"
-
+        android:inputType="phone"
         android:layout_below="@+id/contact"
         android:layout_alignParentStart="true" />
 

@@ -20,6 +20,7 @@ import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.notification.NotificationBar;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Teachers extends BaseActivity{
 
@@ -48,6 +49,7 @@ public class Teachers extends BaseActivity{
 
 
     UserPrefs userPrefs;
+    FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +57,7 @@ public class Teachers extends BaseActivity{
         setContentView(R.layout.activity_teachers);
 
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

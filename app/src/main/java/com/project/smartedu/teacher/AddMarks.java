@@ -131,6 +131,9 @@ public class AddMarks extends BaseActivity {
     ArrayList<String> sturecipients;
 
 
+    HashMap<String,Integer> studentmarksmap;     //student id --> marks in the exam
+
+
 
 
     private class ParentItems extends AsyncTask<Void, Void, Void> {
@@ -218,6 +221,94 @@ public class AddMarks extends BaseActivity {
 
 
 
+    private class ExamMarksItems extends AsyncTask<Void, Void, Void> {
+
+        private Context async_context;
+        private ProgressDialog pd;
+
+
+        public ExamMarksItems(Context context){
+            this.async_context = context;
+            pd=new ProgressDialog(async_context);
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd.setMessage("Loading...");
+            pd.setCancelable(false);
+            pd.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            final Object lock = new Object();
+
+
+            for(int x=0;x<studentLt.size();x++){
+
+
+                final String studentid=localstumap.get(studentLt.get(x));
+                Log.d("testing","id = " + studentid);
+
+                Exam exam=TeacherUserPrefs.examHashMap.get(examId);
+
+                databasereference= Constants.databaseReference.child(Constants.STUDENTS_TABLE).child(institutionName).child(studentid).child("exam").child(exam.getSubject()).child(exam.getId());
+                Log.d("testing","subject = " + studentid);
+                databasereference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+                        synchronized (lock) {
+
+                            for(DataSnapshot ds:dataSnapshot.getChildren()) {
+                                Log.d("testing","here");
+
+                                if(ds.getKey().equalsIgnoreCase("marks_obtained")){
+                                    studentmarksmap.put(studentid,Integer.parseInt(ds.getValue().toString()));
+                                    Log.d("testing","marks = " + ds.getValue().toString());
+                                    break;
+                                }
+
+                            }
+                            lock.notifyAll();
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+                synchronized (lock){
+                    try {
+                        lock.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //Handles the stuff after the synchronisation with the firebase listener has been achieved
+            //The main UI is already idle by this moment
+            super.onPostExecute(aVoid);
+
+           pd.dismiss();
+            setList();
+        }
+        //end firebase_async_class
+    }
+
 
 
 
@@ -267,6 +358,7 @@ public class AddMarks extends BaseActivity {
         studentLt = new ArrayList<String>();
         marksLt=new ArrayList<>();
         localstumap=new HashMap<>();
+        studentmarksmap=new HashMap<>();
 
         for(int x=0;x<TeacherUserPrefs.studentsuseridLt.size();x++){
 
@@ -299,60 +391,17 @@ public class AddMarks extends BaseActivity {
 
             Log.d("user", "Retrieved " + studentLt.size() + " students in this class");
             //Toast.makeText(getApplicationContext(), studentListRet.toString(), Toast.LENGTH_LONG).show();
-            for (int i = 0; i < studentLt.size(); i++) {
 
-                String student = studentLt.get(i);
-
-
-
-                modelItems[i] = new MarksModel(student, i);
-
-
+            for(int i=0;i<studentLt.size();i++){
+                String stuid=localstumap.get(studentLt.get(i));
+                studentmarksmap.put(stuid,0);
             }
 
-          /*  MarksListAdapter myListAdapter = new MarksListAdapter(AddMarks.this,studentLt,marksLt);
-
-            studentList.setAdapter(myListAdapter);*/
-
-            adapter = new MarksCustomAdapter(AddMarks.this, modelItems, classId);
-            studentList.setAdapter(adapter);
-            saveButton.setVisibility(View.VISIBLE);
+            ExamMarksItems examMarksItems=new ExamMarksItems(AddMarks.this);
+            examMarksItems.execute();
 
 
 
-            saveButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    boolean flag=false;
-                    for (int i = 0; i < adapter.getCount(); i++) {
-                        MarksModel item = adapter.getItem(i);
-                        if(item.getValue()>Integer.parseInt(TeacherUserPrefs.examHashMap.get(examId).getMax_marks())){
-                            Toast.makeText(AddMarks.this,"Marks cannot be greater than maximum marks",Toast.LENGTH_LONG).show();
-                            flag=true;
-                            break;
-                        }
-                        if(item.getValue()<0){
-                            Toast.makeText(AddMarks.this,"Marks cannot be less than zero",Toast.LENGTH_LONG).show();
-                            flag=true;
-                            break;
-                        }
-
-
-                        Log.d("marks",String.valueOf(item.getValue()));
-                    }
-
-                    if(!flag) {
-                        save();
-                    }
-
-
-
-
-
-
-                }
-            });
 
 
 
@@ -363,6 +412,67 @@ public class AddMarks extends BaseActivity {
 
 
 
+    public void setList(){
+        for (int i = 0; i < studentLt.size(); i++) {
+
+            String student = studentLt.get(i);
+
+            String stuid=localstumap.get(student);
+
+            Integer marks=studentmarksmap.get(stuid);
+
+            modelItems[i] = new MarksModel(student, marks);
+
+
+        }
+
+          /*  MarksListAdapter myListAdapter = new MarksListAdapter(AddMarks.this,studentLt,marksLt);
+
+            studentList.setAdapter(myListAdapter);*/
+
+        adapter = new MarksCustomAdapter(AddMarks.this, modelItems, classId);
+        studentList.setAdapter(adapter);
+        saveButton.setVisibility(View.VISIBLE);
+
+
+
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                boolean flag=false;
+                for (int i = 0; i < adapter.getCount(); i++) {
+                    MarksModel item = adapter.getItem(i);
+                    if(item.getValue()>Integer.parseInt(TeacherUserPrefs.examHashMap.get(examId).getMax_marks())){
+                        Toast.makeText(AddMarks.this,"Marks cannot be greater than maximum marks",Toast.LENGTH_LONG).show();
+                        flag=true;
+                        break;
+                    }
+                    if(item.getValue()<0){
+                        Toast.makeText(AddMarks.this,"Marks cannot be less than zero",Toast.LENGTH_LONG).show();
+                        flag=true;
+                        break;
+                    }
+
+
+                    Log.d("marks",String.valueOf(item.getValue()));
+                }
+
+                if(!flag) {
+                    save();
+                }
+
+
+
+
+
+
+            }
+        });
+
+
+
+    }
 
 
 

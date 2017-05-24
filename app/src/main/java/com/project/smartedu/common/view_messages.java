@@ -742,7 +742,7 @@ msg_id=dataSnapshot1.getKey();
 
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                getApplicationContext(), android.R.layout.simple_list_item_1, messageLt);
+                getApplicationContext(), R.layout.simple_list_item, messageLt);
 
         messageList.setAdapter(adapter);
 
@@ -768,7 +768,7 @@ msg_id=dataSnapshot1.getKey();
 
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                getApplicationContext(), android.R.layout.simple_list_item_1, messageLt);
+                getApplicationContext(), R.layout.simple_list_item, messageLt);
 
         messageList.setAdapter(adapter);
     }

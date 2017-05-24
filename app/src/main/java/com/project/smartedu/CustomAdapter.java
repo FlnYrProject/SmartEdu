@@ -193,15 +193,6 @@ public class CustomAdapter extends ArrayAdapter<Model> implements View.OnClickLi
                 CheckBox cb = (CheckBox) v;
                 Model model = (Model) cb.getTag();
                 model.setChecked(cb.isChecked());
-
-                if(cb.isChecked()) {
-                   v.setBackgroundColor(RED);
-
-
-                }else {
-                    v.setBackgroundColor(WHITE);
-                }
-
                 break;
 
             default:

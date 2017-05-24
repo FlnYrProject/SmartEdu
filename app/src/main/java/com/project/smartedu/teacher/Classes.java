@@ -103,7 +103,7 @@ public class Classes extends BaseActivity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     String item = ((TextView) view).getText().toString();
                     String classid=classmap.get(item);
-                    Toast.makeText(Classes.this, "id of class selected is = " + classid, Toast.LENGTH_LONG).show();
+                  //  Toast.makeText(Classes.this, "id of class selected is = " + classid, Toast.LENGTH_LONG).show();
                     if (_for.equals("students")) {
                         Intent to_student = new Intent(Classes.this, Students.class);
                         to_student.putExtra("institution_name", institutionName);

@@ -30,6 +30,12 @@
                 android:layout_gravity="center_horizontal"
                 tools:layout="@layout/fragment_notification_bar" />
 
+            <include
+                android:id="@+id/notice_board"
+                layout="@layout/fragment_notice_board"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent" />
+
         </LinearLayout>
 
 
