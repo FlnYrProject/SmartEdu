@@ -46,12 +46,12 @@ public class student_result extends Fragment {
 
 
 
-    HashMap<String,String> exammarksobtMap;             //exam id--> marks obtained
-    HashMap<String,Exam> examMap;               //exam id---> exam
 
     ListView examsubjectLt;
     ListView examdetailLt;
 
+
+    TeacherUserPrefs teacherUserPrefs;
 
     private class ExamResultItems extends AsyncTask<Void, Void, Void> {
 
@@ -71,8 +71,8 @@ public class student_result extends Fragment {
             pd.setCancelable(false);
             pd.show();
             databaseReference= Constants.databaseReference.child(Constants.STUDENTS_TABLE).child(institutionName).child(studentid).child("exam");
-            exammarksobtMap.clear();
-            examMap.clear();
+            TeacherUserPrefs.exammarksobtMap.clear();
+            TeacherUserPrefs.examMap.clear();
         }
 
         @Override
@@ -113,12 +113,12 @@ public class student_result extends Fragment {
                                             }
 
                                             if(dataSnapshot2.getKey().equalsIgnoreCase("marks_obtained")){
-                                                    exammarksobtMap.put(dataSnapshot1.getKey(),dataSnapshot2.getValue().toString());
+                                                    TeacherUserPrefs.exammarksobtMap.put(dataSnapshot1.getKey(),dataSnapshot2.getValue().toString());
                                             }
 
                                     }
 
-                                examMap.put(dataSnapshot1.getKey(),exam);
+                                TeacherUserPrefs.examMap.put(dataSnapshot1.getKey(),exam);
 
 
                             }
@@ -150,7 +150,7 @@ public class student_result extends Fragment {
             //Handles the stuff after the synchronisation with the firebase listener has been achieved
             //The main UI is already idle by this moment
             super.onPostExecute(aVoid);
-
+            teacherUserPrefs.setFirstMarksLoading(false);
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
@@ -179,12 +179,15 @@ public class student_result extends Fragment {
         classId=getArguments().getString("classId");
         institutionName=getArguments().getString("institution_name");
 
-        examMap=new HashMap<>();
-        exammarksobtMap=new HashMap<>();
 
+        teacherUserPrefs=new TeacherUserPrefs(getContext());
         examsubjectLt=(ListView)android.findViewById(R.id.exam_list);
-        ExamResultItems examResultItems=new ExamResultItems(getContext());
-        examResultItems.execute();
+        if(teacherUserPrefs.getFirstMarksLoading()) {
+            ExamResultItems examResultItems = new ExamResultItems(getContext());
+            examResultItems.execute();
+        }else {
+            setExamSubjectList();
+        }
 
         return android;
     }
@@ -194,16 +197,16 @@ public class student_result extends Fragment {
 
     public void setExamSubjectList(){
 
-        if (examMap.size()==0){
+        if (TeacherUserPrefs.examMap.size()==0){
             Toast.makeText(getContext(),"No exam result uploaded",Toast.LENGTH_LONG).show();
         }else{
 
             ArrayList<String> examsubjectitems=new ArrayList<>();
 
-            for (String examid:examMap.keySet()){
+            for (String examid:TeacherUserPrefs.examMap.keySet()){
 
 
-                Exam exam=examMap.get(examid);
+                Exam exam=TeacherUserPrefs.examMap.get(examid);
 
 
                 if(!examsubjectitems.contains(exam.getSubject())){
@@ -235,16 +238,16 @@ public class student_result extends Fragment {
 
                     ArrayList<String> exammarksitems=new ArrayList<>();
 
-                    for (String examId:examMap.keySet()){
+                    for (String examId:TeacherUserPrefs.examMap.keySet()){
 
-                        Exam exam=examMap.get(examId);
+                        Exam exam=TeacherUserPrefs.examMap.get(examId);
 
                         if(exam.getSubject().equalsIgnoreCase(selectedSubject)){
 
                             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
                             String dateString = formatter.format(new Date(Long.parseLong(exam.getDate())));
 
-                            String entry=exam.getName() + " on " + dateString + "\nMaximum Marks = " + exam.getMax_marks() +"\nMarks Obtained = " + exammarksobtMap.get(exam.getId());
+                            String entry=exam.getName() + " on " + dateString + "\nMaximum Marks = " + exam.getMax_marks() +"\nMarks Obtained = " + TeacherUserPrefs.exammarksobtMap.get(exam.getId());
 
                             exammarksitems.add(entry);
                         }

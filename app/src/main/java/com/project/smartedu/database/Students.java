@@ -12,6 +12,10 @@ public class Students {
     String name;
 
 
+    public Students(){
+
+    }
+
     public Students(String userid, String class_id, String roll_number, String name) {
         this.userid = userid;
         this.class_id = class_id;

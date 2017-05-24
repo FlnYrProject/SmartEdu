@@ -57,6 +57,9 @@ public class student_info extends Fragment{
     DatabaseReference databaseReference;
 
 
+    TeacherUserPrefs teacherUserPrefs;
+
+
 
 
 
@@ -95,27 +98,33 @@ public class student_info extends Fragment{
                     synchronized (lock) {
                         for(DataSnapshot ds:dataSnapshot.getChildren()) {
                             if(ds.getKey().equals("name")) {
-                                studentName.setText(ds.getValue().toString());
+
+                                TeacherUserPrefs.studentName=ds.getValue().toString();
+
                             }
 
                             if(ds.getKey().equals("dob")) {
-                                studentDob.setText(ds.getValue().toString());
+                                TeacherUserPrefs.studentDob=ds.getValue().toString();
+
                             }
 
 
 
                             if(ds.getKey().equals("address")) {
-                                studentAddress.setText(ds.getValue().toString());
+                                TeacherUserPrefs.studentAddress=ds.getValue().toString();
+
                             }
 
                             if(ds.getKey().equals("contact")) {
-                                studentContact.setText(ds.getValue().toString());
+                                TeacherUserPrefs.studentContact=ds.getValue().toString();
+
                             }
 
 
 
                             if(ds.getKey().equals("parent_email")) {
-                                studentParentEmail.setText(ds.getValue().toString());
+                                TeacherUserPrefs.studentParentEmail=ds.getValue().toString();
+
                             }
                         }
                         lock.notifyAll();
@@ -145,6 +154,8 @@ public class student_info extends Fragment{
             //The main UI is already idle by this moment
             super.onPostExecute(aVoid);
 
+            teacherUserPrefs.setFirstInfoLoading(false);
+setDetails();
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
@@ -187,16 +198,17 @@ public class student_info extends Fragment{
         deleteStudent=(Button)android.findViewById(R.id.delete_student);
 
 
+        teacherUserPrefs=new TeacherUserPrefs(getContext());
         com.project.smartedu.database.Students student=TeacherUserPrefs.studentsHashMap.get(studentId);
 
 
+        if(teacherUserPrefs.getFirstInfoLoading()) {
+            StudentDetailsItem studentDetailsItem = new StudentDetailsItem(getContext());     //get upload data
+            studentDetailsItem.execute();
+        }else{
 
-
-        StudentDetailsItem studentDetailsItem = new StudentDetailsItem(getContext());     //get upload data
-       studentDetailsItem.execute();
-
-
-
+            setDetails();
+        }
 
 
 
@@ -254,6 +266,16 @@ public class student_info extends Fragment{
             }
         });
         return android;
+    }
+
+
+    public void setDetails(){
+        studentName.setText( TeacherUserPrefs.studentName);
+        studentDob.setText(TeacherUserPrefs.studentDob);
+        studentAddress.setText(  TeacherUserPrefs.studentAddress);
+        studentContact.setText( TeacherUserPrefs.studentContact);
+        studentParentEmail.setText( TeacherUserPrefs.studentParentEmail);
+
     }
 
    /* protected void deleteParentData(final ParseObject institution,ParseUser studentUser)

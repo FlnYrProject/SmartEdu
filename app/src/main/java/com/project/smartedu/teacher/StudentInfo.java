@@ -25,6 +25,8 @@ public class StudentInfo extends FragmentActivity{
     String id;
     String institutionName;
 
+    TeacherUserPrefs teacherUserPrefs;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +38,10 @@ public class StudentInfo extends FragmentActivity{
         id = from_student.getStringExtra("id");
         classId = from_student.getStringExtra("classId");
 
+
+        teacherUserPrefs=new TeacherUserPrefs(StudentInfo.this);
         institutionName= from_student.getStringExtra("institution_name");
-        Toast.makeText(StudentInfo.this, "id of student selected is = " + id, Toast.LENGTH_LONG).show();
+      //  Toast.makeText(StudentInfo.this, "id of student selected is = " + id, Toast.LENGTH_LONG).show();
         //TabAdapter = new TabPagerAdapter(getSupportFragmentManager(),id);
 
         Tab = (ViewPager) findViewById(R.id.pager);
@@ -150,4 +154,18 @@ public class StudentInfo extends FragmentActivity{
     }
 
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent student_intent = new Intent(StudentInfo.this, Students.class);
+        student_intent.putExtra("institution_name",institutionName);
+        student_intent.putExtra("role", "Teacher");
+        student_intent.putExtra("id", classId);
+        startActivity(student_intent);
+
+        teacherUserPrefs.setFirstAttendanceLoading(true);
+        teacherUserPrefs.setFirstInfoLoading(true);
+        teacherUserPrefs.setFirstMarksLoading(true);
+
+    }
 }

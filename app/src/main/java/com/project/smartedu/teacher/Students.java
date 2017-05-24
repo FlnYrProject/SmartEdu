@@ -39,6 +39,7 @@ public class Students extends BaseActivity {
     private FragmentDrawer drawerFragment;
 
     UserPrefs userPrefs;
+    TeacherUserPrefs teacherUserPrefs;
 
 
     ListView studentList;
@@ -67,6 +68,7 @@ public class Students extends BaseActivity {
 
 
         userPrefs=new UserPrefs(Students.this);
+        teacherUserPrefs=new TeacherUserPrefs(Students.this);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
       /*  getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -84,15 +86,7 @@ public class Students extends BaseActivity {
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar,role);
         drawerFragment.setDrawerListener(this);
 
-      /*  noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
-        noti_bar.setTexts(userPrefs.getUserName(),role,institutionName);*/
 
-        //  myList = dbHandler.getAllTasks();
-
-        //Log.i("Anmol", "(Inside MainActivity) dbHandler.getAllTasks().toString() gives " + dbHandler.getAllTasks().toString());
-        //ListAdapter adapter = new CustomListAdapter(getApplicationContext(), dbHandler.getAllTasks());
-        //taskList.setAdapter(adapter);
-        Toast.makeText(Students.this, "id class selected is = " +classId, Toast.LENGTH_LONG).show();
 
         addStudentButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -160,6 +154,11 @@ public class Students extends BaseActivity {
 
 
                     String stuid=localstumap.get(item);
+
+                    teacherUserPrefs.setFirstAttendanceLoading(true);
+                    teacherUserPrefs.setFirstInfoLoading(true);
+                    teacherUserPrefs.setFirstMarksLoading(true);
+
 
                     Intent to_student_info = new Intent(Students.this, StudentInfo.class);
                     to_student_info.putExtra("id", stuid);
@@ -548,7 +547,7 @@ public class Students extends BaseActivity {
         super.onBackPressed();
         Intent task_intent = new Intent(Students.this, Classes.class);
         task_intent.putExtra("institution_name", institutionName);
-        task_intent.putExtra("for","attendance");
+        task_intent.putExtra("for", "students");
         task_intent.putExtra("role", role);
         //task_intent.putExtra("id", classId);
         startActivity(task_intent);

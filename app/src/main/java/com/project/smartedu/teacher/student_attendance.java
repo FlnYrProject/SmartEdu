@@ -46,6 +46,7 @@ public class student_attendance extends Fragment {
 
 
 
+    TeacherUserPrefs teacherUserPrefs;
 
 
     private class AttendanceItems extends AsyncTask<Void, Void, Void> {
@@ -119,7 +120,7 @@ public class student_attendance extends Fragment {
             //Handles the stuff after the synchronisation with the firebase listener has been achieved
             //The main UI is already idle by this moment
             super.onPostExecute(aVoid);
-
+            teacherUserPrefs.setFirstAttendanceLoading(false);
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
@@ -151,13 +152,17 @@ setAttendanceList();
         classId=getArguments().getString("classId");
         institutionName=getArguments().getString("institution_name");
 
+        teacherUserPrefs=new TeacherUserPrefs(getContext());
         Log.d("nowdata",institutionName + " " + classId + " " + studentid);
 
         attendancemap=new HashMap<>();
 
         attendanceList=(ListView)android.findViewById(R.id.attendance_list);
-        AttendanceItems attendanceItems=new AttendanceItems(getContext());
-        attendanceItems.execute();
+
+        if(teacherUserPrefs.getFirstAttendanceLoading()) {
+            AttendanceItems attendanceItems = new AttendanceItems(getContext());
+            attendanceItems.execute();
+        }
 
 
 

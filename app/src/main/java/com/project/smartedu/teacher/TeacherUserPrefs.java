@@ -33,6 +33,20 @@ public class TeacherUserPrefs {
 
     public static final String INSTITUION= "Inst";
 
+    public  static final String FIRST_INFO_LOADING="FirstInfoLoading";
+
+    public  static final String FIRST_MARKS_LOADING="FirstMarksLoading";
+
+    public  static final String FIRST_ATTENDANCE_LOADING="FirstAttendanceLoading";
+
+    public static String studentName="";
+    public static String studentDob="";
+
+    public static String studentAddress="";
+
+    public static String studentContact="";
+    public static String studentParentEmail="";
+
 
 
 
@@ -50,6 +64,12 @@ public class TeacherUserPrefs {
 
 
 
+
+    public static  HashMap<String,Exam> examMap=new HashMap<>();    //exam id--> marks obtained
+    public static  HashMap<String,String> exammarksobtMap=new HashMap<>();       //exam id---> exam
+
+
+
     static {
 
         allotments=new ArrayList<>();
@@ -58,6 +78,16 @@ public class TeacherUserPrefs {
         studentsHashMap=new HashMap<>();
         examidLt=new ArrayList<>();
         examHashMap=new HashMap<>();
+
+
+        studentName=new String();
+        studentDob=new String();
+        studentAddress=new String();
+        studentContact=new String();
+        studentParentEmail=new String();
+
+        examMap=new HashMap<>();
+        exammarksobtMap=new HashMap<>();
 
     }
 
@@ -80,6 +110,47 @@ public class TeacherUserPrefs {
         editor.commit();
     }
 
+
+    public void setFirstInfoLoading(Boolean firstInfoLoading){
+
+        // Storing name in pref
+        editor.putBoolean(FIRST_INFO_LOADING, firstInfoLoading);
+
+        // commit changes
+        editor.commit();
+    }
+
+    public Boolean getFirstInfoLoading(){
+        return pref.getBoolean(FIRST_INFO_LOADING,true);
+    }
+
+    public void setFirstAttendanceLoading(Boolean firstAttendanceLoading){
+
+        // Storing name in pref
+        editor.putBoolean(FIRST_ATTENDANCE_LOADING, firstAttendanceLoading);
+
+        // commit changes
+        editor.commit();
+    }
+
+    public Boolean getFirstAttendanceLoading(){
+        return pref.getBoolean(FIRST_ATTENDANCE_LOADING,true);
+    }
+
+
+
+    public void setFirstMarksLoading(Boolean firstMarksLoading){
+
+        // Storing name in pref
+        editor.putBoolean(FIRST_MARKS_LOADING, firstMarksLoading);
+
+        // commit changes
+        editor.commit();
+    }
+
+    public Boolean getFirstMarksLoading(){
+        return pref.getBoolean(FIRST_MARKS_LOADING,true);
+    }
     public void clearTeacherDetails(){
         // Clearing all data from Shared Preferences
         editor.clear();
