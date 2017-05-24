@@ -39,30 +39,8 @@
                 </LinearLayout>
 
 
-                <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="37dp"
-                    android:text="Create Id&apos;s"
-                    android:id="@+id/shareCode"
-                    android:layout_below="@+id/container_toolbar"
-                    android:background="#20BF9F"
-                    android:textColor="#ffff" />
 
-                <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Add Teacher"
-                    android:id="@+id/addTeacher"
-                    android:layout_alignParentTop="true"
-                    android:textColor="#ffff"
-                    android:background="#080808"
-                    android:layout_gravity="center_horizontal" />
 
-                <ListView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/teacherList"
-                    android:layout_gravity="center_horizontal" />
 
             </LinearLayout>
 

@@ -15,11 +15,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.R;
+import com.project.smartedu.UserPrefs;
 import com.project.smartedu.navigation.FragmentDrawer;
+import com.project.smartedu.notification.NotificationBar;
 
 import java.util.ArrayList;
 
-public class Teachers extends BaseActivity implements FragmentDrawer.FragmentDrawerListener{
+public class Teachers extends BaseActivity{
 
     String classId;
     String name;
@@ -27,27 +29,31 @@ public class Teachers extends BaseActivity implements FragmentDrawer.FragmentDra
     ArrayList<String> teacherLt;
     ArrayAdapter adapter=null;
 
-    Button createIDs;
+   // Button createIDs;
     Button delButton;
     ListView teacherList;
 
     TextView Name;
     TextView Age;
 
-    String role;
-    String institutionName;
+
+    
 
     DatabaseReference databaseReference;
     FirebaseAuth firebaseAuth;
 
+    private Toolbar mToolbar;
     private FragmentDrawer drawerFragment;
+    NotificationBar noti_bar;
+
+
+    UserPrefs userPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teachers);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -65,13 +71,21 @@ public class Teachers extends BaseActivity implements FragmentDrawer.FragmentDra
         role=from_home.getStringExtra("role");
         institutionName=from_home.getStringExtra("institution_name");
 
+    userPrefs=new UserPrefs(Teachers.this);
+
+
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
 
         drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
-        drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), toolbar,role);
+        drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout),mToolbar,role);
         drawerFragment.setDrawerListener(this);
 
+        noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
+        noti_bar.setTexts(userPrefs.getUserName(),role,institutionName);
+
        
-        createIDs=(Button)findViewById(R.id.shareCode);
+      //  createIDs=(Button)findViewById(R.id.shareCode);
         teacherList = (ListView) findViewById(R.id.teacherList);
 
 

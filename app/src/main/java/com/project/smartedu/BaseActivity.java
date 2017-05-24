@@ -622,7 +622,7 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
             if (position == 1) { //tasks
                 Intent task_intent = new Intent(BaseActivity.this, com.project.smartedu.common.Tasks.class);
-                task_intent.putExtra("role", role);
+                task_intent.putExtra("role", "admin");
                 task_intent.putExtra("institution_name", institutionName);
                 startActivity(task_intent);
             }
@@ -630,7 +630,7 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
             if (position == 2) { //teachers
 
                 Intent task_intent = new Intent(BaseActivity.this, com.project.smartedu.admin.Teachers.class);
-                task_intent.putExtra("role", role);
+                task_intent.putExtra("role", "admin");
                 task_intent.putExtra("institution_name", institutionName);
                 startActivity(task_intent);
 
@@ -639,7 +639,7 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
             if (position == 3) { //classes
 
                 Intent task_intent = new Intent(BaseActivity.this, com.project.smartedu.admin.Classes.class);
-                task_intent.putExtra("role", role);
+                task_intent.putExtra("role", "admin");
                 task_intent.putExtra("institution_name", institutionName);
                 startActivity(task_intent);
 

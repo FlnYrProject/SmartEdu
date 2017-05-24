@@ -771,7 +771,7 @@ userPrefs=new UserPrefs(Home.this);
 
 
         noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
-        setupNotiBar();
+       // setupNotiBar();
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         //getSupportActionBar().setDisplayShowHomeEnabled(true);

@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class Classes extends BaseActivity implements FragmentDrawer.FragmentDrawerListener{
+public class Classes extends BaseActivity{
 
 
     ArrayList<String>  classLt;
