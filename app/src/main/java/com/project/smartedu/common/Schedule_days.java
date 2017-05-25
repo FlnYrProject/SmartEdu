@@ -113,7 +113,12 @@ public class Schedule_days extends Fragment {
                     Schedule scheduleobject = scheduleslt.get(i);
                     long start = TimeUnit.MILLISECONDS.toMinutes(scheduleobject.getStart_time());
                     long end = TimeUnit.MILLISECONDS.toMinutes(scheduleobject.getEnd_time());
-                    String scheduleitem = start + "\n" + end + "\n" + scheduleobject.getInfo();
+                    int hours_start= (int) (start/60);
+                    int hours_end=(int)(end/60);
+                    int mins_start= (int) (start%60);
+                    int mins_end=(int)(end%60);
+
+                    String scheduleitem = "From-->"+hours_start+":"+mins_start + "\n" + "To-->"+hours_end + ":"+mins_end + "\n" + scheduleobject.getInfo();
                     items[i] = scheduleitem;
                     localScheduleMap.put(scheduleitem,scheduleobject);
                 }
@@ -153,8 +158,8 @@ public class Schedule_days extends Fragment {
                 endtimedisplay = (TextView) show_dialog.findViewById(R.id.end_time);
                 infodisplay = (TextView) show_dialog.findViewById(R.id.info);
 
-                starttimedisplay.setText(details[0].trim());
-                endtimedisplay.setText(details[1].trim());
+                starttimedisplay.setText(details[0].trim().substring(7));
+                endtimedisplay.setText(details[1].trim().substring(5));
 
                 infodisplay.setText(details[2].trim());
 
@@ -192,7 +197,7 @@ public class Schedule_days extends Fragment {
                         scheduleslt.remove(selectedSchedule);
                         show_dialog.dismiss();
                         Intent reload=new Intent(getActivity(), com.project.smartedu.common.Schedule.class);
-                        reload.putExtra("institutionName",institutionName);
+                        reload.putExtra("institution_name",institutionName);
                         reload.putExtra("day", day);
                         reload.putExtra("role", role);
                         startActivity(reload);
@@ -250,7 +255,7 @@ public class Schedule_days extends Fragment {
                                 dialog_in.dismiss();
 
                                 Intent reload=new Intent(getActivity(), com.project.smartedu.common.Schedule.class);
-                                reload.putExtra("institutionName",institutionName);
+                                reload.putExtra("institution_name",institutionName);
                                 reload.putExtra("day", day);
                                 reload.putExtra("role", role);
                                 startActivity(reload);
@@ -453,7 +458,12 @@ public class Schedule_days extends Fragment {
 
     public boolean checkTimeClash(long start,long end)
     {   // Log.d("user", "checking and flag = " + String.valueOf(flag));
-        final int[] check = new int[1];
+        int check=0;
+
+
+        if(start>=end){
+            return true;
+        }
 
 
         for (int i = 0; i < scheduleslt.size(); i++) {
@@ -461,21 +471,22 @@ public class Schedule_days extends Fragment {
             Schedule schedule = scheduleslt.get(i);
             long ret_start = schedule.getStart_time();
             long ret_end = schedule.getEnd_time();
+
             if (start >= ret_start && start < ret_end) {
                 //flag=1;
-                check[0] = 1;
+                check= 1;
                 return true;
                 //break;
             }
             if (end > ret_start && end <= ret_end) {
                 //Schedule_days.this.flag = 1;
-                check[0] = 1;
+                check = 1;
                 return true;
                 // break;
             }
             if (start < ret_start && end > ret_end) {
                 Schedule_days.this.flag = 1;
-                check[0] = 1;
+                check = 1;
                 return true;
                 // break;
             }

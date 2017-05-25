@@ -451,7 +451,7 @@ public class Classes extends BaseActivity{
 
 
                             }else {
-                                Toast.makeText(getApplicationContext(),"t not present",Toast.LENGTH_LONG).show();
+                               // Toast.makeText(getApplicationContext(),"t not present",Toast.LENGTH_LONG).show();
                                 HashMap<String, String> allotmap = new HashMap<String, String>();
                                 allotmap.put(databaseReference.getKey(), selectedclass.getClassid());
                                 Allotments newAllot = new Allotments(teacheruserkey, allotmap);
@@ -466,7 +466,7 @@ public class Classes extends BaseActivity{
 
                             if(teacheralreadypresent) {
                                 //nothing as both are present
-                                Toast.makeText(getApplicationContext(),"Already present",Toast.LENGTH_LONG).show();
+                           //     Toast.makeText(getApplicationContext(),"Already present",Toast.LENGTH_LONG).show();
                             }
 
 
