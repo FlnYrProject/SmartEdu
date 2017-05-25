@@ -180,7 +180,7 @@ public class NewStudent extends BaseActivity {
                     dataReference.setValue(institutionName);
 
 
-                    Toast.makeText(getApplicationContext(), "Student User Registration Successful ", Toast.LENGTH_LONG).show();
+                 //   Toast.makeText(getApplicationContext(), "Student User Registration Successful ", Toast.LENGTH_LONG).show();
 
 
 
@@ -227,7 +227,7 @@ public class NewStudent extends BaseActivity {
 
         addParentUser();
 
-        Toast.makeText(getApplicationContext(), "Student details successfully stored", Toast.LENGTH_LONG).show();
+   //     Toast.makeText(getApplicationContext(), "Student details successfully stored", Toast.LENGTH_LONG).show();
 
 
 
@@ -263,7 +263,7 @@ public class NewStudent extends BaseActivity {
 
 
 
-                    Toast.makeText(getApplicationContext(), "Parent User Registration Successful ", Toast.LENGTH_LONG).show();
+              //      Toast.makeText(getApplicationContext(), "Parent User Registration Successful ", Toast.LENGTH_LONG).show();
                     loginTeacherBack();
 
                 }else{
@@ -312,6 +312,7 @@ public class NewStudent extends BaseActivity {
 
                pd.dismiss();
                 if(task.isSuccessful()){
+                    Toast.makeText(getApplicationContext(), "Student User Registration Successful ", Toast.LENGTH_LONG).show();
 
                     Intent i = new Intent(NewStudent.this, Students.class);
                     i.putExtra("role",role);

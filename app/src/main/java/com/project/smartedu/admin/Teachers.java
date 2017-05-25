@@ -50,7 +50,7 @@ public class Teachers extends BaseActivity{
 
 
     UserPrefs userPrefs;
-    FloatingActionButton fab;
+   Button fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +58,7 @@ public class Teachers extends BaseActivity{
         setContentView(R.layout.activity_teachers);
 
 
-        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (Button) findViewById(R.id.addTeacher);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

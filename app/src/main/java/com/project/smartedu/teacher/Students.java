@@ -37,7 +37,7 @@ import java.util.List;
 public class Students extends BaseActivity {
 
     private Toolbar mToolbar;
-    FloatingActionButton addStudentButton;
+Button addStudentButton;
     private FragmentDrawer drawerFragment;
 
     UserPrefs userPrefs;
@@ -80,7 +80,7 @@ public class Students extends BaseActivity {
         noti_bar.setTexts(userPrefs.getUserName(), role,institutionName);
 
 
-        addStudentButton =(FloatingActionButton) findViewById(R.id.fab);
+        addStudentButton =(Button) findViewById(R.id.addStudent);
         studentList = (ListView) findViewById(R.id.studentList);
 
         drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
