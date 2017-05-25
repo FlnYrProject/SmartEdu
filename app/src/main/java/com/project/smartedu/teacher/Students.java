@@ -127,7 +127,7 @@ public class Students extends BaseActivity {
         if(studentLt.size()>0){
 
             no_of_stu=studentLt.size();
-            ArrayAdapter adapter = new ArrayAdapter(Students.this, android.R.layout.simple_list_item_1, studentLt);
+            ArrayAdapter adapter = new ArrayAdapter(Students.this, android.R.layout.simple_list_item_1, sortList(studentLt));
             studentList.setAdapter(adapter);
 
 
@@ -537,6 +537,36 @@ public class Students extends BaseActivity {
             default: return super.onOptionsItemSelected(item);
         }
     }*/
+
+    public ArrayList<String> sortList(ArrayList<String> arrayList){
+
+        ArrayList<Integer> serials=new ArrayList<>();
+        HashMap<Integer,String> map=new HashMap<>();
+
+
+        for(int x=0;x<arrayList.size();x++){
+
+            String[] entry=arrayList.get(x).split("\\. ");
+            serials.add(Integer.parseInt(entry[0]));
+            map.put(Integer.parseInt(entry[0]),arrayList.get(x));
+
+        }
+
+        Collections.sort(serials);
+
+        ArrayList<String> sortedList=new ArrayList<>();
+
+        for(int x=0;x<serials.size();x++){
+            Integer serial=serials.get(x);
+            sortedList.add(map.get(serial));
+        }
+
+
+
+        return  sortedList;
+
+
+    }
 
     @Override
     public void onBackPressed() {

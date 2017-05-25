@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.project.smartedu.database.Messages;
+import com.project.smartedu.database.Notice;
 import com.project.smartedu.database.Schedule;
 import com.project.smartedu.database.Uploads;
 
@@ -84,6 +85,10 @@ public class UserPrefs {
     public static HashMap<String,Messages> receivedmessagemap;      //name+time--->message
     public static HashMap<String,Messages> sentmessagemap;      //name+time--->message
 
+
+    public static ArrayList<String> noticeLt;
+    public static HashMap<String,Notice> noticemap; //notice id--->notice
+
     static {
         roleslistmap=new HashMap<>();           //role type mapped to list of institutions
         parentchildidmap=new HashMap<>();     //child user id to list of institutions
@@ -93,6 +98,8 @@ public class UserPrefs {
         uploadkeymap=new HashMap<>();
         receivedmessagemap=new HashMap<>();
         sentmessagemap=new HashMap<>();
+        noticeLt=new ArrayList<>();
+        noticemap=new HashMap<>();
     }
 
     public UserPrefs(Context context){

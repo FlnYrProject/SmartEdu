@@ -21,6 +21,7 @@ import com.project.smartedu.notification.NotificationBar;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 public class Teachers extends BaseActivity{
 
@@ -109,8 +110,40 @@ public class Teachers extends BaseActivity{
 
     public void showList(){
 
-        adapter = new ArrayAdapter(Teachers.this, android.R.layout.simple_list_item_1, teacherLt);
+        adapter = new ArrayAdapter(Teachers.this, android.R.layout.simple_list_item_1, sortList(teacherLt));
         teacherList.setAdapter(adapter);
+    }
+
+
+
+    public ArrayList<String> sortList(ArrayList<String> arrayList){
+
+        ArrayList<Integer> serials=new ArrayList<>();
+        HashMap<Integer,String> map=new HashMap<>();
+
+
+        for(int x=0;x<arrayList.size();x++){
+
+            String[] entry=arrayList.get(x).split("\\. ");
+            serials.add(Integer.parseInt(entry[0]));
+            map.put(Integer.parseInt(entry[0]),arrayList.get(x));
+
+        }
+
+        Collections.sort(serials);
+
+        ArrayList<String> sortedList=new ArrayList<>();
+
+        for(int x=0;x<serials.size();x++){
+            Integer serial=serials.get(x);
+            sortedList.add(map.get(serial));
+        }
+
+
+
+return  sortedList;
+
+
     }
 
 

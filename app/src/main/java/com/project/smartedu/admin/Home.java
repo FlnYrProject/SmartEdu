@@ -28,8 +28,10 @@ import com.project.smartedu.UserPrefs;
 import com.project.smartedu.common.Tasks;
 import com.project.smartedu.database.Allotments;
 import com.project.smartedu.database.Class;
+import com.project.smartedu.database.Notice;
 import com.project.smartedu.database.Schedule;
 import com.project.smartedu.navigation.FragmentDrawer;
+import com.project.smartedu.noticeBoard.NoticeBoard;
 import com.project.smartedu.notification.NotificationBar;
 
 import java.text.SimpleDateFormat;
@@ -66,6 +68,155 @@ public class Home extends BaseActivity{
     HashMap<Schedule,String> schedulekeymap;        //to map schedule to the key
 
     NotificationBar noti_bar;
+    NoticeBoard noticeBoard;
+
+
+
+
+
+
+
+
+
+    private class NoticeBoardItems extends AsyncTask<Void, Void, Void> {
+
+        private Context async_context;
+        private ProgressDialog pd;
+
+        public NoticeBoardItems(Context context){
+            this.async_context = context;
+            pd = new ProgressDialog(async_context);
+            databaseReference = Constants.databaseReference.child(Constants.NOTIFICATION_TABLE).child(institutionName);
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd.setMessage("Fetching Notices");
+            pd.setCancelable(false);
+            pd.show();
+          UserPrefs.noticeLt.clear();
+            UserPrefs.noticemap.clear();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            final Object lock = new Object();
+
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    synchronized (lock) {
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+
+                            Log.d("noticekey",ds.getKey());             //notice id
+
+
+
+                            UserPrefs.noticeLt.add(ds.getKey());
+
+                            Notice notice=new Notice();
+                            notice.setNoticeid(ds.getKey());
+
+                            for(DataSnapshot dataSnapshot1:ds.getChildren()){
+
+                                if(dataSnapshot1.getKey().equalsIgnoreCase("by")){
+                                        notice.setBystring(dataSnapshot1.getValue().toString());
+                                }
+
+                                if(dataSnapshot1.getKey().equalsIgnoreCase("content")){
+                                    notice.setContent(dataSnapshot1.getValue().toString());
+                                }
+
+                                if(dataSnapshot1.getKey().equalsIgnoreCase("time")){
+                                    notice.setTime(dataSnapshot1.getValue().toString());
+                                }
+
+                                if(dataSnapshot1.getKey().equalsIgnoreCase("user_id")){
+                                    notice.setUserid(dataSnapshot1.getValue().toString());
+                                }
+
+                                if(dataSnapshot1.getKey().equalsIgnoreCase("user_name")){
+                                    notice.setUsername(dataSnapshot1.getValue().toString());
+                                }
+
+
+
+
+                            }
+
+                            UserPrefs.noticemap.put(ds.getKey(),notice);
+
+
+
+                        }
+
+
+
+                        lock.notifyAll();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+
+            });
+
+
+            synchronized (lock){
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+
+
+
+
+
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //Handles the stuff after the synchronisation with the firebase listener has been achieved
+            //The main UI is already idle by this moment
+            super.onPostExecute(aVoid);
+
+
+
+
+            //Show the log in progress_bar for at least a few milliseconds
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    pd.dismiss();
+                    pd=null;
+                    noticeBoard.setData(institutionName,role);
+
+                }
+            }, 500);  // 100 milliseconds
+        }
+
+
+        //end firebase_async_class
+    }
+
+
+
+
+
+
 
 
 
@@ -164,6 +315,7 @@ public class Home extends BaseActivity{
                 public void run() {
                     pd.dismiss();
                     pd=null;
+                    loadNoticeBoardData();
                 }
             }, 500);  // 100 milliseconds
         }
@@ -861,8 +1013,11 @@ public class Home extends BaseActivity{
 
         userPrefs=new UserPrefs(Home.this);
         adminUserPrefs=new AdminUserPrefs(getApplicationContext());
+
         noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
 
+
+        noticeBoard=(NoticeBoard)getSupportFragmentManager().findFragmentById(R.id.notice_board);
 
 
         swipeRefreshLayout=(SwipeRefreshLayout)findViewById(R.id.swipe_layout);
@@ -892,10 +1047,15 @@ public class Home extends BaseActivity{
             userPrefs.setFirstLoading(false);
             setupNotiBar();
             loadData();
+
         }else{
             noti_bar.setTexts(userPrefs.getUserName(), role,institutionName);
+            noticeBoard.setData(institutionName,role);
+
 
         }
+
+
 
 
 
@@ -1006,6 +1166,15 @@ public class Home extends BaseActivity{
 
         AllotmentItems allotmentItemsasync = new AllotmentItems(Home.this);        //get teacher data
        allotmentItemsasync.execute();
+
+    }
+
+
+
+    private void loadNoticeBoardData(){
+
+        NoticeBoardItems noticeBoardItems=new NoticeBoardItems(Home.this);
+        noticeBoardItems.execute();
 
     }
 

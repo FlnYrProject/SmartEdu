@@ -30,6 +30,13 @@
                     android:id="@+id/noti"
                     android:layout_gravity="center_horizontal"
                     tools:layout="@layout/fragment_notification_bar" />
+                <fragment
+                    android:id="@+id/notice_board"
+                    tools:layout="@layout/fragment_notice_board"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:name="com.project.smartedu.noticeBoard.NoticeBoard"/>
+
 
             </LinearLayout>
 
