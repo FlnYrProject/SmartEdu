@@ -28,6 +28,7 @@ import com.project.smartedu.teacher.teacher_message;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class message_to_teacher extends BaseActivity {
@@ -107,6 +108,8 @@ public class message_to_teacher extends BaseActivity {
             // ArrayAdapter adapter = new ArrayAdapter(AddAttendance_everyday.this, android.R.layout.simple_list_item_1, studentLt);
             //Toast.makeText(Students.this, "here = ", Toast.LENGTH_LONG).show();
 
+            ArrayList<String> entrylist=new ArrayList<>();
+
             Log.d("user", "Retrieved " + StudentUserPrefs.teachersuseridLt.size() + " students in this class");
             //Toast.makeText(getApplicationContext(), studentListRet.toString(), Toast.LENGTH_LONG).show();
             for (int i = 0; i < StudentUserPrefs.teachersuseridLt.size(); i++) {
@@ -114,13 +117,21 @@ public class message_to_teacher extends BaseActivity {
                 String teacherid=StudentUserPrefs.teachersuseridLt.get(i);
                 Teachers teachers=StudentUserPrefs.teacherHashMap.get(teacherid);
                String entry= teachers.getSerial_number() + ". " + teachers.getName();
+                entrylist.add(entry);
                 localteachermap.put(entry,teacherid);
 
 
+            }
+
+
+            entrylist=sortList(entrylist);
+
+            for (int i = 0; i < StudentUserPrefs.teachersuseridLt.size(); i++) {
+                String entry=entrylist.get(i);
                 modelItems[i] = new Model(entry, 0);
 
-
             }
+
 
             customAdapter = new CustomAdapter(message_to_teacher.this, modelItems, studentUserPrefs.getClassId());
             // no use of the reference context here but in attendance_everyday
@@ -335,4 +346,37 @@ public class message_to_teacher extends BaseActivity {
             startActivity(nouser);
         }
     }
+
+
+
+    public ArrayList<String> sortList(ArrayList<String> arrayList){
+
+        ArrayList<Integer> serials=new ArrayList<>();
+        HashMap<Integer,String> map=new HashMap<>();
+
+
+        for(int x=0;x<arrayList.size();x++){
+
+            String[] entry=arrayList.get(x).split("\\. ");
+            serials.add(Integer.parseInt(entry[0]));
+            map.put(Integer.parseInt(entry[0]),arrayList.get(x));
+
+        }
+
+        Collections.sort(serials);
+
+        ArrayList<String> sortedList=new ArrayList<>();
+
+        for(int x=0;x<serials.size();x++){
+            Integer serial=serials.get(x);
+            sortedList.add(map.get(serial));
+        }
+
+
+
+        return  sortedList;
+
+
+    }
+
 }
