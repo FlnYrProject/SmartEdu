@@ -183,7 +183,7 @@ public class NoticeBoard extends Fragment {
             Notice notice = UserPrefs.noticemap.get(UserPrefs.noticeLt.get(x));
             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss aa");
             String dateString = formatter.format(new Date(Long.parseLong(notice.getTime())));
-            noticeEntryList.add(notice.getContent() + "\n" + notice.getBystring() + "\n" + dateString);
+            noticeEntryList.add(notice.getContent() + "\nBy : " + notice.getBystring() + "\n" + dateString);
 
 
         }
