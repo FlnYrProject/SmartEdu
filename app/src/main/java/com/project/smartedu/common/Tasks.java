@@ -1,15 +1,10 @@
 package com.project.smartedu.common;
 
 import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -24,26 +19,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 import com.project.smartedu.BaseActivity;
 import com.project.smartedu.Constants;
 import com.project.smartedu.R;
 import com.project.smartedu.UserPrefs;
 import com.project.smartedu.admin.AdminUserPrefs;
 import com.project.smartedu.admin.Home;
-import com.project.smartedu.database.Task;
+import com.project.smartedu.navigation.FragmentDrawer;
+import com.project.smartedu.notification.NotificationBar;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
 
 public class Tasks extends BaseActivity {
 
@@ -86,7 +76,9 @@ public class Tasks extends BaseActivity {
 
     HashMap<String,String> taskidmap;
 
-
+    private Toolbar mToolbar;
+    private FragmentDrawer drawerFragment;
+    NotificationBar noti_bar;
 
 
 
@@ -129,6 +121,12 @@ public class Tasks extends BaseActivity {
             }
         });
 
+        drawerFragment = (FragmentDrawer) getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
+        drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout),mToolbar,role);
+        drawerFragment.setDrawerListener(this);
+
+        noti_bar = (NotificationBar)getSupportFragmentManager().findFragmentById(R.id.noti);
+        noti_bar.setTexts(userPrefs.getUserName(),role,institutionName);
 
         firebaseAuth = FirebaseAuth.getInstance();
 
