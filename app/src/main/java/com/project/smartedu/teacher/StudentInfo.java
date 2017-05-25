@@ -24,7 +24,7 @@ public class StudentInfo extends FragmentActivity{
     String classId;
     String id;
     String institutionName;
-
+    String role;
     TeacherUserPrefs teacherUserPrefs;
 
 
@@ -37,7 +37,7 @@ public class StudentInfo extends FragmentActivity{
         Intent from_student = getIntent();
         id = from_student.getStringExtra("id");
         classId = from_student.getStringExtra("classId");
-
+role=from_student.getStringExtra("role");;
 
         teacherUserPrefs=new TeacherUserPrefs(StudentInfo.this);
         institutionName= from_student.getStringExtra("institution_name");
@@ -45,7 +45,7 @@ public class StudentInfo extends FragmentActivity{
         //TabAdapter = new TabPagerAdapter(getSupportFragmentManager(),id);
 
         Tab = (ViewPager) findViewById(R.id.pager);
-        Tab.setAdapter(new TabPagerAdapter(getSupportFragmentManager(), id,classId,institutionName));
+        Tab.setAdapter(new TabPagerAdapter(getSupportFragmentManager(), id,classId,institutionName,role));
 
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
