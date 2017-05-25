@@ -186,7 +186,7 @@ public class Classes extends BaseActivity{
         dialog_heading.setText("Sections");
         classSectionList = (ListView) class_info.findViewById(R.id.subjectList);
         ok = (Button) class_info.findViewById(R.id.doneButton);
-        deleteClassButton = (Button) class_info.findViewById(R.id.delClassButton);
+
         addSectionButton = (Button) class_info.findViewById(R.id.addSubjectButton);
         addSectionButton.setText("Add Section");
 
@@ -219,13 +219,7 @@ public class Classes extends BaseActivity{
         });
 
 
-        deleteClassButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // deleteClassGrade(item);
-                class_info.dismiss();
-            }
-        });
+
 
         addSectionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -247,12 +241,12 @@ public class Classes extends BaseActivity{
         final Dialog classSection_details=new Dialog(Classes.this);
         classSection_details.setContentView(R.layout.class_details);
         setDialogSize(classSection_details);
-        deleteSectionButton=(Button)classSection_details.findViewById(R.id.delClassButton);
+        classSection_details.setTitle(classname+ " " +sectioname);
         addSubjectButton=(Button)classSection_details.findViewById(R.id.addSubjectButton);
         dialog_heading=(TextView)classSection_details.findViewById(R.id.description);
         dialog_heading.setText("Subjects");
         addSubjectButton.setText("Add Subject");
-        deleteSectionButton.setText("Delete Section");
+
         done=(Button)classSection_details.findViewById(R.id.doneButton);
         classSubjectList=(ListView)classSection_details.findViewById(R.id.subjectList);
 
@@ -310,35 +304,7 @@ public class Classes extends BaseActivity{
 
 
 
-        deleteSectionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Dialog confirm_delete = new Dialog(Classes.this);
-                confirm_delete.setContentView(R.layout.confirm_message);
-                confirm_message = (TextView) confirm_delete.findViewById(R.id.confirm_message);
-                cancel = (Button) confirm_delete.findViewById(R.id.cancelButton);
-                proceed = (Button) confirm_delete.findViewById(R.id.proceedButton);
-                confirm_message.setText("All data related to class " + classname + " - " + sectioname + ",including students,attendance,uploads etc, will be deleted permanently!!");
-                confirm_delete.show();
-                proceed.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        confirm_delete.dismiss();
-                        //deleteClass(classSectionObject);          //to be done
-                        //deleteStudent(classSectionObject);           //to be done
 
-                    }
-                });
-
-                cancel.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        confirm_delete.dismiss();
-                    }
-                });
-
-            }
-        });
 
 
 

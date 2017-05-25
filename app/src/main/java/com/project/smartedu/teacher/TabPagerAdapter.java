@@ -14,12 +14,13 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
     String institution_code;
     String  institutionName;
     private String fragments[] ={"Info","Attendance","Result"};
-    public TabPagerAdapter(FragmentManager fm, String id, String classId,String institutionName) {
+    String role;
+    public TabPagerAdapter(FragmentManager fm, String id, String classId,String institutionName,String role) {
         super(fm);
         this.id=id;
         this.classId=classId;
         this.institutionName=institutionName;
-        this.institution_code=institution_code;
+        this.role=role;
         // TODO Auto-generated constructor stub
     }
 
@@ -29,6 +30,7 @@ public class TabPagerAdapter extends FragmentStatePagerAdapter {
         bundle.putString("institution_name",institutionName);
         bundle.putString("id",id);
         bundle.putString("classId",classId);
+        bundle.putString("role",role);
         switch (i) {
             case 0:
                 //Fragement for student information

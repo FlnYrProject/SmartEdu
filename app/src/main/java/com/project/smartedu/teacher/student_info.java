@@ -62,6 +62,99 @@ public class student_info extends Fragment{
 
 
 
+    String inskey;
+
+    String role;
+
+
+    private class StudentInstituteDelete extends AsyncTask<Void, Void, Void> {
+
+        private Context async_context;
+        private ProgressDialog pd;
+
+        public StudentInstituteDelete(Context context){
+            this.async_context = context;
+
+            pd = new ProgressDialog(async_context);
+            pd.setMessage("Loading Student...");
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd.setCancelable(false);
+            pd.show();
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            final Object lock = new Object();
+            databaseReference = Constants.databaseReference.child(Constants.USER_DETAILS_TABLE).child(studentId).child("role").child("student");
+
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    synchronized (lock) {
+                        for(DataSnapshot ds:dataSnapshot.getChildren()) {
+                            if(ds.getValue().toString().equalsIgnoreCase(institutionName)) {
+
+                                inskey=ds.getKey();
+                                Log.d("key",ds.getKey());
+
+                            }
+
+
+                        }
+                        lock.notifyAll();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+
+            });
+
+            synchronized (lock){
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            //Handles the stuff after the synchronisation with the firebase listener has been achieved
+            //The main UI is already idle by this moment
+            super.onPostExecute(aVoid);
+
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    //  Toast.makeText(async_context,userPrefs.getUserName(),Toast.LENGTH_LONG).show();
+
+
+                    pd.dismiss();
+                    pd=null;
+                    databaseReference=Constants.databaseReference.child(Constants.USER_DETAILS_TABLE).child(studentId).child("role").child("student").child(inskey);
+                    databaseReference.removeValue();
+                    goToStudents();
+
+                }
+            }, 500);  // 100 milliseconds
+
+
+        }
+        //end firebase_async_class
+    }
+
+
 
 
 
@@ -155,7 +248,7 @@ public class student_info extends Fragment{
             super.onPostExecute(aVoid);
 
             teacherUserPrefs.setFirstInfoLoading(false);
-setDetails();
+            setDetails();
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 public void run() {
@@ -178,8 +271,6 @@ setDetails();
 
 
 
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -187,7 +278,8 @@ setDetails();
         final View android = inflater.inflate(R.layout.fragment_student_info, container, false);
         studentId= getArguments().getString("id");
         classId= getArguments().getString("classId");
-        institutionName=getArguments().getString("institution_node");
+        institutionName=getArguments().getString("institution_name");
+        role=getArguments().getString("role");
         studentName=(TextView)android.findViewById(R.id.student_name);
    //     studentEmail=(TextView)android.findViewById(R.id.student_email);
         studentParentEmail=(TextView)android.findViewById(R.id.student_parentemail);
@@ -232,18 +324,18 @@ setDetails();
                 proceed.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                      /*  ParseObject institution = ParseObject.createWithoutData(InstitutionTable.TABLE_NAME, institution_code);
-                        ParseObject studentObject = ParseObject.createWithoutData(StudentTable.TABLE_NAME, studentId);
-                        ParseUser studentUser = studentObject.getParseUser(StudentTable.STUDENT_USER_REF);
-                        deleteParentData(institution, studentUser);
-                        deleteStudentData(institution, studentUser, studentObject);*/
+
+
+                        databaseReference=Constants.databaseReference.child(Constants.STUDENTS_TABLE).child(institutionName).child(studentId);
+                        databaseReference.removeValue();
+
+                        //databaseReference=Constants.databaseReference.child(Constants.USER_DETAILS_TABLE).child(studentId).child("role").child("student");
+
+                        StudentInstituteDelete studentInstituteDelete=new StudentInstituteDelete(getActivity());
+                        studentInstituteDelete.execute();
 
                         confirm_step.dismiss();
-                        Intent to_student = new Intent(getActivity(), Students.class);
-                        to_student.putExtra("institution_name", institutionName);
-                        to_student.putExtra("id", classId);
 
-                        startActivity(to_student);
 
                     }
                 });
@@ -276,6 +368,18 @@ setDetails();
         studentContact.setText( TeacherUserPrefs.studentContact);
         studentParentEmail.setText( TeacherUserPrefs.studentParentEmail);
 
+    }
+
+
+    protected void goToStudents(){
+
+        TeacherUserPrefs.studentsuseridLt.remove(studentId);
+        TeacherUserPrefs.studentsHashMap.remove(studentId);
+        Intent to_student = new Intent(getActivity(), Students.class);
+        to_student.putExtra("institution_name", institutionName);
+        to_student.putExtra("id", classId);
+        to_student.putExtra("role", role);
+        startActivity(to_student);
     }
 
    /* protected void deleteParentData(final ParseObject institution,ParseUser studentUser)
