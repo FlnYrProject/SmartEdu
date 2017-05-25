@@ -44,7 +44,7 @@
             android:id="@+id/addTeacher"
             android:elevation="9dp"
             android:textColor="@android:color/background_light"
-            android:background="#716d6d" />
+            android:background="#20BF9F" />
 
 
 
