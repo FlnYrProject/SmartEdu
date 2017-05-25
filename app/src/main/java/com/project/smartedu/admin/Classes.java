@@ -320,6 +320,7 @@ public class Classes extends BaseActivity{
         addSubjectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                classSection_details.dismiss();
                 addSubjectCall();
             }
         });
