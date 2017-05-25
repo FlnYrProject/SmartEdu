@@ -61,8 +61,6 @@ public class NewStudent extends BaseActivity {
 
     NotificationBar noti_bar;
     String classId;
-    String parentId;
-    String studentId;
 
     UserPrefs userPrefs;
     TeacherUserPrefs teacherUserPrefs;
@@ -93,7 +91,7 @@ public class NewStudent extends BaseActivity {
         institutionName=from_students.getStringExtra("institution_name");
         no_of_stu=from_students.getIntExtra("no_of_stu",0);
         pd=new ProgressDialog(NewStudent.this);
-        pd.setMessage("Adding Student");
+        pd.setMessage("Adding Student...");
         userPrefs=new UserPrefs(NewStudent.this);
         teacherUserPrefs=new TeacherUserPrefs(NewStudent.this);
 
@@ -130,6 +128,7 @@ public class NewStudent extends BaseActivity {
 
                 rollno = no_of_stu+1;
 
+                pd.setCancelable(false);
                 if ( name.equals("") || email.equals("") || dob.equals("") || address.equals("") || contact.equals("") || parentname.equals("") || parentemail.equals("") || email.equals("")  ) {
                     Toast.makeText(getApplicationContext(), "Student details cannot be empty!", Toast.LENGTH_LONG).show();
                 } else {
@@ -268,6 +267,7 @@ public class NewStudent extends BaseActivity {
                     loginTeacherBack();
 
                 }else{
+                    pd.dismiss();
 
                     //delete student data too
 
@@ -309,15 +309,17 @@ public class NewStudent extends BaseActivity {
         firebaseAuth.signInWithEmailAndPassword(userPrefs.getUserEmail(),userPrefs.getUserPassword()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
+
+               pd.dismiss();
                 if(task.isSuccessful()){
-                    pd.dismiss();
+
                     Intent i = new Intent(NewStudent.this, Students.class);
                     i.putExtra("role",role);
                     i.putExtra("institution_name",institutionName);
                     i.putExtra("id", classId);
                     startActivity(i);
                 }else{
-                    pd.dismiss();
+
                     Toast.makeText(getApplicationContext(), "signed out due to some error,please sign in again", Toast.LENGTH_LONG).show();
                    teacherUserPrefs.clearTeacherDetails();
                     userPrefs.clearUserDetails();

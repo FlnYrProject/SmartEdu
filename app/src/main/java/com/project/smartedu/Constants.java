@@ -25,6 +25,7 @@ public class Constants {
   public static final String MESSAGES_TABLE= "messages";
   public static final String EXAMS_TABLE= "exams";
   public static final String NOTIFICATION_TABLE= "notifications";
+  public static final String TEACHER_ATTENDANCE_TABLE= "teacherattendance";
 
 
   public static final String[] days= {"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};

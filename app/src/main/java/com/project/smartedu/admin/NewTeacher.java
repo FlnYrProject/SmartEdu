@@ -1,6 +1,7 @@
 package com.project.smartedu.admin;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -71,6 +73,9 @@ Spinner teachersex;
     UserPrefs userPrefs;
 
 
+
+    ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,6 +104,9 @@ Spinner teachersex;
 
         addTeacherButton = (Button) findViewById(R.id.addTeacherButton);
 
+        progressDialog=new ProgressDialog(NewTeacher.this);
+        progressDialog.setMessage("Adding Teacher...");
+
 
         addTeacherButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,19 +122,9 @@ Spinner teachersex;
                 if (name.equals(null) || email.equals(null) || dob.equals(null) || contact.equals(null) || address.equals(null) || parentname.equals(null) ) {
                     Toast.makeText(getApplicationContext(), "Teacher details cannot be empty!", Toast.LENGTH_LONG).show();
                 } else {
-/*
 
-                    final Dialog enter_password_dialog = new Dialog(NewTeacher.this);
-                    enter_password_dialog.setContentView(R.layout.enter_password);
-                    enter_password_dialog.setTitle("Provide authentication");
-
-                    setDialogSize(enter_password_dialog);
-                    admin_pass = (EditText) enter_password_dialog.findViewById(R.id.admin_pass);
-
-                    ok = (Button) enter_password_dialog.findViewById(R.id.done);
-                    enter_password_dialog.show();
-*/
-
+                    progressDialog.setCancelable(false);
+                    progressDialog.show();
                     admin_pass = userPrefs.getUserPassword();
                     admin_email=firebaseUser.getEmail();
 
@@ -140,6 +138,7 @@ Spinner teachersex;
                                 sleep(3000);
 
                             }else{
+                                progressDialog.dismiss();
 
                                 Toast.makeText(getApplicationContext(),"Incorrect Authentication",Toast.LENGTH_LONG).show();
 
@@ -231,6 +230,7 @@ Spinner teachersex;
                     addTeacher(teacherfirebaseUser);
                 }else{
 
+                    progressDialog.dismiss();
                     Toast.makeText(getApplicationContext(), "Teacher User Registration Unsuccessful ", Toast.LENGTH_LONG).show();
 
                 }
@@ -275,6 +275,8 @@ Spinner teachersex;
        firebaseAuth.signInWithEmailAndPassword(admin_email,admin_pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
            @Override
            public void onComplete(@NonNull Task<AuthResult> task) {
+
+               progressDialog.dismiss();
                if(task.isSuccessful()){
                    Intent i = new Intent(NewTeacher.this, Teachers.class);
                    i.putExtra("institution_name", institutionName);

@@ -69,7 +69,7 @@
         <item>@string/nav_item_tasks</item>
         <item>@string/nav_item_teachers</item>
         <item>@string/nav_item_classes</item>
-
+<item>@string/nav_item_attendance</item>
 
         <item>@string/nav_item_logout</item>
     </string-array>

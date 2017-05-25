@@ -126,8 +126,11 @@
         <activity
             android:name=".teacher.NewExam"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".teacher.AddMarks"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".teacher.AddMarks"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".admin.TeacherAttendance"
+            android:theme="@style/AppTheme.NoActionBar" ></activity>
     </application>
 
 </manifest>
