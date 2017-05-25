@@ -214,7 +214,7 @@ public class FragmentDrawer extends Fragment {
                     R.drawable.task_icon,
                     R.drawable.role_icon,
                     R.drawable.classes_icon,
-
+                    R.drawable.attendance_icon,
                     R.drawable.logout_icon
 
             };

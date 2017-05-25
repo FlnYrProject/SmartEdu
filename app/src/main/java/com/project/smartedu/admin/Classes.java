@@ -125,7 +125,7 @@ public class Classes extends BaseActivity{
                     ArrayList<String> tempsectionlist=classtosectionmap.get(clsname);
                     tempsectionlist.add(section);
                     classtosectionmap.put(clsname,tempsectionlist);
-                    Toast.makeText(getApplicationContext(),tempsectionlist.size() + " sections in "+ clsname,Toast.LENGTH_LONG ).show();
+                 //   Toast.makeText(getApplicationContext(),tempsectionlist.size() + " sections in "+ clsname,Toast.LENGTH_LONG ).show();
 
                 }else{
                     ArrayList<String> tempsectionlist=new ArrayList<>();
@@ -192,7 +192,7 @@ public class Classes extends BaseActivity{
 
 
         sectionLt = classtosectionmap.get(classname);
-        Toast.makeText(getApplicationContext(),sectionLt.size() + " sections found ",Toast.LENGTH_LONG).show();
+     //   Toast.makeText(getApplicationContext(),sectionLt.size() + " sections found ",Toast.LENGTH_LONG).show();
 
         ArrayAdapter adapter = new ArrayAdapter(Classes.this, android.R.layout.simple_list_item_1, sectionLt);
         classSectionList.setAdapter(adapter);

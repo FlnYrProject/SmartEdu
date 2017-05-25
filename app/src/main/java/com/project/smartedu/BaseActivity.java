@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.project.smartedu.admin.AdminUserPrefs;
+import com.project.smartedu.admin.TeacherAttendance;
 import com.project.smartedu.common.view_messages;
 import com.project.smartedu.navigation.FragmentDrawer;
 import com.project.smartedu.parent.ParentUserPrefs;
@@ -649,7 +650,20 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
 
 
-            if(position==4) //logout
+            if(position==4) //teacherr attendance
+            {
+
+
+                Intent task_intent = new Intent(BaseActivity.this, TeacherAttendance.class);
+                task_intent.putExtra("role", "admin");
+                task_intent.putExtra("institution_name", institutionName);
+                startActivity(task_intent);
+
+            }
+
+
+
+            if(position==5) //logout
             {
 
                 AdminUserPrefs adminUserPrefs=new AdminUserPrefs(BaseActivity.this);
@@ -657,7 +671,6 @@ public class BaseActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 UserPrefs userPrefs=new UserPrefs(BaseActivity.this);
                 userPrefs.clearUserDetails();
             }
-
         } /*else{
             if(position==0)
             {

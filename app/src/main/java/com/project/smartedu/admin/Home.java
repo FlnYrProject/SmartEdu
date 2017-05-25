@@ -1103,6 +1103,16 @@ public class Home extends BaseActivity{
 
                   //  loadAllotmentData();
 
+                }else if (position == 3) { //classes
+
+                    Intent task_intent = new Intent(Home.this,TeacherAttendance.class);
+
+                    task_intent.putExtra("institution_name",institutionName);
+                    task_intent.putExtra("role", "admin");
+                    startActivity(task_intent);
+
+                    //  loadAllotmentData();
+
                 }
 
 

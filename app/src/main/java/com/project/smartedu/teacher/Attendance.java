@@ -439,7 +439,7 @@ ArrayList<String> sturecipients;
 
 
         final String string_date = String.valueOf(Day) + "-" + String.valueOf(Month) + "-" + String.valueOf(Year);
-        Toast.makeText(Attendance.this, "current date = " + Day + "/" + Month + "/" + Year, Toast.LENGTH_LONG).show();
+       // Toast.makeText(Attendance.this, "current date = " + Day + "/" + Month + "/" + Year, Toast.LENGTH_LONG).show();
 
         SimpleDateFormat f = new SimpleDateFormat("dd-MM-yyyy");
         Date d = null;

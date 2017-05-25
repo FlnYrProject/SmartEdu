@@ -31,7 +31,7 @@ public class LoginActivity extends BaseActivity {
     EditText emailInput;
     EditText passwordInput;
     Button loginButton;
-    TextView notAlreadyUserText;
+
     ProgressDialog progressDialog;
     FirebaseAuth firebaseAuth;
     DatabaseReference databaseReference;
@@ -59,7 +59,7 @@ String institutionName;
         emailInput = (EditText)findViewById(R.id.userEmailInput);
         passwordInput = (EditText)findViewById(R.id.userPasswordInput);
         loginButton=(Button)findViewById(R.id.loginButton);
-        notAlreadyUserText=(TextView)findViewById(R.id.notAlreadyUser);
+
         progressDialog = new ProgressDialog(this);
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReference=Constants.databaseReference;
@@ -68,9 +68,7 @@ String institutionName;
 
         if(firebaseAuth.getCurrentUser()!=null){
 
-       // adminCheck();
 
-            //check shared prefs
             if(userPrefs.isAdmin()){
 
                     Intent toAdminConsole=new Intent(LoginActivity.this, Home.class);
@@ -87,12 +85,7 @@ String institutionName;
 
         }
 
-        notAlreadyUserText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                clickedNotUserAlready();
-            }
-        });
+
 
 
         loginButton.setOnClickListener(new View.OnClickListener() {
