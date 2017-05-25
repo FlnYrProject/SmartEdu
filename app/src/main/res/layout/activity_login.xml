@@ -44,7 +44,9 @@
         android:width="300dp"
         android:layout_toEndOf="@+id/userEmailText"
         android:layout_toRightOf="@+id/userEmailText"
-        android:textColor="#ffff"/>
+        android:textColor="#ffff"
+        android:color="#ffff"
+        />
 
     <EditText
         android:layout_width="wrap_content"

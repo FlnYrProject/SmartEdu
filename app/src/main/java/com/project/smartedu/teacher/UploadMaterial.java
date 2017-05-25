@@ -330,8 +330,195 @@ public class UploadMaterial extends BaseActivity implements FragmentDrawer.Fragm
 
         }
 
+        /*
+        uploadList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+                // selected item
+                String[] product = ((TextView) view).getText().toString().split("\n");
+                final String[] details = new String[4];
+                details[3] = "";
+                int i = 0;
+
+                for (String x : product) {
+                    details[i++] = x;
+                }
+
+                final Dialog dialog = new Dialog(UploadMaterial.this);
+                dialog.setContentView(R.layout.show_upload_details);
+                dialog.setTitle("Upload Details");
+
+                setDialogSize(dialog);
+
+                detailHead = (TextView) dialog.findViewById(R.id.textView20);
+                detailHead.setSelected(true);
+
+                myType = (TextView) dialog.findViewById(R.id.typeDesc);
+                mySubject = (TextView) dialog.findViewById(R.id.subject);
+                myDate = (TextView) dialog.findViewById(R.id.uploadDate);
+                myDueDate = (TextView) dialog.findViewById(R.id.dueDate);
+                imageUpload = (ImageView) dialog.findViewById(R.id.imageUpload);
+                myTopic = (TextView) dialog.findViewById(R.id.topic);
+                okButton = (Button) dialog.findViewById(R.id.doneButton);
+                delButton = (Button) dialog.findViewById(R.id.delButton);
+                viewAllButton = (Button) dialog.findViewById(R.id.viewAll);
+                myType.setText(details[0].trim());
+                myTopic.setText(details[1].trim());
+                mySubject.setText(details[2]);
+
+                final long milliseconds;
+                if (!details[3].equals("")) {
+                    myDueDate.setText(details[3].trim());
+
+                    String[] date = details[3].split("/");
+                    final String[] datedetails = new String[3];
+                    int j = 0;
+
+                    for (String x : date) {
+                        datedetails[j++] = x;
+                    }
+
+                    Day = Integer.parseInt(datedetails[0]);
+                    Month = Integer.parseInt(datedetails[1]);
+                    Year = Integer.parseInt(datedetails[2]);
+
+                    String string_date = String.valueOf(Day) + "-" + String.valueOf(Month) + "-" + String.valueOf(Year);
+                    //Toast.makeText(Tasks.this, "date = " + string_date, Toast.LENGTH_LONG).show();
+                    SimpleDateFormat f = new SimpleDateFormat("dd-MM-yyyy");
+                    Date d = null;
+                    try {
+                        d = f.parse(string_date);
+                    } catch (java.text.ParseException e) {
+                        e.printStackTrace();
+                    }
+                    milliseconds = d.getTime();
+                } else {
+                    myDueDate.setText("Not Set");
+                    milliseconds = 0;
+                }
 
 
+                //Toast.makeText(Tasks.this, "date = " + d.toString() + "ms" + milliseconds, Toast.LENGTH_LONG).show();
+
+                ParseQuery<ParseObject> uploadQuery = ParseQuery.getQuery(ImageUploadsTable.TABLE_NAME);
+                uploadQuery.whereEqualTo(ImageUploadsTable.TOPIC, details[0].trim());
+                uploadQuery.whereEqualTo(ImageUploadsTable.SUBJECT, details[1].trim());
+                uploadQuery.whereEqualTo(ImageUploadsTable.CLASS_REF, ParseObject.createWithoutData(ClassTable.TABLE_NAME, classId));
+                uploadQuery.whereEqualTo(ImageUploadsTable.CREATED_BY_USER_REF, ParseUser.getCurrentUser());
+                uploadQuery.whereEqualTo(ImageUploadsTable.DUE_DATE, milliseconds);
+                uploadQuery.findInBackground(new FindCallback<ParseObject>() {
+                    public void done(List<ParseObject> uploadListRet, com.parse.ParseException e) {
+                        if (e == null) {
+                            if (uploadListRet.size() != 0) {
+                                ParseObject u = (ParseObject) uploadListRet.get(0);
+
+                                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                                final String dateString = formatter.format(new Date(u.getLong(ImageUploadsTable.DATE_UPLOADED)));
+                                myDate.setText(dateString.trim());
+
+                                myType.setText(u.get("type").toString().trim());
+
+                                // if (u.get("imageContent") != null) {
+                                //ArrayList<ParseFile> pFileList = new ArrayList<ParseFile>();
+
+                                List<ParseFile> pFileList = (ArrayList<ParseFile>) u.get(ImageUploadsTable.UPLOAD_CONTENT);
+
+                                if (u.get(ImageUploadsTable.UPLOAD_CONTENT) != null) {
+                                    if (!pFileList.isEmpty()) {
+                                        ParseFile pFile = pFileList.get(0);
+                                        byte[] bitmapdata = new byte[0];  // here it throws error
+                                        try {
+                                            bitmapdata = pFile.getData();
+                                            Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
+                                            imageUpload.setImageBitmap(bitmap);
+                                        } catch (ParseException e1) {
+                                            e1.printStackTrace();
+                                        }
+                                        // Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.length);
+                                    }
+                                }
+
+
+                                //pFileList = u.getList("imageContent");
+                                                        /*ParseFile imageFile = (ParseFile) u.get("imageContent");
+                                                        imageFile.getDataInBackground(new GetDataCallback() {
+                                                            @Override
+                                                            public void done(byte[] data, ParseException e) {
+                                                                if (e == null) {
+                                                                    Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                                                                    imageUpload.setImageBitmap(bmp);
+                                                                } else {
+                                                                    Log.d("test",
+                                                                            "There was a problem downloading the data.");
+                                                                }
+                                                            }
+
+                                                        });
+                                //  } /*
+
+                                uploadid = u.getObjectId();
+                                Log.d("user", "upload id: " + uploadid);
+
+
+                                viewAllButton.setOnClickListener(new View.OnClickListener() {
+
+                                    public void onClick(View v) {
+
+                                        Intent to_upload_image = new Intent(UploadMaterial.this, UploadImage.class);
+                                        to_upload_image.putExtra("classId", classId);
+                                        to_upload_image.putExtra("uploadId", uploadid);
+                                        to_upload_image.putExtra("role", role);
+                                        to_upload_image.putExtra("institution_code", institution_code);
+                                        to_upload_image.putExtra("institution_name", institution_name);
+                                        to_upload_image.putExtra("permission_storage", permission_storage);
+                                        startActivity(to_upload_image);
+                                    */
+        /*
+
+                                    }
+                                });
+
+                                okButton.setOnClickListener(new View.OnClickListener() {
+
+                                    public void onClick(View v) {
+
+                                        dialog.dismiss();
+
+                                    }
+                                });
+
+                                dialog.show();
+
+
+                                delButton.setOnClickListener(new View.OnClickListener() {
+                                    public void onClick(View v) {
+
+                                        ParseObject.createWithoutData(ImageUploadsTable.TABLE_NAME, uploadid).deleteEventually();
+
+
+                                        onRestart();
+
+
+                                        dialog.dismiss();
+
+                                    }
+                                });
+                                dialog.show();
+                                new LoadingSyncList(context,layoutLoading,list).execute();
+                            }
+                        } else {
+                            Log.d("user", "Error: " + e.getMessage());
+                        }
+                    }
+                });
+
+                //dialog.show();
+
+
+            }
+
+
+        }); */
 
 
 
