@@ -124,7 +124,7 @@ public class message_to_teacher extends BaseActivity {
             }
 
 
-            entrylist=sortList(entrylist);
+           // entrylist=sortList(entrylist);
 
             for (int i = 0; i < StudentUserPrefs.teachersuseridLt.size(); i++) {
                 String entry=entrylist.get(i);

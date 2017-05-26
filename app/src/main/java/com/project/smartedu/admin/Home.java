@@ -304,7 +304,7 @@ public class Home extends BaseActivity{
 
 
             int size=AdminUserPrefs.allotmments.size();
-            Toast.makeText(getApplicationContext(),size + " allotments found",Toast.LENGTH_LONG).show();
+         //   Toast.makeText(getApplicationContext(),size + " allotments found",Toast.LENGTH_LONG).show();
 
 
 
@@ -430,7 +430,7 @@ public class Home extends BaseActivity{
             super.onPostExecute(aVoid);
 
             int size=AdminUserPrefs.classes.size();
-            Toast.makeText(getApplicationContext(),size + " classes found",Toast.LENGTH_LONG).show();
+          //  Toast.makeText(getApplicationContext(),size + " classes found",Toast.LENGTH_LONG).show();
 
 
 
@@ -738,7 +738,7 @@ public class Home extends BaseActivity{
             super.onPostExecute(aVoid);
 
             //Show the log in progress_bar for at least a few milliseconds
-           Toast.makeText(getApplicationContext(),teacherLt.size() + " teachers found",Toast.LENGTH_LONG).show();
+      //     Toast.makeText(getApplicationContext(),teacherLt.size() + " teachers found",Toast.LENGTH_LONG).show();
 
 
             AdminUserPrefs.teacherLt=teacherLt;

@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.project.smartedu.BaseActivity;
+import com.project.smartedu.ChooseRole;
 import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
 import com.project.smartedu.UserPrefs;
@@ -105,6 +106,7 @@ public class select_institution extends BaseActivity {
             ArrayAdapter adapter = new ArrayAdapter(select_institution.this, android.R.layout.simple_list_item_1, institutionLt);
 
             institutionList.setAdapter(adapter);
+                Toast.makeText( select_institution.this,"Please Select the institute", Toast.LENGTH_SHORT).show();
 
 
             institutionList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -160,5 +162,10 @@ public class select_institution extends BaseActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+
+            super.onBackPressed();
+            Intent reload=new Intent(select_institution.this,ChooseRole.class);
+            startActivity(reload);
+
     }
 }

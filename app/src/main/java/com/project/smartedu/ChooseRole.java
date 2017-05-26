@@ -342,5 +342,10 @@ UserPrefs userPrefs;
     }
 
 
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent reload=new Intent(ChooseRole.this,ChooseRole.class);
+        startActivity(reload);
+    }
 }

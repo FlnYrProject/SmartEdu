@@ -262,7 +262,7 @@ Spinner teachersex;
 
         databaseReference.child(firebaseUser.getUid()).setValue(String.valueOf(serial));
 
-        Toast.makeText(getApplicationContext(), "Teacher details successfully stored with serial = " + serial, Toast.LENGTH_LONG).show();
+       // Toast.makeText(getApplicationContext(), "Teacher details successfully stored with serial = " + serial, Toast.LENGTH_LONG).show();
 
         loginAdminBack();
 

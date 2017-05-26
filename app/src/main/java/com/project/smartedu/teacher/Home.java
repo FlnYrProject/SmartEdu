@@ -650,7 +650,7 @@ loadNoticeBoardData();
 
 
             int size=TeacherUserPrefs.studentsuseridLt.size();
-            Toast.makeText(getApplicationContext(),size + " total students found",Toast.LENGTH_LONG).show();
+           // Toast.makeText(getApplicationContext(),size + " total students found",Toast.LENGTH_LONG).show();
 
             //Show the log in progress_bar for at least a few milliseconds
 
@@ -1217,7 +1217,7 @@ loadNoticeBoardData();
             super.onPostExecute(aVoid);
 
             //Show the log in progress_bar for at least a few milliseconds
-            Toast.makeText(getApplicationContext(),uploadLt.size() + " uploads found",Toast.LENGTH_LONG).show();
+       //     Toast.makeText(getApplicationContext(),uploadLt.size() + " uploads found",Toast.LENGTH_LONG).show();
 
             UserPrefs.uploadkeymap=uploadkeymap;
            // UserPrefs.uploadidmap=uploadidmap;

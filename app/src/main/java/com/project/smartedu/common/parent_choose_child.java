@@ -28,6 +28,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.project.smartedu.BaseActivity;
+import com.project.smartedu.ChooseRole;
 import com.project.smartedu.Constants;
 import com.project.smartedu.LoginActivity;
 import com.project.smartedu.R;
@@ -233,7 +234,7 @@ ParentUserPrefs.childinsitutionmap.clear();
         drawerFragment.setDrawerListener(this);
 
 
-        Toast.makeText(parent_choose_child.this, "role selected = " +role, Toast.LENGTH_LONG).show();
+     //   Toast.makeText(parent_choose_child.this, "role selected = " +role, Toast.LENGTH_LONG).show();
 
         ChildrenItems childrenitems=new ChildrenItems(parent_choose_child.this);
         childrenitems.execute();
@@ -282,7 +283,7 @@ ParentUserPrefs.childinsitutionmap.clear();
 
 
             childList.setAdapter(adapter);
-
+                Toast.makeText( parent_choose_child.this,"Please Select the child", Toast.LENGTH_SHORT).show();
 
             childList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -330,6 +331,12 @@ ParentUserPrefs.childinsitutionmap.clear();
 
 
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent reload=new Intent(parent_choose_child.this,ChooseRole.class);
+        startActivity(reload);
+    }
 
 
 }
